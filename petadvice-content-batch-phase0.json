@@ -1,0 +1,206 @@
+{
+  "condition_entries": [
+    {
+      "id": "dog-cat-repro-001",
+      "name": "Pyometra (uterine infection)",
+      "species": "both",
+      "category": "urinary_reproductive",
+      "applicable_life_stages": ["young_adult", "mature_adult", "senior"],
+      "environment_factors": [],
+      "breed_predispositions": [],
+      "applicable_sex": ["female"],
+      "applicable_neuter_status": ["intact"],
+      "symptom_tags": ["increased_thirst", "increased_urination", "vaginal_discharge", "distended_abdomen", "lethargy", "vomiting", "loss_of_appetite"],
+      "urgency_default": "emergency_now",
+      "red_flags": [
+        {"description": "Any of the symptoms above occurring within roughly 2-8 weeks of a heat cycle", "escalates_to": "emergency_now"},
+        {"description": "Closed pyometra (no visible discharge) with lethargy, vomiting, or a distended abdomen — often more severe since infection is retained internally", "escalates_to": "emergency_now"}
+      ],
+      "home_care_guidance": null,
+      "prevention_tips": "Spaying removes the uterus entirely and eliminates this risk completely — the only fully reliable prevention.",
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://www.akc.org/expert-advice/dog-breeding/responsible-breeding/danger-intact-females-pyometra/",
+        "https://vetmed.illinois.edu/?p=5580"
+      ]
+    },
+    {
+      "id": "dog-cat-repro-002",
+      "name": "Mammary tumors",
+      "species": "both",
+      "category": "urinary_reproductive",
+      "applicable_life_stages": ["mature_adult", "senior"],
+      "environment_factors": [],
+      "breed_predispositions": [],
+      "applicable_sex": ["female"],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["lump_near_nipple", "swollen_mammary_gland", "discharge_from_gland", "skin_ulceration_on_abdomen"],
+      "urgency_default": "vet_soon",
+      "red_flags": [
+        {"description": "Rapidly growing or ulcerated mass", "escalates_to": "vet_24h"}
+      ],
+      "home_care_guidance": null,
+      "prevention_tips": "Risk is driven heavily by spay timing: dogs spayed before their first heat carry roughly 0.5% lifetime risk vs. ~26% after two heat cycles; cats spayed before 6 months see roughly a 91% risk reduction. This sits in tension with the large-breed joint-disease timing question (prevent-002) — flag that trade-off for large-breed female puppies rather than giving a single default age.",
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://www.acvs.org/?p=5652",
+        "https://www.morrisanimalfoundation.org/article/mammary-cancer-in-dogs-and-cats",
+        "https://www.vet.cornell.edu/departments-centers-and-institutes/riney-canine-health-center/canine-health-information/mammary-cancer"
+      ]
+    },
+    {
+      "id": "dog-repro-003",
+      "name": "Testicular tumor (and cryptorchidism risk)",
+      "species": "dog",
+      "category": "urinary_reproductive",
+      "applicable_life_stages": ["mature_adult", "senior"],
+      "environment_factors": [],
+      "breed_predispositions": ["Boxer", "German Shepherd", "Afghan Hound", "Weimaraner", "Shetland Sheepdog", "Collie", "Maltese"],
+      "applicable_sex": ["male"],
+      "applicable_neuter_status": ["intact"],
+      "symptom_tags": ["testicular_swelling", "testicular_asymmetry", "undescended_testicle"],
+      "urgency_default": "vet_soon",
+      "red_flags": [
+        {"description": "Sudden severe scrotal pain or swelling (possible torsion)", "escalates_to": "emergency_now"}
+      ],
+      "home_care_guidance": null,
+      "prevention_tips": "Neutering eliminates the risk. Especially relevant for cryptorchid dogs (undescended testicle) — a retained testicle carries roughly 13x the tumor risk of a normally descended one; descent should be confirmed by around 6 months of age (see prevent-003).",
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://vcahospitals.com/farmington-hills/know-your-pet/testicular-tumors",
+        "https://dvm360.com/view/testicular-cancer-remains-easily-preventable-disease"
+      ]
+    },
+    {
+      "id": "dog-repro-004",
+      "name": "Prostatic disease (benign hyperplasia, prostatitis)",
+      "species": "dog",
+      "category": "urinary_reproductive",
+      "applicable_life_stages": ["mature_adult", "senior"],
+      "environment_factors": [],
+      "breed_predispositions": [],
+      "applicable_sex": ["male"],
+      "applicable_neuter_status": ["intact"],
+      "symptom_tags": ["straining_to_defecate", "difficulty_urinating", "blood_in_urine", "blood_in_semen", "abdominal_pain"],
+      "urgency_default": "vet_soon",
+      "red_flags": [
+        {"description": "Fever with a painful abdomen (possible prostatic abscess/prostatitis rather than benign enlargement)", "escalates_to": "emergency_now"}
+      ],
+      "home_care_guidance": null,
+      "prevention_tips": "Benign prostatic hyperplasia is a near-universal, hormone-driven change in older intact males and is prevented by neutering. Neutering does not eliminate the (much rarer) risk of prostatic cancer.",
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "NOTE: current source is a veterinary-student flashcard reference (brainscape.com) — replace with a primary clinical/guideline source during content authoring, before this entry ships."
+      ]
+    },
+    {
+      "id": "cat-urinary-001",
+      "name": "Straining to urinate / urethral obstruction",
+      "species": "cat",
+      "category": "urinary_reproductive",
+      "applicable_life_stages": ["young_adult", "mature_adult"],
+      "environment_factors": ["indoor_only", "multi_pet_household"],
+      "breed_predispositions": [],
+      "applicable_sex": ["male"],
+      "applicable_neuter_status": ["neutered"],
+      "symptom_tags": ["straining_to_urinate", "frequent_litter_visits", "vocalizing_in_litter_box", "licking_genital_area"],
+      "urgency_default": "emergency_now",
+      "red_flags": [
+        {"description": "Straining with little or no urine produced, in a neutered male cat", "escalates_to": "emergency_now"},
+        {"description": "Lethargy, vomiting, or collapse on top of straining (signs of the electrolyte imbalance that follows a full blockage)", "escalates_to": "emergency_now"}
+      ],
+      "home_care_guidance": null,
+      "prevention_tips": "Multiple clean litter trays, a wet-food-inclusive diet, maintaining a lean body weight (incidence rises with body condition score), and reducing multi-cat household stress can lower recurrence risk. Intact males and female cats can also be affected but far less often — neutering narrows the urethra, which is why neutered males are the highest-risk group specifically, most often between 2-4 years old.",
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://www.hillspet.com/cat-care/healthcare/male-cat-urinary-blockage",
+        "https://vethelpdirect.com/?p=7623",
+        "https://www.myvetcandy.com/news/2019-3-19-risk-factors-associated-with-urethral-obstruction-in-male-neutered-cats"
+      ]
+    },
+    {
+      "id": "dog-repro-005",
+      "name": "Estrogen-responsive (\"spay\") urinary incontinence",
+      "species": "dog",
+      "category": "urinary_reproductive",
+      "applicable_life_stages": ["mature_adult", "senior"],
+      "environment_factors": [],
+      "breed_predispositions": ["large breed (>20kg) overrepresented"],
+      "applicable_sex": ["female"],
+      "applicable_neuter_status": ["neutered"],
+      "symptom_tags": ["urine_leaking_while_resting", "dribbling_urine", "wet_bedding"],
+      "urgency_default": "vet_soon",
+      "red_flags": [
+        {"description": "Blood in urine, straining, fever, or pain alongside leaking (suggests infection or another cause, not simple hormone-responsive incontinence)", "escalates_to": "vet_24h"}
+      ],
+      "home_care_guidance": "Keep bedding clean and dry in the meantime, but a vet visit is still needed — leaking shouldn't be assumed to be routine spay incontinence until infection, stones, and other causes are ruled out with a urinalysis.",
+      "prevention_tips": "Can't be fully prevented — it's a recognized trade-off of spaying, estimated to affect around 20% of spayed female dogs in commonly cited figures (estimates vary across studies), usually months to years afterward. Large-breed females are more commonly affected.",
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://www.whole-dog-journal.com/?p=517070",
+        "https://www.vetstreet.com/our-pet-experts/what-you-need-to-know-about-spay-incontinence-in-female-dogs",
+        "https://www.aaha.org/publications/newstat/articles/2011-08/fda-oks-incontinence-med/"
+      ]
+    }
+  ],
+  "preventive_care_items": [
+    {
+      "id": "prevent-001",
+      "species": "both",
+      "life_stage": "young_adult",
+      "title": "Recalculate diet after spaying/neutering",
+      "description": "Neutering reduces basal metabolic rate by roughly 25-30% and can increase appetite by up to 60%. Dogs become about twice as likely, and cats about 3.4x as likely, to become obese after the procedure if fed the same as before. Recalculate calorie needs at the post-op check and reassess body condition score every 6 months from then on — middle-aged neutered male cats and middle-aged spayed female dogs are the highest-risk groups.",
+      "recurrence": "one-time diet recalculation at neuter, then body-condition check every 6 months",
+      "trigger_age_days": null,
+      "sources": [
+        "https://www.petfoodindustry.com/articles/11026-virbac-creates-unique-line-of-pet-food",
+        "https://dvm360.com/view/managing-weight-loss-dogs-and-cats-proceedings"
+      ]
+    },
+    {
+      "id": "prevent-002",
+      "species": "dog",
+      "life_stage": "puppy",
+      "title": "Discuss neuter timing for large-breed puppies",
+      "description": "For dogs expected to exceed roughly 20kg (44lb) as adults, UC Davis research (Hart et al.) found neutering before 1 year old was linked to a roughly tripled risk of joint disorders (hip/elbow dysplasia, cranial cruciate ligament tears) in some large breeds. This isn't universal — Great Danes and Irish Wolfhounds didn't show the same pattern, and two small breeds (Boston Terriers, Shih Tzus) showed increased cancer risk with early neutering instead. There's no single rule that fits every breed — surface this as a conversation to have with a vet around the puppy's breed and expected adult size, not a default recommendation the app hands down.",
+      "recurrence": "one-time discussion, ideally before 6 months old",
+      "trigger_age_days": null,
+      "sources": [
+        "https://www.vettimes.com/news/vets/small-animal-vets/early-neutering-large-dogs-may-triple-joint-disease-risk",
+        "https://unfoldpodcast.ucdavis.edu/news/big-dogs-face-more-joint-problems-if-neutered-early",
+        "https://blog.vetprep.com/spay/neuter-timing-a-recap-of-the-debate-for-vet-students"
+      ]
+    },
+    {
+      "id": "prevent-003",
+      "species": "dog",
+      "life_stage": "puppy",
+      "title": "Confirm both testicles have descended by 6 months",
+      "description": "Testicular descent is normally complete by around 3 months of age. If one or both haven't descended by 6 months, flag it at the next vet visit — a retained (cryptorchid) testicle carries roughly 13x the tumor risk of a normally descended one, and early neutering is generally recommended for cryptorchid dogs.",
+      "recurrence": "one-time check around the 6-month vet visit",
+      "trigger_age_days": 180,
+      "sources": [
+        "https://vcahospitals.com/farmington-hills/know-your-pet/testicular-tumors"
+      ]
+    },
+    {
+      "id": "prevent-004",
+      "species": "both",
+      "life_stage": "puppy",
+      "title": "Discuss spay timing before the first heat",
+      "description": "Spaying before a dog's first heat cycle cuts lifetime mammary tumor risk to roughly 0.5% (vs. ~26% after two heat cycles); spaying cats before 6 months cuts their risk by roughly 91%. For large-breed female puppies specifically, weigh this against the joint-disease timing question (prevent-002) — the right timing is a vet conversation, not a fixed age the app should prescribe.",
+      "recurrence": "one-time discussion before the first heat cycle",
+      "trigger_age_days": null,
+      "sources": [
+        "https://www.acvs.org/?p=5652",
+        "https://www.morrisanimalfoundation.org/article/mammary-cancer-in-dogs-and-cats"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+[
+  {
+    "id": "q-urinate-001",
+    "prompt": "How much urine is being produced when straining?",
+    "symptom_tag": "straining_to_urinate",
+    "options": ["Normal amount", "A little", "None at all"],
+    "escalate_if": {"A little": "emergency_now", "None at all": "emergency_now"}
+  },
+  {
+    "id": "q-urinate-002",
+    "prompt": "Is there any vomiting, lethargy, or collapse alongside this?",
+    "symptom_tag": "straining_to_urinate",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "emergency_now"}
+  },
+  {
+    "id": "q-vomit-001",
+    "prompt": "How many times has your pet vomited?",
+    "symptom_tag": "vomiting",
+    "options": ["Once", "2-3 times", "More than 3 times in a few hours"],
+    "escalate_if": {"More than 3 times in a few hours": "vet_24h"}
+  },
+  {
+    "id": "q-vomit-002",
+    "prompt": "Is there blood in the vomit, or a swollen abdomen with unproductive retching?",
+    "symptom_tag": "vomiting",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "emergency_now"}
+  },
+  {
+    "id": "q-diarrhea-001",
+    "prompt": "Is there any blood in the stool, or is it black/tarry?",
+    "symptom_tag": "diarrhea",
+    "options": ["No", "Yes, blood or black/tarry stool"],
+    "escalate_if": {"Yes, blood or black/tarry stool": "vet_24h"}
+  },
+  {
+    "id": "q-diarrhea-002",
+    "prompt": "Is your pet also vomiting, lethargic, or refusing food and water?",
+    "symptom_tag": "diarrhea",
+    "options": ["No, otherwise normal", "Yes"],
+    "escalate_if": {"Yes": "vet_24h"}
+  },
+  {
+    "id": "q-limping-001",
+    "prompt": "Is your dog putting any weight on the leg?",
+    "symptom_tag": "limping",
+    "options": ["Yes, some weight-bearing", "No weight-bearing at all"],
+    "escalate_if": {"No weight-bearing at all": "vet_24h"}
+  },
+  {
+    "id": "q-limping-002",
+    "prompt": "Did this follow a fall, road accident, or other significant trauma?",
+    "symptom_tag": "limping",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "emergency_now"}
+  },
+  {
+    "id": "q-reverse-sneezing-001",
+    "prompt": "How long did the episode last, and did it fully resolve?",
+    "symptom_tag": "reverse_sneezing",
+    "options": ["Under a minute, back to normal", "Over a minute, or hasn't fully resolved"],
+    "escalate_if": {"Over a minute, or hasn't fully resolved": "vet_soon"}
+  },
+  {
+    "id": "q-scratching-001",
+    "prompt": "Any pale gums, weakness, or lethargy alongside the itching?",
+    "symptom_tag": "scratching",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "vet_soon"}
+  }
+]

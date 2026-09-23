@@ -1,0 +1,231 @@
+{
+  "condition_entries": [
+    {
+      "id": "dog-gi-001",
+      "name": "Acute vomiting, isolated episode",
+      "species": "dog",
+      "category": "gastrointestinal",
+      "applicable_life_stages": ["puppy", "young_adult", "mature_adult", "senior"],
+      "environment_factors": [],
+      "breed_predispositions": [],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["vomiting"],
+      "urgency_default": "monitor_home",
+      "red_flags": [
+        {"description": "Puppy or senior dog, or a dog with a known chronic illness", "escalates_to": "vet_soon"},
+        {"description": "Repeated vomiting, three or more times in a few hours", "escalates_to": "vet_24h"},
+        {"description": "Blood in the vomit", "escalates_to": "emergency_now"},
+        {"description": "Swollen or distended abdomen with unproductive retching", "escalates_to": "emergency_now"},
+        {"description": "Known or suspected access to toxins, a foreign object, or chocolate", "escalates_to": "vet_24h"},
+        {"description": "Vomiting alongside lethargy, not drinking, or refusing food beyond one missed meal", "escalates_to": "vet_soon"}
+      ],
+      "home_care_guidance": "For a single vomiting episode in an otherwise well adult dog: withhold food for a few hours (not water), then offer small, frequent amounts of a bland diet such as boiled chicken and white rice. Reintroduce normal food gradually over a few days once appetite and stools are back to normal.",
+      "prevention_tips": "Secure bins and human food, and introduce new foods gradually over 7-10 days rather than all at once.",
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://appmgss.impactfirst.co/post/bland-diet-for-dogs",
+        "https://petfolk.com/petfolklore/dog-diarrhea-causes-home-care-when-to-see-vet"
+      ]
+    },
+    {
+      "id": "cat-gi-001",
+      "name": "Occasional hairballs",
+      "species": "cat",
+      "category": "gastrointestinal",
+      "applicable_life_stages": ["kitten", "young_adult", "mature_adult", "senior"],
+      "environment_factors": [],
+      "breed_predispositions": ["long-haired breeds more prone"],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["vomiting", "retching", "gagging"],
+      "urgency_default": "monitor_home",
+      "red_flags": [
+        {"description": "Hairballs more often than once or twice a month", "escalates_to": "vet_soon"},
+        {"description": "Retching repeatedly without producing a hairball", "escalates_to": "emergency_now"},
+        {"description": "Hairball vomiting alongside appetite loss, lethargy, diarrhea, or constipation", "escalates_to": "vet_soon"},
+        {"description": "Blood in the vomit, or an unusually large, frothy, or discoloured hairball", "escalates_to": "vet_24h"},
+        {"description": "A bloated or hard abdomen, or inability to keep food or water down", "escalates_to": "emergency_now"}
+      ],
+      "home_care_guidance": "An occasional hairball (roughly once a month or less) in a cat who is otherwise eating, drinking, and behaving normally is generally nothing to worry about. Regular brushing reduces how much loose hair they swallow while grooming.",
+      "prevention_tips": "Brush your cat regularly, especially long-haired breeds, and ask your vet about a hairball-control diet or fibre supplement if they're frequent.",
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://www.webvet.com/cat-hairballs/",
+        "https://www.webmd.com/cats/guide/what-to-do-about-hairballs-in-cats"
+      ]
+    },
+    {
+      "id": "dog-cat-gi-002",
+      "name": "Mild acute diarrhea, otherwise well",
+      "species": "both",
+      "category": "gastrointestinal",
+      "applicable_life_stages": ["puppy", "kitten", "young_adult", "mature_adult", "senior"],
+      "environment_factors": [],
+      "breed_predispositions": [],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["diarrhea", "loose_stool"],
+      "urgency_default": "monitor_home",
+      "red_flags": [
+        {"description": "Puppy or kitten, senior pet, or a pet with a known chronic illness", "escalates_to": "vet_soon"},
+        {"description": "Blood in the stool, or black/tarry stool", "escalates_to": "vet_24h"},
+        {"description": "Vomiting alongside the diarrhea", "escalates_to": "vet_soon"},
+        {"description": "Lethargy, refusing food or water, or signs of dehydration such as dry gums or sunken eyes", "escalates_to": "vet_24h"},
+        {"description": "Abdominal pain, bloating, or fever", "escalates_to": "vet_24h"},
+        {"description": "Diarrhea lasting more than 24-48 hours despite home care", "escalates_to": "vet_soon"}
+      ],
+      "home_care_guidance": "For a mild, isolated episode in an otherwise well adult pet: withhold food for 12-24 hours (fresh water always available), then reintroduce a bland diet such as boiled chicken or low-fat hamburger with white rice, in small frequent meals. This bland diet isn't nutritionally balanced long-term — transition back to normal food gradually over a few days once stools firm up.",
+      "prevention_tips": "Introduce new foods gradually over 7-10 days, avoid rich table scraps, and keep parasite prevention up to date.",
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://www.vet.cornell.edu/departments-centers-and-institutes/riney-canine-health-center/canine-health-topics/diarrhea",
+        "https://petfolk.com/petfolklore/what-to-feed-a-dog-with-diarrhea"
+      ]
+    },
+    {
+      "id": "dog-resp-001",
+      "name": "Reverse sneezing episode",
+      "species": "dog",
+      "category": "respiratory",
+      "applicable_life_stages": ["puppy", "young_adult", "mature_adult", "senior"],
+      "environment_factors": ["breed_predisposed"],
+      "breed_predispositions": ["Chihuahua", "Yorkshire Terrier", "Maltese", "Pomeranian", "brachycephalic breeds"],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["reverse_sneezing", "snorting", "honking_noise"],
+      "urgency_default": "monitor_home",
+      "red_flags": [
+        {"description": "Episode lasts longer than 1-2 minutes, or doesn't fully resolve", "escalates_to": "vet_soon"},
+        {"description": "Episodes becoming more frequent or severe", "escalates_to": "vet_soon"},
+        {"description": "Nasal discharge or bloody discharge", "escalates_to": "vet_soon"},
+        {"description": "Collapse, blue or grey gums/tongue, or struggling to breathe even outside the episode", "escalates_to": "emergency_now"}
+      ],
+      "home_care_guidance": "Reverse sneezing (a rapid, repeated snorting or honking inhale) looks alarming but is usually a brief, harmless reflex from throat/soft-palate irritation. Stay calm — panicking tends to prolong it. Gently stroking the throat or briefly covering the nostrils to encourage a swallow can help end an episode sooner. It typically resolves in well under a minute with no lasting effect.",
+      "prevention_tips": "Reduce exposure to dust, strong perfumes, and other airborne irritants. It's more common in small and brachycephalic breeds due to airway anatomy and isn't generally preventable beyond that.",
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/reverse-sneezing-in-dogs",
+        "https://www.joiipetcare.com/blogs/health-conditions/reverse-sneezing-in-dogs"
+      ]
+    },
+    {
+      "id": "dog-derm-001",
+      "name": "Early, mild hot spot (acute moist dermatitis)",
+      "species": "dog",
+      "category": "dermatological",
+      "applicable_life_stages": ["puppy", "young_adult", "mature_adult", "senior"],
+      "environment_factors": ["outdoor_access"],
+      "breed_predispositions": ["thick or double-coated breeds"],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["localized_itching", "red_moist_skin", "hair_loss_patch"],
+      "urgency_default": "monitor_home",
+      "red_flags": [
+        {"description": "The area is painful to touch, or your dog won't let you examine it", "escalates_to": "vet_soon"},
+        {"description": "Increasing in size or depth despite home care", "escalates_to": "vet_soon"},
+        {"description": "Discharge, pus, a foul smell, or persistent bleeding", "escalates_to": "vet_soon"},
+        {"description": "No improvement within 1-2 days of starting home care", "escalates_to": "vet_soon"},
+        {"description": "Fever or lethargy alongside the skin lesion", "escalates_to": "vet_soon"}
+      ],
+      "home_care_guidance": "If the spot is small, non-painful, and caught early: gently trim (clippers, not scissors) the fur around it so air reaches the skin, clean gently with a dilute, pet-safe antiseptic — never hydrogen peroxide or alcohol, which damage tissue — and prevent licking with a cone if needed. Leave it uncovered; it needs to stay dry, not bandaged. Never use human topical ointments — some common ingredients like zinc oxide are toxic to dogs.",
+      "prevention_tips": "Keep flea/parasite prevention current (a flea bite is a common trigger), and address matting or trapped moisture in thick coats promptly.",
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://www.goodrx.com/pet-health/dog/hot-spot-treatment-for-dogs-at-home",
+        "https://dutch.com/blogs/dogs/hot-spot-on-dog"
+      ]
+    },
+    {
+      "id": "dog-cat-wound-001",
+      "name": "Minor cut or scrape",
+      "species": "both",
+      "category": "dermatological",
+      "applicable_life_stages": ["puppy", "kitten", "young_adult", "mature_adult", "senior"],
+      "environment_factors": ["outdoor_access", "multi_pet_household"],
+      "breed_predispositions": [],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["minor_bleeding", "small_wound", "scrape"],
+      "urgency_default": "monitor_home",
+      "red_flags": [
+        {"description": "Any bite wound, even a small one, has a high infection risk regardless of size", "escalates_to": "vet_soon"},
+        {"description": "Bleeding doesn't stop after about 10-15 minutes of firm, continuous pressure", "escalates_to": "vet_24h"},
+        {"description": "The wound is deep, over roughly 1cm long, or exposes fat, muscle, or bone", "escalates_to": "vet_24h"},
+        {"description": "Wound near a joint or on the face", "escalates_to": "vet_soon"},
+        {"description": "Signs of infection develop: redness, swelling, pus, odor, warmth, or your pet seems unwell", "escalates_to": "vet_soon"},
+        {"description": "Heavy or uncontrolled bleeding, pale gums, or weakness", "escalates_to": "emergency_now"}
+      ],
+      "home_care_guidance": "For a small, shallow scrape or cut with only minor bleeding: apply gentle, steady pressure with a clean cloth until bleeding stops, then rinse with clean water (skip strong antiseptics and any human ointment). Keep your pet from licking it — a recovery cone helps — and check it daily for the next few days for signs of infection.",
+      "prevention_tips": "Supervised outdoor time and trimmed nails reduce injury risk; in multi-pet households, separate pets during high-arousal play or feeding to reduce fight-related bite wounds.",
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://www.webvet.com/symptom-checker/cat/wounds-and-bleeding/",
+        "https://www.pumpkin.care/post/dog-wound-care"
+      ]
+    },
+    {
+      "id": "dog-cat-parasite-001",
+      "name": "Mild flea infestation",
+      "species": "both",
+      "category": "parasites",
+      "applicable_life_stages": ["puppy", "kitten", "young_adult", "mature_adult", "senior"],
+      "environment_factors": ["outdoor_access", "multi_pet_household", "seasonal_summer"],
+      "breed_predispositions": [],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["scratching", "flea_dirt", "hair_loss_patch", "itchy_skin"],
+      "urgency_default": "monitor_home",
+      "red_flags": [
+        {"description": "Puppy, kitten, senior, or a small/frail pet showing pale gums, weakness, or lethargy (possible flea-related anaemia)", "escalates_to": "vet_soon"},
+        {"description": "Widespread hair loss, broken skin, or signs of a significant allergic reaction (flea allergy dermatitis)", "escalates_to": "vet_soon"},
+        {"description": "Accidental exposure of a cat to a dog flea product or household flea spray containing permethrin", "escalates_to": "emergency_now"}
+      ],
+      "home_care_guidance": "Comb your pet with a fine-toothed flea comb, and use a vet-recommended, species-appropriate flea treatment on every cat, dog (and rabbit) in the household on the same day. Most of a flea problem lives in your home, not on your pet, so wash bedding at 60°C+ and vacuum thoroughly, including furniture, to catch eggs and larvae too.",
+      "prevention_tips": "Year-round vet-recommended flea prevention is far more effective than reactive treatment. CRITICAL: never use a dog flea product on a cat — many contain permethrin, which is highly toxic (potentially fatal) to cats.",
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/fleas-on-cats",
+        "https://www.pdsa.org.uk/media/5834/phh_dog_c_fleas-on-dogs.pdf"
+      ]
+    },
+    {
+      "id": "dog-musculo-001",
+      "name": "Mild limping after exercise",
+      "species": "dog",
+      "category": "musculoskeletal",
+      "applicable_life_stages": ["puppy", "young_adult", "mature_adult", "senior"],
+      "environment_factors": [],
+      "breed_predispositions": [],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["limping", "favoring_a_leg"],
+      "urgency_default": "monitor_home",
+      "red_flags": [
+        {"description": "Puppy limping", "escalates_to": "vet_soon"},
+        {"description": "Not putting any weight on the leg at all", "escalates_to": "vet_24h"},
+        {"description": "Crying, yelping, or clear pain when the leg is touched", "escalates_to": "vet_24h"},
+        {"description": "Visible swelling, heat, an open wound, or the leg looks bent or out of place", "escalates_to": "vet_24h"},
+        {"description": "Follows a fall, being hit by a car, or other significant trauma", "escalates_to": "emergency_now"},
+        {"description": "No improvement after 24-48 hours of rest, or the limp is recurring", "escalates_to": "vet_soon"},
+        {"description": "Lethargy, not eating, or generally unwell alongside the limp", "escalates_to": "vet_soon"}
+      ],
+      "home_care_guidance": "If your dog is still bearing some weight, shows no pain when the leg is gently touched, and is otherwise eating and behaving normally: rest is the treatment. Keep walks to short, slow, on-lead toilet breaks only, avoid stairs and jumping, and don't let them run or play for 24-48 hours. Most mild strains improve noticeably within that window.",
+      "prevention_tips": "Warm up before intense exercise and avoid sudden increases in activity level, especially in dogs who are out of condition.",
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://www.joiipetcare.com/blogs/health-symptoms/limping-in-dogs",
+        "https://bowwowinsurance.com.au/?p=35644"
+      ]
+    }
+  ],
+  "preventive_care_items": []
+}
