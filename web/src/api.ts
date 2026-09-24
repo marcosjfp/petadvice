@@ -44,7 +44,7 @@ export const api = {
   listConditions: (species: string) => request<Condition[]>(`/conditions?species=${species}`),
   listPreventive: (species: string, lifeStage: string) => request<Condition[]>(`/preventive-care?species=${species}&life_stage=${lifeStage}`),
   questions: (symptom: string) => request<Question[]>(`/triage/questions?symptom_tag=${symptom}`),
-  startTriage: (petId: string, symptom: string) => request<TriageStart>('/triage/start', { method: 'POST', body: JSON.stringify({ pet_id: petId, symptom_tag: symptom }) }),
+  startTriage: (petId: string | null, symptom: string, species: 'dog' | 'cat' = 'dog') => request<TriageStart>('/triage/start', { method: 'POST', body: JSON.stringify({ pet_id: petId, symptom_tag: symptom, species }) }),
   answer: (sessionId: string, questionId: string, answer: string) => request<TriageAnswer>('/triage/' + sessionId + '/answer', { method: 'POST', body: JSON.stringify({ question_id: questionId, answer }) }),
   result: (sessionId: string) => request<TriageResult>('/triage/' + sessionId + '/result'),
 }

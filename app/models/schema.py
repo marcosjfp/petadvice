@@ -102,7 +102,7 @@ class Owner(SQLModel, table=True):
 
 class Pet(SQLModel, table=True):
     id: str = Field(default_factory=_new_id, primary_key=True)
-    owner_id: str = Field(index=True, foreign_key="owner.id")
+    owner_id: Optional[str] = Field(default=None, index=True, foreign_key="owner.id")
     name: str
     species: Species
     breed: Optional[str] = None
@@ -189,8 +189,9 @@ class PetCreate(BaseModel):
 
 
 class TriageStartRequest(BaseModel):
-    pet_id: str
+    pet_id: Optional[str] = None
     symptom_tag: str
+    species: Species = Species.dog
 
 
 class TriageAnswerRequest(BaseModel):

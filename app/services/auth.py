@@ -55,3 +55,16 @@ def get_current_owner(
     if owner is None:
         raise HTTPException(status_code=401, detail="Owner not found")
     return owner
+
+
+def get_optional_owner(
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer_scheme),
+    db: Session = Depends(get_session),
+) -> Owner | None:
+    if credentials is None:
+        return None
+    owner_id = decode_access_token(credentials.credentials)
+    owner = db.get(Owner, owner_id)
+    if owner is None:
+        raise HTTPException(status_code=401, detail="Owner not found")
+    return owner

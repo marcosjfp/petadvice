@@ -109,3 +109,30 @@ def test_signup_validation_and_data_lifecycle(client):
     deleted = client.delete("/auth/me", headers=headers)
     assert deleted.status_code == 200
     assert client.get("/auth/me", headers=headers).status_code == 401
+
+
+def test_guest_can_complete_quick_check_without_login(client):
+    started = client.post(
+        "/triage/start",
+        json={"symptom_tag": "vomiting", "species": "dog"},
+    )
+    assert started.status_code == 200
+    session_id = started.json()["session_id"]
+    question = started.json()["next_question"]
+    answers = {
+        "q-vomit-001": "Once",
+        "q-vomit-002": "No, neither",
+        "q-vomit-003": "No",
+        "q-vomit-004": "Normal energy and appetite",
+    }
+    while question is not None:
+        answer = answers[question["id"]]
+        response = client.post(
+            f"/triage/{session_id}/answer",
+            json={"question_id": question["id"], "answer": answer},
+        )
+        assert response.status_code == 200
+        question = response.json()["next_question"]
+    result = client.get(f"/triage/{session_id}/result")
+    assert result.status_code == 200
+    assert result.json()["resulting_urgency"] == "monitor_home"

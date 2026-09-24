@@ -5,7 +5,7 @@ from app.content.loader import content_library
 from app.db import get_session
 from app.models.schema import Owner, Pet, TriageAnswerRequest, TriageSession, TriageStartRequest
 from app.services import triage_engine
-from app.services.auth import get_current_owner
+from app.services.auth import get_optional_owner
 
 router = APIRouter(prefix="/triage", tags=["triage"])
 
@@ -17,10 +17,14 @@ def _get_owned_pet(db: Session, pet_id: str, owner: Owner) -> Pet:
     return pet
 
 
-def _verify_session_ownership(db: Session, session_id: str, owner: Owner) -> None:
+def _verify_session_ownership(db: Session, session_id: str, owner: Owner | None) -> None:
     session = db.get(TriageSession, session_id)
     pet = db.get(Pet, session.pet_id) if session else None
-    if session is None or pet is None or pet.owner_id != owner.id:
+    if session is None or pet is None:
+        raise HTTPException(status_code=404, detail="Triage session not found")
+    if owner is None and pet.owner_id is not None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    if owner is not None and pet.owner_id != owner.id:
         raise HTTPException(status_code=404, detail="Triage session not found")
 
 
@@ -33,10 +37,20 @@ def get_triage_questions(symptom_tag: str):
 @router.post("/start")
 def start_triage(
     payload: TriageStartRequest,
-    current_owner: Owner = Depends(get_current_owner),
+    current_owner: Owner | None = Depends(get_optional_owner),
     db: Session = Depends(get_session),
 ):
-    pet = _get_owned_pet(db, payload.pet_id, current_owner)
+    if payload.pet_id is None:
+        if current_owner is not None:
+            raise HTTPException(status_code=422, detail="pet_id is required for an account check")
+        pet = Pet(name="Guest pet", species=payload.species)
+        db.add(pet)
+        db.commit()
+        db.refresh(pet)
+    else:
+        if current_owner is None:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        pet = _get_owned_pet(db, payload.pet_id, current_owner)
     session, first_question = triage_engine.start_session(db, pet, payload.symptom_tag)
     return {"session_id": session.id, "next_question": first_question, "flow_complete": first_question is None}
 
@@ -45,7 +59,7 @@ def start_triage(
 def answer_triage(
     session_id: str,
     payload: TriageAnswerRequest,
-    current_owner: Owner = Depends(get_current_owner),
+    current_owner: Owner | None = Depends(get_optional_owner),
     db: Session = Depends(get_session),
 ):
     _verify_session_ownership(db, session_id, current_owner)
@@ -61,7 +75,7 @@ def answer_triage(
 @router.get("/{session_id}/result")
 def get_triage_result(
     session_id: str,
-    current_owner: Owner = Depends(get_current_owner),
+    current_owner: Owner | None = Depends(get_optional_owner),
     db: Session = Depends(get_session),
 ):
     _verify_session_ownership(db, session_id, current_owner)
