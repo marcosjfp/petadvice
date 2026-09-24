@@ -119,6 +119,7 @@ class TriageSession(SQLModel, table=True):
     started_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     symptom_entry_point: str
     answers_json: str = "{}"
+    current_question_id: Optional[str] = None
     resulting_urgency: Optional[UrgencyLevel] = None
     resulting_guidance: Optional[str] = None
     condition_entries_matched_raw: str = ""
@@ -142,8 +143,11 @@ class ConditionEntry(BaseModel):
     symptom_tags: list[str]
     urgency_default: UrgencyLevel
     red_flags: list[RedFlag] = PydanticField(default_factory=list)
+    life_stage_escalation: dict[str, UrgencyLevel] = PydanticField(default_factory=dict)
     home_care_guidance: Optional[str] = None
     prevention_tips: Optional[str] = None
+    possible_causes: list[str] = PydanticField(default_factory=list)
+    recommended_examinations: list[str] = PydanticField(default_factory=list)
     vet_reviewed_by: Optional[str] = None
     last_reviewed_date: Optional[date] = None
     sources: list[str] = PydanticField(default_factory=list)
@@ -155,6 +159,8 @@ class TriageQuestion(BaseModel):
     symptom_tag: str
     options: list[str]
     escalate_if: dict[str, UrgencyLevel] = PydanticField(default_factory=dict)
+    is_entry_point: bool = False
+    next_question_by_answer: dict[str, str] = PydanticField(default_factory=dict)
 
 
 class PreventiveCareItem(BaseModel):
@@ -196,3 +202,5 @@ class TriageResult(BaseModel):
     resulting_urgency: UrgencyLevel
     resulting_guidance: str
     matched_condition_ids: list[str]
+    possible_causes: list[str] = PydanticField(default_factory=list)
+    recommended_examinations: list[str] = PydanticField(default_factory=list)

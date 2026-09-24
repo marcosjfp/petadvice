@@ -52,6 +52,9 @@ class ContentLibrary:
     def condition_by_id(self, condition_id: str) -> ConditionEntry | None:
         return next((condition for condition in self.conditions if condition.id == condition_id), None)
 
+    def question_by_id(self, question_id: str) -> TriageQuestion | None:
+        return next((question for question in self.questions if question.id == question_id), None)
+
     def questions_for_symptom(self, symptom_tag: str) -> list[TriageQuestion]:
         return [question for question in self.questions if question.symptom_tag == symptom_tag]
 

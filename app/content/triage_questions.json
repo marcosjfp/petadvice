@@ -1,72 +1,112 @@
 [
   {
+    "id": "q-vomit-001",
+    "prompt": "How many times has your pet vomited?",
+    "symptom_tag": "vomiting",
+    "options": ["Once", "2-3 times", "More than 3 times in a few hours"],
+    "escalate_if": {"More than 3 times in a few hours": "vet_24h"},
+    "is_entry_point": true,
+    "next_question_by_answer": {"Once": "q-vomit-002", "2-3 times": "q-vomit-002", "More than 3 times in a few hours": "q-vomit-002"}
+  },
+  {
+    "id": "q-vomit-002",
+    "prompt": "Is there blood in the vomit, or a swollen/bloated abdomen with unproductive retching (trying to vomit but nothing comes up)?",
+    "symptom_tag": "vomiting",
+    "options": ["No, neither", "Yes"],
+    "escalate_if": {"Yes": "emergency_now"},
+    "next_question_by_answer": {"No, neither": "q-vomit-003"}
+  },
+  {
+    "id": "q-vomit-003",
+    "prompt": "Any known or possible access to something toxic, a foreign object, or chocolate?",
+    "symptom_tag": "vomiting",
+    "options": ["No", "Yes, possible or known access"],
+    "escalate_if": {"Yes, possible or known access": "vet_24h"},
+    "next_question_by_answer": {"No": "q-vomit-004", "Yes, possible or known access": "q-vomit-004"}
+  },
+  {
+    "id": "q-vomit-004",
+    "prompt": "How is your pet's energy and appetite — any lethargy, or refusing food and water?",
+    "symptom_tag": "vomiting",
+    "options": ["Normal energy and appetite", "Lethargy, not eating, or not drinking"],
+    "escalate_if": {"Lethargy, not eating, or not drinking": "vet_soon"},
+    "next_question_by_answer": {}
+  },
+  {
     "id": "q-urinate-001",
     "prompt": "How much urine is being produced when straining?",
     "symptom_tag": "straining_to_urinate",
     "options": ["Normal amount", "A little", "None at all"],
-    "escalate_if": {"A little": "emergency_now", "None at all": "emergency_now"}
+    "escalate_if": {"A little": "emergency_now", "None at all": "emergency_now"},
+    "is_entry_point": true,
+    "next_question_by_answer": {"Normal amount": "q-urinate-002"}
   },
   {
     "id": "q-urinate-002",
     "prompt": "Is there any vomiting, lethargy, or collapse alongside this?",
     "symptom_tag": "straining_to_urinate",
     "options": ["No", "Yes"],
-    "escalate_if": {"Yes": "emergency_now"}
-  },
-  {
-    "id": "q-vomit-001",
-    "prompt": "How many times has your pet vomited?",
-    "symptom_tag": "vomiting",
-    "options": ["Once", "2-3 times", "More than 3 times in a few hours"],
-    "escalate_if": {"More than 3 times in a few hours": "vet_24h"}
-  },
-  {
-    "id": "q-vomit-002",
-    "prompt": "Is there blood in the vomit, or a swollen abdomen with unproductive retching?",
-    "symptom_tag": "vomiting",
-    "options": ["No", "Yes"],
-    "escalate_if": {"Yes": "emergency_now"}
+    "escalate_if": {"Yes": "emergency_now"},
+    "next_question_by_answer": {}
   },
   {
     "id": "q-diarrhea-001",
     "prompt": "Is there any blood in the stool, or is it black/tarry?",
     "symptom_tag": "diarrhea",
     "options": ["No", "Yes, blood or black/tarry stool"],
-    "escalate_if": {"Yes, blood or black/tarry stool": "vet_24h"}
+    "escalate_if": {"Yes, blood or black/tarry stool": "vet_24h"},
+    "is_entry_point": true,
+    "next_question_by_answer": {"No": "q-diarrhea-002", "Yes, blood or black/tarry stool": "q-diarrhea-002"}
   },
   {
     "id": "q-diarrhea-002",
     "prompt": "Is your pet also vomiting, lethargic, or refusing food and water?",
     "symptom_tag": "diarrhea",
     "options": ["No, otherwise normal", "Yes"],
-    "escalate_if": {"Yes": "vet_24h"}
+    "escalate_if": {"Yes": "vet_24h"},
+    "next_question_by_answer": {}
   },
   {
     "id": "q-limping-001",
     "prompt": "Is your dog putting any weight on the leg?",
     "symptom_tag": "limping",
     "options": ["Yes, some weight-bearing", "No weight-bearing at all"],
-    "escalate_if": {"No weight-bearing at all": "vet_24h"}
+    "escalate_if": {"No weight-bearing at all": "vet_24h"},
+    "is_entry_point": true,
+    "next_question_by_answer": {"Yes, some weight-bearing": "q-limping-002", "No weight-bearing at all": "q-limping-002"}
   },
   {
     "id": "q-limping-002",
     "prompt": "Did this follow a fall, road accident, or other significant trauma?",
     "symptom_tag": "limping",
     "options": ["No", "Yes"],
-    "escalate_if": {"Yes": "emergency_now"}
+    "escalate_if": {"Yes": "emergency_now"},
+    "next_question_by_answer": {"No": "q-limping-003"}
+  },
+  {
+    "id": "q-limping-003",
+    "prompt": "Any visible swelling, heat, wound, or pain when the leg is touched?",
+    "symptom_tag": "limping",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "vet_24h"},
+    "next_question_by_answer": {}
   },
   {
     "id": "q-reverse-sneezing-001",
     "prompt": "How long did the episode last, and did it fully resolve?",
     "symptom_tag": "reverse_sneezing",
     "options": ["Under a minute, back to normal", "Over a minute, or hasn't fully resolved"],
-    "escalate_if": {"Over a minute, or hasn't fully resolved": "vet_soon"}
+    "escalate_if": {"Over a minute, or hasn't fully resolved": "vet_soon"},
+    "is_entry_point": true,
+    "next_question_by_answer": {}
   },
   {
     "id": "q-scratching-001",
     "prompt": "Any pale gums, weakness, or lethargy alongside the itching?",
     "symptom_tag": "scratching",
     "options": ["No", "Yes"],
-    "escalate_if": {"Yes": "vet_soon"}
+    "escalate_if": {"Yes": "vet_soon"},
+    "is_entry_point": true,
+    "next_question_by_answer": {}
   }
 ]

@@ -12,8 +12,8 @@
       "applicable_neuter_status": [],
       "symptom_tags": ["vomiting"],
       "urgency_default": "monitor_home",
+      "life_stage_escalation": {"puppy": "vet_soon", "senior": "vet_soon"},
       "red_flags": [
-        {"description": "Puppy or senior dog, or a dog with a known chronic illness", "escalates_to": "vet_soon"},
         {"description": "Repeated vomiting, three or more times in a few hours", "escalates_to": "vet_24h"},
         {"description": "Blood in the vomit", "escalates_to": "emergency_now"},
         {"description": "Swollen or distended abdomen with unproductive retching", "escalates_to": "emergency_now"},
@@ -22,6 +22,19 @@
       ],
       "home_care_guidance": "For a single vomiting episode in an otherwise well adult dog: withhold food for a few hours (not water), then offer small, frequent amounts of a bland diet such as boiled chicken and white rice. Reintroduce normal food gradually over a few days once appetite and stools are back to normal.",
       "prevention_tips": "Secure bins and human food, and introduce new foods gradually over 7-10 days rather than all at once.",
+      "possible_causes": [
+        "Dietary indiscretion — scavenging, a sudden food change, or rich/fatty treats",
+        "Mild gastritis",
+        "Motion sickness",
+        "Intestinal parasites",
+        "Less commonly: obstruction, pancreatitis, or toxin ingestion — this is exactly what the red flags above are checking for"
+      ],
+      "recommended_examinations": [
+        "A physical exam and abdominal palpation",
+        "Bloodwork, if vomiting persists or your pet seems unwell, to check organ function and rule out other causes",
+        "Abdominal X-rays or ultrasound, if a foreign object or obstruction is suspected",
+        "Fecal testing, if parasites are a possibility"
+      ],
       "vet_reviewed_by": null,
       "last_reviewed_date": null,
       "sources": [
