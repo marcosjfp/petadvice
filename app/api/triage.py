@@ -3,10 +3,25 @@ from sqlmodel import Session
 
 from app.content.loader import content_library
 from app.db import get_session
-from app.models.schema import Pet, TriageAnswerRequest, TriageStartRequest
+from app.models.schema import Owner, Pet, TriageAnswerRequest, TriageSession, TriageStartRequest
 from app.services import triage_engine
+from app.services.auth import get_current_owner
 
 router = APIRouter(prefix="/triage", tags=["triage"])
+
+
+def _get_owned_pet(db: Session, pet_id: str, owner: Owner) -> Pet:
+    pet = db.get(Pet, pet_id)
+    if pet is None or pet.owner_id != owner.id:
+        raise HTTPException(status_code=404, detail="Pet not found")
+    return pet
+
+
+def _verify_session_ownership(db: Session, session_id: str, owner: Owner) -> None:
+    session = db.get(TriageSession, session_id)
+    pet = db.get(Pet, session.pet_id) if session else None
+    if session is None or pet is None or pet.owner_id != owner.id:
+        raise HTTPException(status_code=404, detail="Triage session not found")
 
 
 @router.get("/questions")
@@ -16,16 +31,24 @@ def get_triage_questions(symptom_tag: str):
 
 
 @router.post("/start")
-def start_triage(payload: TriageStartRequest, db: Session = Depends(get_session)):
-    pet = db.get(Pet, payload.pet_id)
-    if pet is None:
-        raise HTTPException(status_code=404, detail="Pet not found")
+def start_triage(
+    payload: TriageStartRequest,
+    current_owner: Owner = Depends(get_current_owner),
+    db: Session = Depends(get_session),
+):
+    pet = _get_owned_pet(db, payload.pet_id, current_owner)
     session, first_question = triage_engine.start_session(db, pet, payload.symptom_tag)
     return {"session_id": session.id, "next_question": first_question, "flow_complete": first_question is None}
 
 
 @router.post("/{session_id}/answer")
-def answer_triage(session_id: str, payload: TriageAnswerRequest, db: Session = Depends(get_session)):
+def answer_triage(
+    session_id: str,
+    payload: TriageAnswerRequest,
+    current_owner: Owner = Depends(get_current_owner),
+    db: Session = Depends(get_session),
+):
+    _verify_session_ownership(db, session_id, current_owner)
     try:
         _, next_question, flow_complete = triage_engine.answer_question(db, session_id, payload)
     except triage_engine.UnknownSessionError:
@@ -36,7 +59,12 @@ def answer_triage(session_id: str, payload: TriageAnswerRequest, db: Session = D
 
 
 @router.get("/{session_id}/result")
-def get_triage_result(session_id: str, db: Session = Depends(get_session)):
+def get_triage_result(
+    session_id: str,
+    current_owner: Owner = Depends(get_current_owner),
+    db: Session = Depends(get_session),
+):
+    _verify_session_ownership(db, session_id, current_owner)
     try:
         return triage_engine.compute_result(db, session_id)
     except triage_engine.UnknownSessionError:

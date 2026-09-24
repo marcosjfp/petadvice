@@ -5,7 +5,7 @@ from datetime import date, datetime, timezone
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, Field as PydanticField
+from pydantic import BaseModel, Field as PydanticField, field_validator
 from sqlalchemy import JSON, Column
 from sqlmodel import Field, SQLModel
 
@@ -95,6 +95,8 @@ def _new_id() -> str:
 class Owner(SQLModel, table=True):
     id: str = Field(default_factory=_new_id, primary_key=True)
     email: str = Field(index=True, unique=True)
+    hashed_password: str
+    consent_given_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
@@ -175,7 +177,6 @@ class PreventiveCareItem(BaseModel):
 
 
 class PetCreate(BaseModel):
-    owner_id: str
     name: str
     species: Species
     breed: Optional[str] = None
@@ -204,3 +205,39 @@ class TriageResult(BaseModel):
     matched_condition_ids: list[str]
     possible_causes: list[str] = PydanticField(default_factory=list)
     recommended_examinations: list[str] = PydanticField(default_factory=list)
+
+
+class OwnerSignup(BaseModel):
+    email: str
+    password: str
+    privacy_policy_accepted: bool
+
+    @field_validator("password")
+    @classmethod
+    def password_min_length(cls, value: str) -> str:
+        if len(value) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        return value
+
+    @field_validator("privacy_policy_accepted")
+    @classmethod
+    def must_accept_privacy_policy(cls, value: bool) -> bool:
+        if not value:
+            raise ValueError("You must accept the privacy policy to create an account")
+        return value
+
+
+class OwnerLogin(BaseModel):
+    email: str
+    password: str
+
+
+class OwnerPublic(BaseModel):
+    id: str
+    email: str
+    created_at: datetime
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"

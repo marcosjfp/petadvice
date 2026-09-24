@@ -4,7 +4,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import conditions, pets, preventive_care, triage
+from app.api import auth, conditions, pets, preventive_care, triage
 from app.content.loader import content_library
 from app.db import init_db
 
@@ -28,6 +28,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(pets.router)
+app.include_router(auth.router)
 app.include_router(conditions.router)
 app.include_router(triage.router)
 app.include_router(preventive_care.router)
