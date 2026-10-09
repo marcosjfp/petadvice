@@ -37,6 +37,9 @@ class ContentLibrary:
             questions = []
             if QUESTIONS_FILE.exists():
                 questions = [TriageQuestion.model_validate(item) for item in json.loads(QUESTIONS_FILE.read_text())]
+            self._validate_questions(questions)
+            if len({item.id for item in preventive_items}) != len(preventive_items):
+                raise ValueError("Duplicate preventive care id across batches")
             invalid_home_care = [item.id for item in conditions if item.urgency_default != UrgencyLevel.monitor_home and item.home_care_guidance]
             if invalid_home_care:
                 raise ValueError(f"home_care_guidance is only allowed for monitor_home entries: {invalid_home_care}")
@@ -45,6 +48,42 @@ class ContentLibrary:
         self.conditions = conditions
         self.preventive_items = preventive_items
         self.questions = questions
+
+    @staticmethod
+    def _validate_questions(questions: list[TriageQuestion]) -> None:
+        by_id = {question.id: question for question in questions}
+        if len(by_id) != len(questions):
+            raise ValueError("Duplicate triage question id")
+        for question in questions:
+            options = set(question.options)
+            if not options or len(options) != len(question.options):
+                raise ValueError(f"Question needs unique options: {question.id}")
+            if not (set(question.escalate_if) | set(question.next_question_by_answer)) <= options:
+                raise ValueError(f"Question references an invalid answer: {question.id}")
+            for next_id in question.next_question_by_answer.values():
+                target = by_id.get(next_id)
+                if target is None or target.symptom_tag != question.symptom_tag:
+                    raise ValueError(f"Invalid question branch: {question.id} -> {next_id}")
+        visiting: set[str] = set()
+        visited: set[str] = set()
+
+        def visit(question_id: str) -> None:
+            if question_id in visiting:
+                raise ValueError(f"Cycle in triage questions: {question_id}")
+            if question_id in visited:
+                return
+            visiting.add(question_id)
+            for next_id in by_id[question_id].next_question_by_answer.values():
+                visit(next_id)
+            visiting.remove(question_id)
+            visited.add(question_id)
+
+        for question in questions:
+            visit(question.id)
+        for symptom in {question.symptom_tag for question in questions}:
+            group = [question for question in questions if question.symptom_tag == symptom]
+            if sum(question.is_entry_point for question in group) != 1:
+                raise ValueError(f"Symptom needs exactly one entry question: {symptom}")
 
     def conditions_for_symptom(self, symptom_tag: str) -> list[ConditionEntry]:
         return [condition for condition in self.conditions if symptom_tag in condition.symptom_tags]

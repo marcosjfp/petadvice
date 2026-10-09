@@ -5,7 +5,7 @@ from datetime import date, datetime, timezone
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, Field as PydanticField, field_validator
+from pydantic import BaseModel, EmailStr, Field as PydanticField, field_validator
 from sqlalchemy import JSON, Column
 from sqlmodel import Field, SQLModel
 
@@ -177,21 +177,47 @@ class PreventiveCareItem(BaseModel):
 
 
 class PetCreate(BaseModel):
-    name: str
+    name: str = PydanticField(min_length=1, max_length=100)
     species: Species
     breed: Optional[str] = None
     breed_size: Optional[BreedSize] = None
     date_of_birth: Optional[date] = None
     sex: Optional[Sex] = None
     neutered: Optional[bool] = None
-    weight_kg: Optional[float] = None
+    weight_kg: Optional[float] = PydanticField(default=None, gt=0, le=200, allow_inf_nan=False)
     environment_factors: list[EnvironmentFactor] = PydanticField(default_factory=list)
+
+    @field_validator("name", mode="before")
+    @classmethod
+    def trim_name(cls, value: str) -> str:
+        return value.strip() if isinstance(value, str) else value
+
+    @field_validator("species")
+    @classmethod
+    def individual_species(cls, value: Species) -> Species:
+        if value == Species.both:
+            raise ValueError("Choose dog or cat for a pet")
+        return value
+
+    @field_validator("date_of_birth")
+    @classmethod
+    def birth_date_not_future(cls, value: date | None) -> date | None:
+        if value and value > date.today():
+            raise ValueError("Date of birth cannot be in the future")
+        return value
 
 
 class TriageStartRequest(BaseModel):
     pet_id: Optional[str] = None
-    symptom_tag: str
+    symptom_tag: str = PydanticField(min_length=1, max_length=100)
     species: Species = Species.dog
+
+    @field_validator("species")
+    @classmethod
+    def individual_species(cls, value: Species) -> Species:
+        if value == Species.both:
+            raise ValueError("Choose dog or cat for a check")
+        return value
 
 
 class TriageAnswerRequest(BaseModel):
@@ -208,17 +234,19 @@ class TriageResult(BaseModel):
     recommended_examinations: list[str] = PydanticField(default_factory=list)
 
 
-class OwnerSignup(BaseModel):
-    email: str
-    password: str
-    privacy_policy_accepted: bool
+class OwnerLogin(BaseModel):
+    email: EmailStr
+    password: str = PydanticField(min_length=1, max_length=128)
 
-    @field_validator("password")
+    @field_validator("email", mode="before")
     @classmethod
-    def password_min_length(cls, value: str) -> str:
-        if len(value) < 8:
-            raise ValueError("Password must be at least 8 characters")
-        return value
+    def normalize_email(cls, value: str) -> str:
+        return value.strip().lower() if isinstance(value, str) else value
+
+
+class OwnerSignup(OwnerLogin):
+    password: str = PydanticField(min_length=15, max_length=128)
+    privacy_policy_accepted: bool
 
     @field_validator("privacy_policy_accepted")
     @classmethod
@@ -226,11 +254,6 @@ class OwnerSignup(BaseModel):
         if not value:
             raise ValueError("You must accept the privacy policy to create an account")
         return value
-
-
-class OwnerLogin(BaseModel):
-    email: str
-    password: str
 
 
 class OwnerPublic(BaseModel):

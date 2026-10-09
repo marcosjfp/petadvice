@@ -1,5 +1,6 @@
 import json
 
+from sqlalchemy import update
 from sqlmodel import Session
 
 from app.content.loader import content_library
@@ -15,12 +16,22 @@ class InvalidAnswerError(Exception):
     pass
 
 
+class UnsupportedSymptomError(Exception):
+    pass
+
+
+class IncompleteSessionError(Exception):
+    pass
+
+
 def _entry_question(symptom_tag: str) -> TriageQuestion | None:
     questions = content_library.questions_for_symptom(symptom_tag)
     return next((question for question in questions if question.is_entry_point), questions[0] if questions else None)
 
 
 def start_session(db: Session, pet: Pet, symptom_tag: str) -> tuple[TriageSession, TriageQuestion | None]:
+    if not content_library.conditions_for_symptom(symptom_tag) and not content_library.questions_for_symptom(symptom_tag):
+        raise UnsupportedSymptomError(symptom_tag)
     first_question = _entry_question(symptom_tag)
     session = TriageSession(
         pet_id=pet.id,
@@ -57,15 +68,26 @@ def answer_question(db: Session, session_id: str, req: TriageAnswerRequest) -> t
     question = content_library.question_by_id(req.question_id)
     if question is None or req.answer not in question.options:
         raise InvalidAnswerError(req.question_id)
-    if session.current_question_id and session.current_question_id != req.question_id:
+    if session.current_question_id != req.question_id or question.symptom_tag != session.symptom_entry_point:
         raise InvalidAnswerError(req.question_id)
     answers = json.loads(session.answers_json)
     answers[req.question_id] = req.answer
-    session.answers_json = json.dumps(answers)
     next_id = question.next_question_by_answer.get(req.answer)
     next_question = content_library.question_by_id(next_id) if next_id else None
-    session.current_question_id = next_question.id if next_question else None
-    db.add(session)
+    # Compare-and-set prevents two requests that read the same question from
+    # overwriting each other, including an emergency answer in another worker.
+    changed = db.execute(
+        update(TriageSession).where(
+            TriageSession.id == session_id,
+            TriageSession.current_question_id == req.question_id,
+        ).values(
+            answers_json=json.dumps(answers),
+            current_question_id=next_question.id if next_question else None,
+        )
+    )
+    if changed.rowcount != 1:
+        db.rollback()
+        raise InvalidAnswerError(req.question_id)
     db.commit()
     db.refresh(session)
     return session, next_question, next_question is None
@@ -78,11 +100,16 @@ def compute_result(db: Session, session_id: str) -> TriageResult:
     pet = db.get(Pet, session.pet_id)
     if pet is None:
         raise UnknownSessionError(session.pet_id)
+    if session.current_question_id is not None:
+        raise IncompleteSessionError(session_id)
 
     matched = content_library.conditions_for_symptom(session.symptom_entry_point)
     candidates = [condition for condition in matched if _pet_matches_condition_scope(pet, condition)]
-    candidates = candidates or matched
-    urgency = min((condition.urgency_default for condition in candidates), key=lambda item: item.rank, default=UrgencyLevel.monitor_home)
+    # Never substitute entries for another species or known incompatible scope.
+    # A check without applicable content cannot justify home-care reassurance.
+    urgency = max((condition.urgency_default for condition in candidates), key=lambda item: item.rank, default=UrgencyLevel.vet_24h)
+    if session.resulting_urgency and session.resulting_urgency.rank > urgency.rank:
+        urgency = session.resulting_urgency
     life_stage = calculate_life_stage(pet)
     for condition in candidates:
         escalation = condition.life_stage_escalation.get(life_stage) if life_stage else None

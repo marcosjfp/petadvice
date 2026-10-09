@@ -4,7 +4,7 @@ import pytest
 from sqlmodel import Session, SQLModel, create_engine
 
 from app.content.loader import content_library
-from app.models.schema import BreedSize, CatLifeStage, DogLifeStage, Pet, Sex, Species, TriageAnswerRequest, UrgencyLevel
+from app.models.schema import BreedSize, CatLifeStage, DogLifeStage, Pet, Sex, Species, TriageAnswerRequest, TriageSession, UrgencyLevel
 from app.services.life_stage_calculator import calculate_cat_life_stage, calculate_dog_life_stage
 from app.services import triage_engine
 
@@ -36,6 +36,15 @@ def make_pet(db, **overrides):
     return pet
 
 
+def complete_remaining_questions(db, session_id):
+    """Follow the normal-energy branch until every required question is answered."""
+    while (question_id := db.get(TriageSession, session_id).current_question_id) is not None:
+        question = content_library.question_by_id(question_id)
+        triage_engine.answer_question(db, session_id, TriageAnswerRequest(
+            question_id=question_id, answer=question.options[0],
+        ))
+
+
 def test_content_batch_validates():
     assert len(content_library.conditions) == 14
     assert len(content_library.preventive_items) == 4
@@ -64,6 +73,7 @@ def test_urgency_only_escalates(db):
     session, _ = triage_engine.start_session(db, pet, "vomiting")
     triage_engine.answer_question(db, session.id, TriageAnswerRequest(question_id="q-vomit-001", answer="More than 3 times in a few hours"))
     triage_engine.answer_question(db, session.id, TriageAnswerRequest(question_id="q-vomit-002", answer="No, neither"))
+    complete_remaining_questions(db, session.id)
     result = triage_engine.compute_result(db, session.id)
     assert result.resulting_urgency.rank >= UrgencyLevel.vet_24h.rank
     assert result.matched_condition_ids == ["dog-gi-001"]
@@ -72,6 +82,7 @@ def test_urgency_only_escalates(db):
 def test_species_scope_excludes_cat_hairball_guidance_for_dog(db):
     pet = make_pet(db, species=Species.dog)
     session, _ = triage_engine.start_session(db, pet, "vomiting")
+    complete_remaining_questions(db, session.id)
     result = triage_engine.compute_result(db, session.id)
     assert result.matched_condition_ids == ["dog-gi-001"]
 
@@ -102,6 +113,7 @@ def test_home_care_red_flags_escalate(db, species, symptom, question_id, answer,
             TriageAnswerRequest(question_id="q-limping-001", answer="Yes, some weight-bearing"),
         )
     triage_engine.answer_question(db, session.id, TriageAnswerRequest(question_id=question_id, answer=answer))
+    complete_remaining_questions(db, session.id)
     result = triage_engine.compute_result(db, session.id)
     assert result.resulting_urgency == expected
 
@@ -152,3 +164,80 @@ def test_puppy_vomiting_auto_escalates_via_life_stage(db):
     triage_engine.answer_question(db, session.id, TriageAnswerRequest(question_id="q-vomit-004", answer="Normal energy and appetite"))
     result = triage_engine.compute_result(db, session.id)
     assert result.resulting_urgency.rank >= UrgencyLevel.vet_soon.rank
+
+
+def test_incomplete_check_cannot_return_home_care(db):
+    pet = make_pet(db, species=Species.dog)
+    session, _ = triage_engine.start_session(db, pet, 'vomiting')
+    with pytest.raises(triage_engine.IncompleteSessionError):
+        triage_engine.compute_result(db, session.id)
+
+
+def test_completed_check_cannot_be_overwritten_or_accept_other_symptom(db):
+    pet = make_pet(db, species=Species.dog)
+    session, _ = triage_engine.start_session(db, pet, 'scratching')
+    triage_engine.answer_question(db, session.id, TriageAnswerRequest(question_id='q-scratching-001', answer='Yes'))
+    for request in [
+        TriageAnswerRequest(question_id='q-scratching-001', answer='No'),
+        TriageAnswerRequest(question_id='q-vomit-001', answer='Once'),
+    ]:
+        with pytest.raises(triage_engine.InvalidAnswerError):
+            triage_engine.answer_question(db, session.id, request)
+    assert triage_engine.compute_result(db, session.id).resulting_urgency == UrgencyLevel.vet_soon
+
+
+def test_unsupported_symptom_rejected(db):
+    pet = make_pet(db)
+    with pytest.raises(triage_engine.UnsupportedSymptomError):
+        triage_engine.start_session(db, pet, 'not-a-symptom')
+
+
+def test_no_applicable_content_never_returns_other_species_home_care(db):
+    pet = make_pet(db, species=Species.cat)
+    session, _ = triage_engine.start_session(db, pet, 'reverse_sneezing')
+    complete_remaining_questions(db, session.id)
+    result = triage_engine.compute_result(db, session.id)
+    assert result.matched_condition_ids == []
+    assert result.resulting_urgency == UrgencyLevel.vet_24h
+
+
+def test_highest_applicable_urgency_wins(db):
+    pet = make_pet(db, species=Species.dog, sex=Sex.female, neutered=False)
+    session, _ = triage_engine.start_session(db, pet, 'vomiting')
+    complete_remaining_questions(db, session.id)
+    result = triage_engine.compute_result(db, session.id)
+    assert result.resulting_urgency == UrgencyLevel.emergency_now
+    assert 'dog-cat-repro-001' in result.matched_condition_ids
+
+
+@pytest.mark.parametrize('fault', ['duplicate', 'missing_branch', 'other_symptom', 'cycle', 'invalid_option', 'missing_entry'])
+def test_invalid_question_graph_rejected(fault):
+    from app.content.loader import ContentLibrary
+    questions = [question.model_copy(deep=True) for question in content_library.questions]
+    if fault == 'duplicate':
+        questions.append(questions[0])
+    elif fault == 'missing_branch':
+        questions[0].next_question_by_answer['Once'] = 'missing'
+    elif fault == 'other_symptom':
+        questions[0].next_question_by_answer['Once'] = 'q-scratching-001'
+    elif fault == 'cycle':
+        questions[0].next_question_by_answer['Once'] = questions[0].id
+    elif fault == 'invalid_option':
+        questions[0].escalate_if['maybe'] = UrgencyLevel.emergency_now
+    elif fault == 'missing_entry':
+        questions[0].is_entry_point = False
+    with pytest.raises(ValueError):
+        ContentLibrary._validate_questions(questions)
+
+
+def test_stale_request_cannot_overwrite_an_emergency_answer(db):
+    pet = make_pet(db, species=Species.dog)
+    session, _ = triage_engine.start_session(db, pet, 'vomiting')
+    triage_engine.answer_question(db, session.id, TriageAnswerRequest(question_id='q-vomit-001', answer='Once'))
+    with Session(db.bind, expire_on_commit=False) as stale_db:
+        stale_session = stale_db.get(TriageSession, session.id)
+        assert stale_session.current_question_id == 'q-vomit-002'
+        triage_engine.answer_question(db, session.id, TriageAnswerRequest(question_id='q-vomit-002', answer='Yes'))
+        with pytest.raises(triage_engine.InvalidAnswerError):
+            triage_engine.answer_question(stale_db, session.id, TriageAnswerRequest(question_id='q-vomit-002', answer='No, neither'))
+    assert triage_engine.compute_result(db, session.id).resulting_urgency == UrgencyLevel.emergency_now

@@ -9,7 +9,7 @@ from app.services.life_stage_calculator import calculate_life_stage
 router = APIRouter(prefix="/pets", tags=["pets"])
 
 
-@router.post("", response_model=Pet)
+@router.post("")
 def create_pet(
     payload: PetCreate,
     current_owner: Owner = Depends(get_current_owner),
@@ -23,7 +23,7 @@ def create_pet(
     db.add(pet)
     db.commit()
     db.refresh(pet)
-    return pet
+    return {**pet.model_dump(), "life_stage": calculate_life_stage(pet)}
 
 
 @router.get("/{pet_id}")

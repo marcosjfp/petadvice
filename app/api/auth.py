@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
 
 from app.db import get_session
@@ -18,13 +19,17 @@ from app.services.auth import (
     get_current_owner,
     hash_password,
     verify_password,
+    verify_dummy_password,
+    set_session_cookie,
+    clear_session_cookie,
+    verify_auth_origin,
 )
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["auth"], dependencies=[Depends(verify_auth_origin)])
 
 
 @router.post("/signup", response_model=TokenResponse)
-def signup(payload: OwnerSignup, db: Session = Depends(get_session)):
+def signup(payload: OwnerSignup, response: Response, db: Session = Depends(get_session)):
     existing = db.exec(select(Owner).where(Owner.email == payload.email)).first()
     if existing:
         raise HTTPException(status_code=400, detail="An account with this email already exists")
@@ -34,17 +39,38 @@ def signup(payload: OwnerSignup, db: Session = Depends(get_session)):
         consent_given_at=datetime.now(timezone.utc),
     )
     db.add(owner)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError as error:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="An account with this email already exists") from error
     db.refresh(owner)
-    return TokenResponse(access_token=create_access_token(owner.id))
+    token = create_access_token(owner.id)
+    set_session_cookie(response, token)
+    return TokenResponse(access_token=token)
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(payload: OwnerLogin, db: Session = Depends(get_session)):
+def login(payload: OwnerLogin, response: Response, db: Session = Depends(get_session)):
     owner = db.exec(select(Owner).where(Owner.email == payload.email)).first()
-    if owner is None or not verify_password(payload.password, owner.hashed_password):
+    if owner is None:
+        verify_dummy_password(payload.password)
         raise HTTPException(status_code=401, detail="Incorrect email or password")
-    return TokenResponse(access_token=create_access_token(owner.id))
+    if not verify_password(payload.password, owner.hashed_password):
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
+    if owner.hashed_password.startswith(("$2a$", "$2b$", "$2y$")):
+        owner.hashed_password = hash_password(payload.password)
+        db.add(owner)
+        db.commit()
+    token = create_access_token(owner.id)
+    set_session_cookie(response, token)
+    return TokenResponse(access_token=token)
+
+
+@router.post("/logout")
+def logout(response: Response):
+    clear_session_cookie(response)
+    return {"status": "logged out"}
 
 
 @router.get("/me", response_model=OwnerPublic)
@@ -73,6 +99,7 @@ def export_my_data(
 
 @router.delete("/me")
 def delete_my_account(
+    response: Response,
     current_owner: Owner = Depends(get_current_owner),
     db: Session = Depends(get_session),
 ):
@@ -84,4 +111,5 @@ def delete_my_account(
         db.delete(pet)
     db.delete(current_owner)
     db.commit()
+    clear_session_cookie(response)
     return {"status": "account and all associated data deleted"}

@@ -40,6 +40,8 @@ def start_triage(
     current_owner: Owner | None = Depends(get_optional_owner),
     db: Session = Depends(get_session),
 ):
+    if not content_library.conditions_for_symptom(payload.symptom_tag) and not content_library.questions_for_symptom(payload.symptom_tag):
+        raise HTTPException(status_code=422, detail="This symptom is not supported. Contact your veterinary practice for guidance.")
     if payload.pet_id is None:
         if current_owner is not None:
             raise HTTPException(status_code=422, detail="pet_id is required for an account check")
@@ -83,3 +85,5 @@ def get_triage_result(
         return triage_engine.compute_result(db, session_id)
     except triage_engine.UnknownSessionError:
         raise HTTPException(status_code=404, detail="Triage session not found")
+    except triage_engine.IncompleteSessionError:
+        raise HTTPException(status_code=409, detail="Complete the remaining questions before viewing guidance")
