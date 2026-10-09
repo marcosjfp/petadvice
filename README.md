@@ -1,95 +1,68 @@
 # PETAdvice
 
-PETAdvice is a React/TypeScript frontend and FastAPI backend for general dog/cat symptom urgency and preventive-care information. It does not diagnose animals or replace veterinary care. The clinical content is awaiting veterinary review.
+PETAdvice combines React/TypeScript and FastAPI for dog/cat symptom urgency and preventive-care information. Its questions were tailored with veterinary input. Educational guidance does not replace examination by a vet; this modernization pass preserves the clinical question/content files.
 
-## Implemented functionality
+## Features
 
-- Guest symptom checks with branching questions and persistent emergency information.
-- Account signup/login/logout, pet profiles and switching between pets.
-- Species/life-stage filtering, structured urgency results and escalation.
-- Searchable condition library with expandable guidance, red flags, sources and review status.
-- Preventive-care titles, descriptions and recurrence information, including loading/empty/error states.
-- Account data export and deletion with a confirmation step in the UI.
-- PWA shell and manifest; checks require an online API. There are no notifications or scheduled reminders yet.
+- Guest checks with branching questions, urgency guidance, private access tokens, expiry, download and deletion.
+- Cookie login, Argon2id passwords, email verification, single-use recovery links, revocable sessions and logout across devices.
+- Pet profiles/switching, searchable condition details, sources and life-stage care information.
+- Password confirmation for account export/deletion and session controls.
+- PostgreSQL/Alembic, shared Redis rate limits, encrypted mail outbox, retention worker and readiness monitoring.
+- Same-origin container deployment with Caddy, a non-root API/worker, local font assets and PWA shell. Checks need an online API; reminders/history editing are future product work.
 
-See [the code and application review](docs/modernization-review.md) for changes, evidence and prioritized remaining work.
+Read the [implementation review](docs/modernization-review.md), [operations runbook](docs/operations/runbook.md) and [unpublished privacy-policy draft](docs/privacy-policy-draft.md).
 
-## Local development
+## Native development
 
-Use Python 3.13 and Node 24 (the versions tested locally). The frontend requires Node 22.12 or newer.
+Python 3.13 works locally; the container/CI target Python 3.14. Use Node 24.
 
 ```sh
 python3 -m venv .venv
 .venv/bin/python -m pip install --require-hashes -r requirements.txt
-.venv/bin/python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+# Preserve an existing database backup before migrating it.
+.venv/bin/python -m alembic upgrade head
+.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log
 ```
 
-In another terminal:
+In separate terminals:
 
 ```sh
+.venv/bin/python -m app.jobs.worker
 npm ci --prefix web
 npm run dev --prefix web -- --host 127.0.0.1
 ```
 
-Open `http://127.0.0.1:5173`. Vite proxies `/api/*` to the backend and strips `/api`. Stay on the same frontend hostname when testing cookie sessions. API docs are at `http://127.0.0.1:8000/docs`.
+Open `http://127.0.0.1:5173`. Vite proxies `/api` to the backend. Keep the same frontend hostname for cookie tests. API docs are at `http://127.0.0.1:8000/docs`. Settings load an ignored root `.env` if present; `.env.example` explains configuration. Development emails are private `.mail/*.eml` files, delivered by the worker, with no external sending.
 
-Environment variables must be supplied by your shell or deployment provider; `.env.example` is documentation and is not automatically loaded by the backend. Vite reads `web/.env` for frontend settings.
+The application checks the Alembic schema at startup and refuses pending migrations. It no longer creates/rewrites tables during startup. SQLite remains available for native development; production requires PostgreSQL and shared Redis. Fresh container installations separate database administrator and restricted application roles.
 
-## Authentication and deployment
+## Deployment and privacy
 
-Browser authentication uses a one-hour HttpOnly, SameSite=Lax session cookie. Production cookies are Secure. The browser no longer stores JWTs in localStorage. Existing localStorage sessions require signing in again. Existing bcrypt password hashes are upgraded to Argon2id after a successful login; existing passwords can still be used. New signup passwords require 15–128 characters. Email addresses are validated and normalized.
+Use `compose.yaml` and the [runbook](docs/operations/runbook.md) for local containers, PostgreSQL import, encrypted backups/restores, retention and rollback. The old ephemeral backend-only Render manifest has been retired. Choose hosting, domain and SMTP before remote deployment; no provider has been selected or deployed.
 
-Bearer JWTs remain available for API clients. JWT verification requires expiration, issue time, subject, issuer and audience. Cookie-authenticated writes must send a trusted `Origin` header. CORS is not a replacement for this CSRF check.
+Production requires stable keys, exact HTTPS origins/hosts, SMTP/TLS, a restricted database role, operator/contact and a published policy URL. Verification is mandatory in production. Browser tokens use one-hour HttpOnly/SameSite cookies; mutations validate trusted origins. Tokens are checked against stored sessions, so logout/password reset revoke access. API clients may use Bearer tokens with the same revocation rules.
 
-Backend variables:
+Guest access expires after 24 hours by default, with configurable scheduled cleanup. Accounts are retained until deletion. Backup/log retention and restored-deletion handling need an operator decision before launch. Account notice acknowledgement records the policy version; technical controls do not establish legal compliance.
 
-| Variable | Purpose |
-| --- | --- |
-| `APP_ENV` | Default `development`; set `production` for Secure cookies and startup checks. |
-| `JWT_SECRET_KEY` | Production requires a random value of at least 32 characters. Use the same stable secret across workers. Development without a configured secret generates a process-local secret, so restarting signs users out. |
-| `CORS_ORIGINS` | Exact trusted frontend origins, comma-separated. Never use `*` with credentialed requests. |
-| `DATABASE_URL` | Defaults to `sqlite:///./petadvice.db`. SQLite is for local development/demos. |
-
-Frontend `VITE_API_BASE_URL` defaults to `/api`. Deploy the frontend and API on the same origin through a reverse proxy that strips `/api`, or use HTTPS subdomains of the same site with explicit CORS configuration. Separate unrelated Vercel/Render domains do not work with SameSite=Lax cookies. The development proxy does not exist in a static production build or `vite preview`; configure the production proxy explicitly.
-
-The supplied `render.yaml` sets production mode and generates a signing secret. It is still a demo backend: persistent storage, a production domain/proxy, migrations and operational protections need separate setup. Do not treat its ephemeral SQLite storage as suitable for real accounts.
-
-Private API responses use `Cache-Control: no-store`. The service worker has no runtime API cache and excludes `/api` from navigation fallback. Updates do not automatically reload an active assessment. Install/offline behavior still needs testing on actual mobile devices; original brand images remain large.
-
-## Triage safeguards
-
-- Unsupported symptoms are rejected before creating a guest pet/session.
-- Only the current question and one of its configured answers are accepted.
-- Completed sessions cannot be rewritten.
-- Results cannot be retrieved until the question flow is complete.
-- Applicable content is never replaced with other-species or known incompatible guidance.
-- The highest applicable default urgency wins. No applicable content produces referral guidance, not home-care reassurance.
-- Content loading validates unique IDs/options, answer mappings, branch references, symptom boundaries, entry points and absence of cycles.
-
-These are software safeguards. Guest profiles do not capture age/sex/neuter status, some decision trees are sparse, and medical appropriateness requires veterinary review. No release approval is implied.
+The supplied local preview now uses the restricted `petadvice_app` database login for the API, worker and migrations. The explicitly approved transition preserved existing records and administrator access. Production refuses administrator app credentials.
 
 ## Verification
 
 ```sh
 .venv/bin/python -m pytest -q
+.venv/bin/python -m alembic check
 npm run lint --prefix web
 npm test --prefix web
 npm run build --prefix web
 npm audit --prefix web
+uvx pip-audit -r requirements.txt --disable-pip
 ```
 
-Backend API tests use an isolated in-memory database and do not run migrations against the developer's database. Frontend tests cover pet switching, correct preventive-care rendering, result retry without a second answer submission, and condition search/detail behavior. GitHub Actions runs tests, lint, build and the frontend vulnerability audit; workflow actions are pinned to verified release commits.
+API tests isolate their database. Migration/restore tests use temporary files. Set `TEST_POSTGRES_URL` and `TEST_REDIS_URL` for real infrastructure tests; these use disposable schemas and unique rate-limit keys. Set `TEST_APP_URL=http://127.0.0.1:8080/api` only for an isolated development deployment; HTTP smoke tests create and remove their own synthetic data. Never point smoke tests at a public production service.
 
-`requirements.in` holds compatible direct dependency ranges. `requirements.txt` locks transitive versions and integrity hashes. To intentionally refresh it:
+CI runs PostgreSQL/Redis integration tests alongside backend tests and migrations, plus frontend lint/tests/build/advisories. Hashed Python and npm lockfiles record tested dependencies. Base/service images are pinned to tested digests; update them with verification for security patches.
 
-```sh
-uv pip compile --generate-hashes requirements.in -o requirements.txt
-```
+## Repository data
 
-The npm lockfile records tested compatible upgrades. Major TypeScript/PWA upgrades should be reviewed and verified separately.
-
-## Before public release
-
-Prioritize veterinary review and representative clinical scenarios; durable PostgreSQL storage with migrations/backups; rate limiting and anti-abuse controls; session revocation and password recovery; an operator-specific privacy policy and retention policy; guest-data cleanup; and production observability. Data export/deletion features alone do not establish GDPR compliance.
-
-`petadvice.db` was already tracked by Git. The new ignore rules prevent new databases being added but do not remove an already tracked file or its history. Preserve a local backup and decide how to remove it from version control before sharing the repository. Do not commit real secrets or personal data.
+The working `petadvice.db` was privately backed up, migrated and removed from current Git tracking. Environment files, mailboxes, backups and databases are ignored and excluded from container builds. Older Git history still contains the original database; history was not rewritten. Review that history before publishing the repository.

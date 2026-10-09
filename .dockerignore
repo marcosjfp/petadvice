@@ -1,0 +1,14 @@
+.git
+.venv
+.env
+.env.*
+.mail
+.backups
+*.db
+*.db-*
+*.sqlite3
+**/__pycache__
+**/.pytest_cache
+web/node_modules
+web/dist
+docs

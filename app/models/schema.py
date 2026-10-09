@@ -6,7 +6,7 @@ from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel, EmailStr, Field as PydanticField, field_validator
-from sqlalchemy import JSON, Column
+from sqlalchemy import JSON, Column, Enum as SAEnum
 from sqlmodel import Field, SQLModel
 
 
@@ -97,6 +97,8 @@ class Owner(SQLModel, table=True):
     email: str = Field(index=True, unique=True)
     hashed_password: str
     consent_given_at: Optional[datetime] = None
+    consent_policy_version: Optional[str] = None
+    email_verified_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
@@ -104,11 +106,11 @@ class Pet(SQLModel, table=True):
     id: str = Field(default_factory=_new_id, primary_key=True)
     owner_id: Optional[str] = Field(default=None, index=True, foreign_key="owner.id")
     name: str
-    species: Species
+    species: Species = Field(sa_type=SAEnum(Species, native_enum=False, length=4))
     breed: Optional[str] = None
-    breed_size: Optional[BreedSize] = None
+    breed_size: Optional[BreedSize] = Field(default=None, sa_type=SAEnum(BreedSize, native_enum=False, length=6))
     date_of_birth: Optional[date] = None
-    sex: Optional[Sex] = None
+    sex: Optional[Sex] = Field(default=None, sa_type=SAEnum(Sex, native_enum=False, length=6))
     neutered: Optional[bool] = None
     weight_kg: Optional[float] = None
     environment_factors: list[str] = Field(default_factory=list, sa_column=Column(JSON))
@@ -122,9 +124,48 @@ class TriageSession(SQLModel, table=True):
     symptom_entry_point: str
     answers_json: str = "{}"
     current_question_id: Optional[str] = None
-    resulting_urgency: Optional[UrgencyLevel] = None
+    resulting_urgency: Optional[UrgencyLevel] = Field(default=None, sa_type=SAEnum(UrgencyLevel, native_enum=False, length=13))
     resulting_guidance: Optional[str] = None
     condition_entries_matched_raw: str = ""
+
+
+class AuthSession(SQLModel, table=True):
+    id: str = Field(default_factory=_new_id, primary_key=True)
+    owner_id: str = Field(index=True, foreign_key="owner.id")
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    expires_at: datetime = Field(index=True)
+    authenticated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    revoked_at: Optional[datetime] = None
+
+
+class AccountAction(SQLModel, table=True):
+    token_hash: str = Field(primary_key=True)
+    owner_id: str = Field(index=True, foreign_key="owner.id")
+    kind: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    expires_at: datetime = Field(index=True)
+    used_at: Optional[datetime] = None
+
+
+class EmailDelivery(SQLModel, table=True):
+    id: str = Field(default_factory=_new_id, primary_key=True)
+    owner_id: str = Field(index=True, foreign_key="owner.id")
+    encrypted_payload: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    next_attempt_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    expires_at: datetime
+    attempts: int = 0
+
+
+class GuestAccess(SQLModel, table=True):
+    session_id: str = Field(primary_key=True, foreign_key="triagesession.id")
+    token_hash: str
+    expires_at: datetime = Field(index=True)
+
+
+class MaintenanceStatus(SQLModel, table=True):
+    job: str = Field(primary_key=True)
+    last_success_at: datetime
 
 
 class RedFlag(BaseModel):
@@ -260,6 +301,29 @@ class OwnerPublic(BaseModel):
     id: str
     email: str
     created_at: datetime
+    email_verified_at: Optional[datetime] = None
+    email_verification_required: bool = False
+
+
+class EmailRequest(BaseModel):
+    email: EmailStr
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, value):
+        return value.strip().lower() if isinstance(value, str) else value
+
+
+class ActionRequest(BaseModel):
+    token: str = PydanticField(min_length=20, max_length=200)
+
+
+class ResetPasswordRequest(ActionRequest):
+    password: str = PydanticField(min_length=15, max_length=128)
+
+
+class ReauthenticateRequest(BaseModel):
+    password: str = PydanticField(min_length=1, max_length=128)
 
 
 class TokenResponse(BaseModel):

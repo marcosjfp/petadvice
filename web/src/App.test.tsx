@@ -10,6 +10,7 @@ vi.mock('./api', async (importOriginal) => {
     getMe: vi.fn(), listPets: vi.fn(), startTriage: vi.fn(), answer: vi.fn(), result: vi.fn(),
     listPreventive: vi.fn(), listConditions: vi.fn(), createPet: vi.fn(), logout: vi.fn(),
     login: vi.fn(), signup: vi.fn(), exportMyData: vi.fn(), deleteMyAccount: vi.fn(),
+    privacy: vi.fn(), forgotPassword: vi.fn(), resendVerification: vi.fn(), verifyEmail: vi.fn(), resetPassword: vi.fn(), reauthenticate: vi.fn(), logoutAll: vi.fn(), exportCheck: vi.fn(), deleteGuestCheck: vi.fn(),
   } }
 })
 const pets = [
@@ -20,6 +21,7 @@ beforeEach(() => {
   vi.resetAllMocks()
   vi.mocked(api.getMe).mockResolvedValue({ id: 'owner', email: 'test@example.com' })
   vi.mocked(api.listPets).mockResolvedValue(pets)
+  vi.mocked(api.privacy).mockResolvedValue({ status: 'draft', operator: null, contact: null, policy_url: null, policy_version: 'test', guest_retention_hours: 24, account_retention: 'Until deletion', backup_retention: 'Pending' })
 })
 
 test('switching pets discards the previous pet question and hides dog-only symptoms', async () => {
@@ -74,4 +76,78 @@ test('library supports search, details and readable urgency', async () => {
   expect(screen.getByText('Blood — Contact a vet within 24 hours')).toBeVisible()
   await user.type(screen.getByRole('searchbox', { name: 'Search the library' }), 'no-match')
   expect(screen.getByText(/No entries match/)).toBeInTheDocument()
+})
+
+test('forgot password shows a neutral response without trying to sign in', async () => {
+  const { ApiError } = await import('./api')
+  vi.mocked(api.getMe).mockRejectedValue(new ApiError('Not authenticated', 401))
+  vi.mocked(api.forgotPassword).mockResolvedValue({ message: 'If this address belongs to an eligible account, an email will arrive shortly.' })
+  const user = userEvent.setup()
+  render(<App />)
+  await user.click(await screen.findByRole('button', { name: 'Log in' }))
+  await user.click(screen.getByRole('button', { name: 'Forgot your password?' }))
+  await user.type(screen.getByRole('textbox', { name: 'Email' }), 'someone@example.com')
+  await user.click(screen.getByRole('button', { name: 'Send reset link' }))
+  expect(await screen.findByText(/eligible account/)).toBeInTheDocument()
+  expect(api.forgotPassword).toHaveBeenCalledWith('someone@example.com')
+  expect(api.login).not.toHaveBeenCalled()
+})
+
+test('a guest capability follows answers and results and allows deletion', async () => {
+  const { ApiError } = await import('./api')
+  vi.mocked(api.getMe).mockRejectedValue(new ApiError('Not authenticated', 401))
+  vi.mocked(api.startTriage).mockResolvedValue({ session_id: 'guest-check', guest_token: 'private-capability', expires_at: '2026-10-10T12:00:00Z', flow_complete: false, next_question: { id: 'question', prompt: 'Any weakness?', options: ['No'] } })
+  vi.mocked(api.answer).mockResolvedValue({ next_question: null, flow_complete: true })
+  vi.mocked(api.result).mockResolvedValue({ resulting_urgency: 'vet_soon', resulting_guidance: 'Contact your vet.', matched_condition_ids: [], possible_causes: [], recommended_examinations: [] })
+  vi.mocked(api.deleteGuestCheck).mockResolvedValue({ status: 'deleted' })
+  const user = userEvent.setup()
+  render(<App />)
+  await user.click(await screen.findByRole('button', { name: /Start a quick check/ }))
+  await user.click(screen.getByRole('button', { name: 'Vomiting' }))
+  await user.click(screen.getByRole('button', { name: 'Continue' }))
+  await user.click(await screen.findByRole('button', { name: 'No' }))
+  expect(await screen.findByRole('heading', { name: 'Book a vet appointment' })).toBeInTheDocument()
+  expect(api.answer).toHaveBeenCalledWith('guest-check', 'question', 'No', 'private-capability')
+  expect(api.result).toHaveBeenCalledWith('guest-check', 'private-capability')
+  await user.click(screen.getByRole('button', { name: 'Delete this guest check' }))
+  expect(await screen.findByRole('heading', { name: 'What have you noticed?' })).toBeInTheDocument()
+  expect(api.deleteGuestCheck).toHaveBeenCalledWith('guest-check', 'private-capability')
+})
+
+test('account deletion confirms the password before deleting', async () => {
+  vi.mocked(api.reauthenticate).mockRejectedValueOnce(new Error('Incorrect password')).mockResolvedValue({ status: 'confirmed' })
+  vi.mocked(api.deleteMyAccount).mockResolvedValue({ status: 'deleted' })
+  const user = userEvent.setup()
+  render(<App />)
+  await user.click(await screen.findByRole('button', { name: 'Account' }))
+  await user.click(screen.getByRole('button', { name: 'Delete my account…' }))
+  expect(screen.getByRole('button', { name: 'Permanently delete my account' })).toBeDisabled()
+  await user.type(screen.getByLabelText('Confirm your password for account controls'), 'incorrect')
+  await user.click(screen.getByRole('button', { name: 'Permanently delete my account' }))
+  expect(await screen.findByText('Incorrect password')).toBeInTheDocument()
+  expect(api.deleteMyAccount).not.toHaveBeenCalled()
+  await user.clear(screen.getByLabelText('Confirm your password for account controls'))
+  await user.type(screen.getByLabelText('Confirm your password for account controls'), 'correct-passphrase')
+  await user.click(screen.getByRole('button', { name: 'Permanently delete my account' }))
+  await waitFor(() => expect(api.deleteMyAccount).toHaveBeenCalledTimes(1))
+})
+
+test('password reset removes the link from the URL and requires matching passwords', async () => {
+  const { ApiError } = await import('./api')
+  vi.mocked(api.getMe).mockRejectedValue(new ApiError('Not authenticated', 401))
+  vi.mocked(api.resetPassword).mockResolvedValue({ message: 'Password changed. Sign in with your new password.' })
+  window.history.replaceState(null, '', '/#action=reset&token=private-reset-token')
+  const user = userEvent.setup()
+  render(<App />)
+  expect(window.location.hash).toBe('')
+  await user.type(screen.getByLabelText('New password'), 'a-new-long-passphrase')
+  await user.type(screen.getByLabelText('Confirm new password'), 'a-different-passphrase')
+  await user.click(screen.getByRole('button', { name: 'Reset password' }))
+  expect(screen.getByRole('alert')).toHaveTextContent('The passwords do not match.')
+  expect(api.resetPassword).not.toHaveBeenCalled()
+  await user.clear(screen.getByLabelText('Confirm new password'))
+  await user.type(screen.getByLabelText('Confirm new password'), 'a-new-long-passphrase')
+  await user.click(screen.getByRole('button', { name: 'Reset password' }))
+  expect(await screen.findByText(/Password changed/)).toBeInTheDocument()
+  expect(api.resetPassword).toHaveBeenCalledWith('private-reset-token', 'a-new-long-passphrase')
 })

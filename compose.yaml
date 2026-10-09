@@ -1,0 +1,121 @@
+name: petadvice
+x-api: &api
+  image: petadvice-api:${PETADVICE_IMAGE_TAG:-local}
+  build:
+    context: .
+    dockerfile: deploy/Dockerfile.api
+  environment:
+    APP_ENV: "${APP_ENV:-development}"
+    DATABASE_URL: "${DATABASE_URL:?Set DATABASE_URL}"
+    JWT_SECRET_KEY: "${JWT_SECRET_KEY:?Set JWT_SECRET_KEY}"
+    CORS_ORIGINS: "${CORS_ORIGINS:-http://127.0.0.1:8080,http://localhost:8080}"
+    PUBLIC_WEB_URL: "${PUBLIC_WEB_URL:-http://127.0.0.1:8080}"
+    TRUSTED_HOSTS: "${TRUSTED_HOSTS:-localhost,127.0.0.1}"
+    RATE_LIMIT_STORAGE_URI: "${RATE_LIMIT_STORAGE_URI:-redis://redis:6379/0}"
+    GUEST_RETENTION_HOURS: "${GUEST_RETENTION_HOURS:-24}"
+    REQUIRE_EMAIL_VERIFICATION: "${REQUIRE_EMAIL_VERIFICATION:-false}"
+    MAIL_BACKEND: "${MAIL_BACKEND:-file}"
+    MAIL_DIRECTORY: "${MAIL_DIRECTORY:-.mail}"
+    MAIL_ENCRYPTION_KEY: "${MAIL_ENCRYPTION_KEY:-}"
+    SMTP_HOST: "${SMTP_HOST:-}"
+    SMTP_PORT: "${SMTP_PORT:-587}"
+    SMTP_USERNAME: "${SMTP_USERNAME:-}"
+    SMTP_PASSWORD: "${SMTP_PASSWORD:-}"
+    SMTP_FROM: "${SMTP_FROM:-}"
+    SMTP_STARTTLS: "${SMTP_STARTTLS:-true}"
+    SMTP_SSL: "${SMTP_SSL:-false}"
+    PRIVACY_OPERATOR: "${PRIVACY_OPERATOR:-}"
+    PRIVACY_EMAIL: "${PRIVACY_EMAIL:-}"
+    PRIVACY_POLICY_URL: "${PRIVACY_POLICY_URL:-}"
+    PRIVACY_POLICY_VERSION: "${PRIVACY_POLICY_VERSION:-beta-2026-10-09}"
+    FORWARDED_ALLOW_IPS: ${PROXY_IP:-172.30.240.10}
+  restart: unless-stopped
+  read_only: true
+  tmpfs: [/tmp]
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  volumes: [mail:/app/.mail]
+  networks: [backend, egress]
+services:
+  db:
+    image: postgres:18@sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: petadvice
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:?Set a separate POSTGRES_ADMIN_PASSWORD}
+      APP_DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your ignored environment file}
+    volumes:
+      - postgres:/var/lib/postgresql
+      - ./deploy/postgres/init-app.sh:/docker-entrypoint-initdb.d/init-app.sh:ro
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U petadvice -d petadvice"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [backend]
+  redis:
+    image: redis:8-alpine@sha256:3811787313eba226a2ef38658c6ccb91cd5e110edc89c37767de373120a0e5a0
+    command: [redis-server, --appendonly, 'yes', --maxmemory, 128mb, --maxmemory-policy, noeviction]
+    volumes: [redis:/data]
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [backend]
+  migrate:
+    <<: *api
+    restart: 'no'
+    command: [python, -m, alembic, upgrade, head]
+    depends_on:
+      db: {condition: service_healthy}
+  api:
+    <<: *api
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/ready', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+  worker:
+    <<: *api
+    command: [python, -m, app.jobs.worker]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  web:
+    image: petadvice-web:${PETADVICE_IMAGE_TAG:-local}
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.web
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    ports:
+      - '${WEB_BIND_HOST:-127.0.0.1}:${WEB_HTTP_PORT:-8080}:80'
+      - '${WEB_BIND_HOST:-127.0.0.1}:${WEB_HTTPS_PORT:-8443}:443'
+    volumes: [caddy_data:/data, caddy_config:/config]
+    restart: unless-stopped
+    depends_on:
+      api: {condition: service_healthy}
+    networks:
+      frontend: {}
+      backend:
+        ipv4_address: ${PROXY_IP:-172.30.240.10}
+networks:
+  frontend: {}
+  backend:
+    internal: true
+    ipam:
+      config:
+        - subnet: ${PROXY_SUBNET:-172.30.240.0/24}
+  egress: {}
+volumes:
+  postgres: {}
+  redis: {}
+  mail: {}
+  caddy_data: {}
+  caddy_config: {}

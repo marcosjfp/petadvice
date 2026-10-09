@@ -57,14 +57,24 @@ export type Condition = {
 export type PreventiveCareItem = { id: string; title: string; description: string; recurrence: string | null; sources: string[] }
 export type Question = { id: string; prompt: string; options: string[] }
 export type TriageResult = { resulting_urgency: Urgency; resulting_guidance: string; matched_condition_ids: string[]; possible_causes: string[]; recommended_examinations: string[] }
-export type TriageStart = { session_id: string; next_question: Question | null; flow_complete: boolean }
+export type TriageStart = { session_id: string; next_question: Question | null; flow_complete: boolean; guest_token?: string | null; expires_at?: string | null }
 export type TriageAnswer = { next_question: Question | null; flow_complete: boolean }
+export type Owner = { id: string; email: string; email_verified_at?: string | null; email_verification_required?: boolean }
+export type Privacy = { status: string; operator: string | null; contact: string | null; policy_url: string | null; policy_version: string; guest_retention_hours: number; account_retention: string; backup_retention: string }
+const guestHeaders = (token?: string | null) => token ? { 'X-Guest-Token': token } : undefined
 
 export const api = {
   signup: (email: string, password: string, privacyPolicyAccepted: boolean) => request('/auth/signup', { method: 'POST', body: JSON.stringify({ email, password, privacy_policy_accepted: privacyPolicyAccepted }) }),
   login: (email: string, password: string) => request('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
   logout: () => request('/auth/logout', { method: 'POST' }),
-  getMe: () => request<{ id: string; email: string }>('/auth/me'),
+  getMe: () => request<Owner>('/auth/me'),
+  privacy: () => request<Privacy>('/privacy'),
+  forgotPassword: (email: string) => request<{ message: string }>('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
+  resendVerification: (email: string) => request<{ message: string }>('/auth/resend-verification', { method: 'POST', body: JSON.stringify({ email }) }),
+  verifyEmail: (token: string) => request<{ message: string }>('/auth/verify-email', { method: 'POST', body: JSON.stringify({ token }) }),
+  resetPassword: (token: string, password: string) => request<{ message: string }>('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, password }) }),
+  reauthenticate: (password: string) => request('/auth/reauthenticate', { method: 'POST', body: JSON.stringify({ password }) }),
+  logoutAll: () => request('/auth/logout-all', { method: 'POST' }),
   exportMyData: () => request<unknown>('/auth/me/export'),
   deleteMyAccount: () => request('/auth/me', { method: 'DELETE' }),
   createPet: (payload: PetCreate) => request<Pet>('/pets', { method: 'POST', body: JSON.stringify(payload) }),
@@ -72,6 +82,8 @@ export const api = {
   listConditions: (species: Species) => request<Condition[]>(`/conditions?${new URLSearchParams({ species })}`),
   listPreventive: (species: Species, lifeStage?: string | null) => request<PreventiveCareItem[]>(`/preventive-care?${new URLSearchParams({ species, ...(lifeStage ? { life_stage: lifeStage } : {}) })}`),
   startTriage: (petId: string | null, symptom: string, species: Species = 'dog') => request<TriageStart>('/triage/start', { method: 'POST', body: JSON.stringify({ pet_id: petId, symptom_tag: symptom, species }) }),
-  answer: (sessionId: string, questionId: string, answer: string) => request<TriageAnswer>(`/triage/${encodeURIComponent(sessionId)}/answer`, { method: 'POST', body: JSON.stringify({ question_id: questionId, answer }) }),
-  result: (sessionId: string) => request<TriageResult>(`/triage/${encodeURIComponent(sessionId)}/result`),
+  answer: (sessionId: string, questionId: string, answer: string, guestToken?: string | null) => request<TriageAnswer>(`/triage/${encodeURIComponent(sessionId)}/answer`, { method: 'POST', headers: guestHeaders(guestToken), body: JSON.stringify({ question_id: questionId, answer }) }),
+  result: (sessionId: string, guestToken?: string | null) => request<TriageResult>(`/triage/${encodeURIComponent(sessionId)}/result`, { headers: guestHeaders(guestToken) }),
+  exportCheck: (sessionId: string, guestToken: string) => request<unknown>(`/triage/${encodeURIComponent(sessionId)}/export`, { headers: guestHeaders(guestToken) }),
+  deleteGuestCheck: (sessionId: string, guestToken: string) => request(`/triage/${encodeURIComponent(sessionId)}`, { method: 'DELETE', headers: guestHeaders(guestToken) }),
 }

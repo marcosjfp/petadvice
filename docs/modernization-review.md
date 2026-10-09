@@ -1,6 +1,6 @@
 # PETAdvice code and application review
 
-Reviewed on 9 October 2026. This is a completed first modernization pass on the local beta, with remaining release work identified below. It is not a clinical sign-off, a compliance certification, or a production deployment.
+Reviewed and updated on 9 October 2026. The initial application review and the follow-up security, persistence, privacy and deployment implementation are recorded here. Clinical question/content files were preserved at the user’s request; questions were tailored with veterinary input. Remote hosting and the operator-specific privacy policy remain pending.
 
 ## Outcome
 
@@ -12,8 +12,8 @@ The updated app has usable condition details, correct care-plan content, request
 
 | Area | Implemented now | Remaining product gap |
 | --- | --- | --- |
-| Guest quick check | Species selection, supported symptoms, adaptive questions, urgency results, restart | Capture age/sex/neuter context; guest retention/deletion; broader reviewed symptom coverage |
-| Accounts | Signup, login, logout, data export and deletion | Recovery, email verification, session revocation, anti-abuse, production privacy policy |
+| Guest quick check | Species selection, adaptive questions/results, private access, expiry, download/deletion | Capture age/sex/neuter context; broader symptom coverage |
+| Accounts | Signup/login, recovery/verification, revocation, anti-abuse and password-confirmed export/deletion | Operator-approved production privacy policy and SMTP provider |
 | Pet profiles | Creation, multiple pets, switching, computed life stage | Editing/deleting an individual pet, richer relevant context |
 | Learn | Species-filtered search, expandable guidance, red flags, sources, review status | Broader reviewed content and a richer content publication workflow |
 | Care plan | Correct titles/descriptions/recurrence, age-aware filtering, unknown-age and empty states | Scheduling, reminders, completion tracking, broader life-stage coverage |
@@ -74,7 +74,7 @@ The in-app browser was unavailable, so Chrome was used. Screenshots below were c
 
    ![Updated account controls](audit/08-account-after.png)
 
-## Validation
+## Initial pass validation
 
 - **44 backend tests passed**, with no warnings after installing the locked stack.
 - **4 frontend regression tests passed.** Coverage includes switching pets, care response fields, failed-result retry without another answer submission, and library search/details.
@@ -95,14 +95,32 @@ Workflow actions are pinned to verified current releases of [checkout](https://g
 
 ## Prioritized next work
 
-### Before public users
+### Status after the authorized follow-up
 
-1. **Veterinary content and decision-tree review.** Test representative emergencies and uncertain answers; validate age/sex/neuter scope, thresholds and species-specific pathways. Guest checks currently omit important context. Replace heuristic red-flag text matching with explicit, reviewed answer outcomes. Sparse content is not a complete symptom service.
-2. **Persistence and migration discipline.** Move to durable PostgreSQL storage with a tested migration plan, backups and restore testing. Replace startup SQLite table alterations with versioned migrations. Preserve existing data during the transition.
-3. **Abuse and session controls.** Add gateway/shared-store rate limits for login, signup and guest checks; password recovery, verification, session revocation and reauthentication for sensitive actions. Clearing the cookie does not revoke an already copied bearer token, which lasts up to one hour.
-4. **Privacy and retention.** Publish an operator-specific policy with hosting, retention and contact details; document backup deletion; clean up expired guest data; add a way to manage/delete guest checks. Data export and deletion alone do not establish legal compliance.
-5. **Production topology and monitoring.** Deploy behind same-origin `/api` routing or a same-site HTTPS API, configure exact trusted origins, stable secret management, logs without personal data, uptime/error monitoring and tested rollback. Unrelated Vercel/Render domains will not work with the new SameSite cookie model.
-6. **Repository hygiene.** The existing `petadvice.db` is already tracked. Ignore rules do not remove it from current tracking or Git history. Preserve a local backup, then resolve tracking/history before publishing code containing real accounts. No database/history cleanup was performed in this pass.
+| Priority | Implemented and verified locally | Remaining release work |
+| --- | --- | --- |
+| 1. Veterinary questions | Preserved as requested; the user confirms veterinary input in tailoring them. | No clinical changes/sign-off metadata invented in this technical pass. |
+| 2. Persistence | PostgreSQL support, three Alembic revisions, startup schema checks, legacy pet/link recovery, transactional SQLite import, encrypted backup/safe restore tools. The existing SQLite database was backed up and migrated; PostgreSQL import/restore preserved its account, pet and check. | Select durable hosting/storage, automate off-host encrypted backup/expiry, agree recovery targets. |
+| 3. Abuse/accounts | Shared Redis limits that fail closed, recovery, verification, one-use expiring links, encrypted asynchronous email, revocable sessions, logout all devices and password confirmation. | SMTP provider is not chosen; delivery currently uses private local development mail files. |
+| 4. Privacy/retention | Versioned notice acknowledgement, configurable guest expiry, scheduled cleanup, guest download/delete, account controls, self-hosted fonts and an operator-policy draft. | Complete operator/contact/hosting/legal-basis/backup retention decisions and publish the final policy. Guest default is provisionally 24 hours. |
+| 5. Deployment/monitoring | Same-origin container setup, HTTPS-capable Caddy, explicit trusted origins/hosts/proxy, non-root/read-only API/worker, minimized logs, readiness/worker heartbeat, probe, pinned images, CI integration tests and verified image-tag recovery procedure. The explicitly approved local database transition is complete: API, worker and migrations use the restricted application role, preserving administrator access and records. | No remote provider/domain/SMTP/alert destination configured. Production refuses administrator application credentials. |
+| 6. Repository hygiene | Private pre-migration backup, working database preserved, current database untracked; secrets/mail/backups excluded from Git/container contexts. | Older Git history still contains the database. History was not rewritten; assess it before repository publication. |
+
+See the [operations runbook](operations/runbook.md) and [policy draft](privacy-policy-draft.md) for configuration and remaining release decisions. The one-time local role transition in `deploy/restrict-local-database.py` has been applied and verified after explicit approval.
+
+### Follow-up verification
+
+- Full local backend suite with real PostgreSQL/Redis and isolated HTTP deployment checks: **69 passed**. Native default tests intentionally skip external infrastructure/HTTP tests unless configured.
+- The full backend suite also passed after switching to `petadvice_app`. API and worker connections use that restricted role and pass the production database-role guard; existing administrator authentication, application object ownership, preserved records and readiness were verified.
+- **8 frontend tests passed**, covering existing behavior plus recovery, guest capabilities/deletion, password-confirmed account deletion and reset-link handling.
+- Strict TypeScript/Vite build, frontend lint, migration drift check and Git whitespace check passed.
+- Current npm and pinned Python advisory audits reported no known vulnerabilities. The Python audit found a cryptography advisory during this pass; the lock was updated to the fixed **50.0.2** release and rechecked.
+- PostgreSQL concurrent token-consumption test allowed exactly one successful claim; shared Redis instances enforced one budget.
+- The actual beta’s legacy migration preserved one account, one recovered pet and one check. A private snapshot imported into temporary PostgreSQL and restored from an encrypted backup with matching records; the drill databases were removed.
+- Browser verification on the container deployment completed a synthetic guest emergency branch, checked focus/expiry/data controls and found no captured console errors/warnings. Account HTTP smoke checks covered cookie login, profile/export, logout revocation and synthetic account deletion.
+- `/api/ready` checked the database/schema, Redis and maintenance heartbeat. Restart/recovery from recorded verified image tags was rehearsed; there is no prior production release to assess for schema compatibility. CI is configured but has not run remotely.
+
+![Guest expiry and data controls visible after scrolling](audit/11-guest-controls-visible.jpg)
 
 ### Product follow-up
 

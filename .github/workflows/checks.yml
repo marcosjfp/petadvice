@@ -7,16 +7,46 @@ permissions:
 jobs:
   backend:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18@sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336
+        env:
+          POSTGRES_DB: petadvice_test
+          POSTGRES_USER: petadvice_test
+          POSTGRES_PASSWORD: disposable-ci-password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U petadvice_test -d petadvice_test"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:8-alpine@sha256:3811787313eba226a2ef38658c6ccb91cd5e110edc89c37767de373120a0e5a0
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.13'
+          python-version: '3.14'
           cache: pip
       - run: python -m pip install --require-hashes -r requirements.txt
       - run: python -m pytest -q
         env:
           DATABASE_URL: sqlite:////tmp/petadvice-ci.db
+          TEST_POSTGRES_URL: postgresql+psycopg://petadvice_test:disposable-ci-password@localhost:5432/petadvice_test
+          TEST_REDIS_URL: redis://localhost:6379/1
+      - run: python -m alembic upgrade head
+        env:
+          DATABASE_URL: sqlite:////tmp/petadvice-ci.db
+      - run: python -m alembic check
+        env:
+          DATABASE_URL: sqlite:////tmp/petadvice-ci.db
+      - name: Audit locked Python dependencies
+        run: |
+          python -m venv /tmp/petadvice-audit
+          /tmp/petadvice-audit/bin/pip install pip-audit==2.10.1
+          /tmp/petadvice-audit/bin/pip-audit -r requirements.txt --disable-pip
   frontend:
     runs-on: ubuntu-latest
     defaults:

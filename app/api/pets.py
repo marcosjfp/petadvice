@@ -3,7 +3,7 @@ from sqlmodel import Session, select
 
 from app.db import get_session
 from app.models.schema import Owner, Pet, PetCreate
-from app.services.auth import get_current_owner
+from app.services.auth import get_current_owner, require_verified_owner
 from app.services.life_stage_calculator import calculate_life_stage
 
 router = APIRouter(prefix="/pets", tags=["pets"])
@@ -12,7 +12,7 @@ router = APIRouter(prefix="/pets", tags=["pets"])
 @router.post("")
 def create_pet(
     payload: PetCreate,
-    current_owner: Owner = Depends(get_current_owner),
+    current_owner: Owner = Depends(require_verified_owner),
     db: Session = Depends(get_session),
 ):
     pet = Pet(

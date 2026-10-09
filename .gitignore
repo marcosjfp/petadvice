@@ -13,3 +13,6 @@ __pycache__/
 coverage/
 htmlcov/
 .coverage
+.mail/
+.backups/
+*.sqlite3

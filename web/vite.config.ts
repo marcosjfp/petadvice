@@ -16,6 +16,7 @@ export default defineConfig({
       icons: [{ src: '/petadvice-logo.png', sizes: '1254x1254', type: 'image/png', purpose: 'any' }],
     },
     workbox: {
+      globPatterns: ['**/*.{js,css,html,ico,woff2}'],
       navigateFallbackDenylist: [/^\/api\//],
       // Private responses and medical checks must never use an offline API cache.
       runtimeCaching: [],

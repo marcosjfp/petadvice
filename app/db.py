@@ -1,48 +1,50 @@
-import os
+from pathlib import Path
 
-from sqlalchemy import MetaData, inspect, text
-from sqlmodel import Session, SQLModel, create_engine
+from alembic.config import Config
+from alembic.runtime.migration import MigrationContext
+from alembic.script import ScriptDirectory
+from sqlalchemy import event, text
+from sqlmodel import Session, create_engine
 
-from app.models.schema import Pet
+from app.settings import get_settings
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./petadvice.db")
-connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
-engine = create_engine(DATABASE_URL, echo=False, connect_args=connect_args)
+
+def normalize_database_url(url: str) -> str:
+    if url.startswith('postgres://'):
+        return url.replace('postgres://', 'postgresql+psycopg://', 1)
+    if url.startswith('postgresql://'):
+        return url.replace('postgresql://', 'postgresql+psycopg://', 1)
+    return url
+
+
+DATABASE_URL = normalize_database_url(get_settings().database_url)
+connect_args = {'check_same_thread': False} if DATABASE_URL.startswith('sqlite') else {'options': '-c timezone=UTC'}
+engine = create_engine(DATABASE_URL, connect_args=connect_args, pool_pre_ping=True)
+
+if DATABASE_URL.startswith('sqlite'):
+    @event.listens_for(engine, 'connect')
+    def enable_sqlite_constraints(connection, _):
+        connection.execute('PRAGMA foreign_keys=ON')
+
+
+def migration_config() -> Config:
+    root = Path(__file__).resolve().parent.parent
+    config = Config(str(root / 'alembic.ini'))
+    config.set_main_option('script_location', str(root / 'migrations'))
+    return config
 
 
 def init_db() -> None:
-    SQLModel.metadata.create_all(engine)
-    if DATABASE_URL.startswith("sqlite"):
-        inspector = inspect(engine)
-        pet_columns = inspector.get_columns("pet") if "pet" in inspector.get_table_names() else []
-        owner_column = next((column for column in pet_columns if column["name"] == "owner_id"), None)
-        if owner_column and owner_column["nullable"] is False:
-            with engine.begin() as connection:
-                connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
-                connection.exec_driver_sql("ALTER TABLE pet RENAME TO pet_legacy")
-                new_table = Pet.__table__.to_metadata(MetaData(), name="pet_new")
-                new_table.create(connection)
-                columns = [column.name for column in new_table.columns]
-                column_sql = ", ".join(columns)
-                connection.execute(
-                    text(
-                        f"INSERT INTO pet_new ({column_sql}) "
-                        f"SELECT {column_sql} FROM pet_legacy"
-                    )
-                )
-                connection.exec_driver_sql("DROP TABLE pet_legacy")
-                connection.exec_driver_sql("ALTER TABLE pet_new RENAME TO pet")
-                connection.exec_driver_sql("PRAGMA foreign_keys=ON")
-            inspector = inspect(engine)
-        if "triagesession" in inspector.get_table_names():
-            columns = {column["name"] for column in inspector.get_columns("triagesession")}
-        else:
-            columns = set()
-        if "triagesession" in inspector.get_table_names() and "current_question_id" not in columns:
-            with engine.begin() as connection:
-                connection.exec_driver_sql(
-                    "ALTER TABLE triagesession ADD COLUMN current_question_id VARCHAR"
-                )
+    """Check schema readiness. Deployments apply migrations before starting workers."""
+    scripts = ScriptDirectory.from_config(migration_config())
+    with engine.connect() as connection:
+        current = MigrationContext.configure(connection).get_current_heads()
+        if get_settings().production and engine.dialect.name == 'postgresql':
+            privileged = connection.execute(text('SELECT rolsuper OR rolcreatedb OR rolcreaterole OR rolreplication OR rolbypassrls FROM pg_roles WHERE rolname = current_user')).scalar()
+            if privileged:
+                raise RuntimeError('Production database credentials must use a non-administrator application role')
+    if set(current) != set(scripts.get_heads()):
+        raise RuntimeError('Database migrations are pending. Back up the database, then run: python -m alembic upgrade head')
 
 
 def get_session():

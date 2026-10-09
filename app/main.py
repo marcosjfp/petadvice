@@ -1,64 +1,106 @@
 from contextlib import asynccontextmanager
-import os
+import json
+import logging
+import time
+import uuid
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exception_handlers import http_exception_handler
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.middleware.trustedhost import TrustedHostMiddleware
+from sqlalchemy import text
+from sqlmodel import Session
 
 from app.api import auth, conditions, pets, preventive_care, triage
 from app.content.loader import content_library
-from app.db import init_db
-from app.services.auth import COOKIE_NAME, clear_session_cookie, validate_auth_configuration
+from app.db import get_session, init_db
+from app.jobs.worker import worker_status
+from app.services.auth import COOKIE_NAME, clear_session_cookie
+from app.services.mail import mail_cipher
+from app.services.rate_limit import get_limiter, limit_requests
+from app.settings import get_settings
+
+settings = get_settings()
+logger = logging.getLogger('petadvice.requests')
+logger.setLevel(logging.INFO)
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter('%(message)s'))
+    logger.addHandler(handler)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    validate_auth_configuration()
+    settings.validate_production()
     init_db()
+    mail_cipher()
     content_library.load()
     yield
 
 
-app = FastAPI(title="PETAdvice API", version="0.1.0", lifespan=lifespan)
-cors_origins = [origin.strip() for origin in os.getenv(
-    "CORS_ORIGINS",
-    "http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174",
-).split(",") if origin.strip()]
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=cors_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-app.include_router(pets.router)
-app.include_router(auth.router)
-app.include_router(conditions.router)
-app.include_router(triage.router)
-app.include_router(preventive_care.router)
+app = FastAPI(title='PETAdvice API', version='0.2.0', lifespan=lifespan, dependencies=[Depends(limit_requests('global', '240/minute'))])
+app.add_middleware(CORSMiddleware, allow_origins=settings.origins, allow_credentials=True, allow_methods=['GET', 'POST', 'DELETE'], allow_headers=['Content-Type', 'Authorization', 'X-Guest-Token'])
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=[host.strip() for host in settings.trusted_hosts.split(',') if host.strip()])
+for router in [pets.router, auth.router, conditions.router, triage.router, preventive_care.router]:
+    app.include_router(router)
 
 
 @app.exception_handler(StarletteHTTPException)
 async def clear_invalid_browser_session(request, error):
     response = await http_exception_handler(request, error)
-    if (error.status_code == 401 and request.cookies.get(COOKIE_NAME)
-            and not request.headers.get("authorization") and request.url.path != "/auth/login"):
-        # Expired/restarted sessions must not prevent a signed-out guest check.
+    if error.status_code == 401 and request.cookies.get(COOKIE_NAME) and not request.headers.get('authorization') and request.url.path != '/auth/login':
         clear_session_cookie(response)
     return response
 
 
-@app.middleware("http")
+@app.middleware('http')
 async def security_headers(request, call_next):
-    response = await call_next(request)
-    response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    if request.url.path.startswith(("/auth", "/pets", "/triage")):
-        response.headers["Cache-Control"] = "no-store"
+    request_id = uuid.uuid4().hex
+    request.state.request_id = request_id
+    started = time.monotonic()
+    try:
+        response = await call_next(request)
+    except Exception:
+        # Exception strings, raw URLs, query strings and credentials must not enter logs.
+        from starlette.responses import JSONResponse
+        response = JSONResponse({'detail': 'An unexpected error occurred. Try again shortly.', 'request_id': request_id}, status_code=500)
+    response.headers['X-Request-ID'] = request_id
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['Referrer-Policy'] = 'no-referrer'
+    if settings.production:
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000'
+    if request.url.path.startswith(('/auth', '/pets', '/triage', '/ready', '/privacy')):
+        response.headers['Cache-Control'] = 'no-store'
+    route = request.scope.get('route')
+    logger.info(json.dumps({'event': 'request', 'request_id': request_id, 'method': request.method, 'route': getattr(route, 'path', 'unmatched'), 'status': response.status_code, 'duration_ms': round((time.monotonic() - started) * 1000)}))
     return response
 
 
-@app.get("/health")
+@app.get('/health')
 def health():
-    return {"status": "ok"}
+    return {'status': 'ok'}
+
+
+@app.get('/ready')
+def ready(db: Session = Depends(get_session)):
+    try:
+        db.execute(text('SELECT 1'))
+        init_db()
+        if not get_limiter().storage.check():
+            raise RuntimeError('Rate-limit store unavailable')
+        backlog = worker_status(db)
+    except Exception as error:
+        raise HTTPException(503, 'Service dependencies are not ready') from error
+    if backlog['mail_backlog_delayed']:
+        raise HTTPException(503, 'Email delivery is delayed')
+    if backlog['worker_stale']:
+        raise HTTPException(503, 'Maintenance worker is not ready')
+    return {'status': 'ready'}
+
+
+@app.get('/privacy')
+def privacy_notice():
+    configured = bool(settings.privacy_operator and settings.privacy_email and settings.privacy_policy_url)
+    return {'status': 'configured' if configured else 'draft', 'operator': settings.privacy_operator or None, 'contact': settings.privacy_email or None, 'policy_url': settings.privacy_policy_url or None, 'policy_version': settings.privacy_policy_version, 'guest_retention_hours': settings.guest_retention_hours, 'account_retention': 'Until you delete your account', 'backup_retention': 'Set by the deployment operator; not yet configured' if not configured else 'See the published privacy policy'}

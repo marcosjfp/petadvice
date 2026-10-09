@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { api, ApiError, urgencyLabels, type Condition, type Pet, type Question, type Species, type TriageResult, type PreventiveCareItem } from './api'
+import { api, ApiError, urgencyLabels, type Condition, type Owner, type Privacy, type Pet, type Question, type Species, type TriageResult, type PreventiveCareItem } from './api'
+import AccountLink from './AccountLink'
+import { downloadJson } from './download'
 import { errorMessage, useRequest } from './useRequest'
 import fullLogo from './assets/brand/Logo_new.png'
 import nameLogo from './assets/brand/Logo_Just_Name.png'
@@ -13,6 +15,12 @@ function ErrorNotice({ message }: { message: string }) {
 }
 
 function App() {
+  const [accountLink, setAccountLink] = useState(() => {
+    const values = new URLSearchParams(window.location.hash.slice(1))
+    const action = values.get('action'), token = values.get('token')
+    return (action === 'verify' || action === 'reset') && token ? { action, token } as { action: 'verify' | 'reset'; token: string } : null
+  })
+  const [owner, setOwner] = useState<Owner | null>(null)
   const [auth, setAuth] = useState<'checking' | 'signed-in' | 'guest' | 'error'>('checking')
   const [view, setView] = useState<View>('triage')
   const [pets, setPets] = useState<Pet[]>([])
@@ -31,12 +39,17 @@ function App() {
   const { busy, error, run } = useRequest()
 
   useEffect(() => {
+    if (accountLink) window.history.replaceState(null, '', window.location.pathname + window.location.search)
+  }, [accountLink])
+
+  useEffect(() => {
     // Remove credentials stored by the previous version. Cookies are HttpOnly.
     try { localStorage.removeItem('petadvice_token') } catch { /* Storage can be disabled; cookie auth still works. */ }
     let cancelled = false
-    api.getMe().then(() => { if (!cancelled) setAuth('signed-in') })
+    api.getMe().then((data) => { if (!cancelled) { setOwner(data); setAuth('signed-in') } })
       .catch((failure) => { if (!cancelled) setAuth(failure instanceof ApiError && failure.status === 401 ? 'guest' : 'error') })
     const expired = () => {
+      setOwner(null)
       setAuth('guest'); setPets([]); setSelectedPetId(null); setPetsLoaded(false)
       setShowAuth(true); setShowQuickCheck(false)
     }
@@ -56,6 +69,7 @@ function App() {
   }, [auth, load])
 
   function resetAccount() {
+    setOwner(null)
     setAuth('guest'); setPets([]); setSelectedPetId(null); setPetsLoaded(false)
     setShowPetForm(false); setShowAuth(false); setShowQuickCheck(false); setView('triage')
   }
@@ -79,13 +93,17 @@ function App() {
 
   function retryLoad() { setLoadError(''); setPetsLoaded(false); setAuth('checking'); setLoad((count) => count + 1) }
 
+  if (accountLink) return <Shell><AccountLink {...accountLink} onDone={() => { setAccountLink(null); setShowAuth(true); retryLoad() }} /><Emergency /></Shell>
+
   if (auth === 'checking' || (auth === 'signed-in' && !petsLoaded)) return <Shell><p role="status">Loading your account…</p><Emergency /></Shell>
   if (auth === 'error' || loadError) return <Shell><h1>We could not load your account.</h1><ErrorNotice message={loadError || 'Check your connection and try again.'} /><button className="primary" onClick={retryLoad}>Try again</button><Emergency /></Shell>
   if (auth === 'guest') {
-    if (showAuth) return <AuthPanel onBack={() => setShowAuth(false)} onAuthenticated={() => { setAuth('signed-in'); setShowAuth(false); setShowQuickCheck(false); setPetsLoaded(false) }} />
+    if (showAuth) return <AuthPanel onBack={() => setShowAuth(false)} onAuthenticated={() => { setShowAuth(false); setShowQuickCheck(false); retryLoad() }} />
     if (showQuickCheck) return <Shell onBack={() => setShowQuickCheck(false)}><Triage pet={null} onLogin={() => setShowAuth(true)} /><Emergency /></Shell>
     return <PublicLanding onQuickCheck={() => setShowQuickCheck(true)} onLogin={() => setShowAuth(true)} />
   }
+
+  if (owner?.email_verification_required && !owner.email_verified_at) return <Shell><VerificationNotice email={owner.email} onLogout={resetAccount} /><Account onDeleted={resetAccount} /><Emergency /></Shell>
 
   if ((!pet || showPetForm) && view !== 'account') return <Shell onBack={pet ? () => setShowPetForm(false) : undefined}>
     <section className="welcome"><p className="eyebrow">{pet ? 'Add another companion' : 'Set up your first pet'}</p>
@@ -134,30 +152,40 @@ function PublicLanding({ onQuickCheck, onLogin }: { onQuickCheck: () => void; on
 }
 
 function PrivacyNotice() {
-  return <details className="privacy-notice"><summary>How your data is used in this beta</summary><p>The app stores your email, a password hash, pet profiles and symptom checks. Account data is available to you through export, and deleting your account removes its profiles and checks from the app database. Guest checks are also stored in the database.</p><p>Do not enter personal or sensitive details in pet names. A published privacy policy covering the operator, hosting, retention and privacy contact is required before public release.</p></details>
+  const [notice, setNotice] = useState<Privacy | null>(null)
+  useEffect(() => { let active = true; api.privacy().then((data) => { if (active) setNotice(data) }).catch(() => {}); return () => { active = false } }, [])
+  return <details className="privacy-notice"><summary>How your data is used</summary><p>The app stores your email, a password hash, pet profiles, symptom checks and security records. You can download account data or delete your account and its profiles and checks from the app database.</p><p>{notice ? `Guest checks expire after ${notice.guest_retention_hours} hours and are removed by scheduled cleanup. You can also download or delete a guest check while it is open.` : 'Guest checks have a limited retention period; the current notice could not be loaded.'} Closing the page loses access to that guest check.</p><p>Account data is kept until you delete the account. Backups follow the deployment operator’s separate retention schedule.</p>{notice?.policy_url && /^https:\/\//.test(notice.policy_url) ? <p><a href={notice.policy_url} target="_blank" rel="noopener noreferrer">Read the privacy policy</a> · {notice.operator}{notice.contact && <> · <a href={`mailto:${notice.contact}`}>{notice.contact}</a></>}</p> : <p>This beta notice is a draft. Operator, hosting, backup retention and privacy contact details are still pending before public release.</p>}<p>Do not enter personal or sensitive details in pet names.</p></details>
+}
+
+function VerificationNotice({ email, onLogout }: { email: string; onLogout: () => void }) {
+  const { busy, error, run } = useRequest()
+  const [status, setStatus] = useState('')
+  return <section className="panel"><h1>Check your email.</h1><p>Verify {email} before saving pet profiles. Open the link in your verification email, then return here.</p><button className="primary" disabled={busy} onClick={() => void run(async () => { setStatus((await api.resendVerification(email)).message) })}>Resend verification email</button><button className="secondary" onClick={() => window.location.reload()}>I have verified my email</button><button className="secondary" disabled={busy} onClick={() => void run(async () => { await api.logout(); onLogout() })}>Log out</button><p role="status">{status}</p><ErrorNotice message={error} /></section>
 }
 
 function AuthPanel({ onBack, onAuthenticated }: { onBack: () => void; onAuthenticated: () => void }) {
-  const [mode, setMode] = useState<'login' | 'signup'>('login')
+  const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [privacyAccepted, setPrivacyAccepted] = useState(false)
+  const [status, setStatus] = useState('')
   const { busy, error, run, setError } = useRequest()
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     void run(async () => {
+      if (mode === 'forgot') { setStatus((await api.forgotPassword(email)).message); return }
       if (mode === 'login') await api.login(email, password)
       else await api.signup(email, password, privacyAccepted)
       onAuthenticated()
     })
   }
-  return <Shell onBack={onBack}><section className="welcome auth-panel"><p className="eyebrow">Private guidance for your pets</p><h1>{mode === 'login' ? 'Welcome back.' : 'Create your account.'}</h1><p className="lead">Your pet profiles and checks stay tied to your account.</p>
+  return <Shell onBack={onBack}><section className="welcome auth-panel"><p className="eyebrow">Private guidance for your pets</p><h1>{mode === 'login' ? 'Welcome back.' : mode === 'forgot' ? 'Recover your account.' : 'Create your account.'}</h1><p className="lead">{mode === 'forgot' ? 'Enter your email to request a password reset link.' : 'Your pet profiles and checks stay tied to your account.'}</p>
     <form className="profile-form auth-form" onSubmit={submit} aria-busy={busy}>
       <label>Email<input name="email" type="email" autoComplete="username" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} /></label>
-      <label>Password<input name="password" type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} required minLength={mode === 'signup' ? 15 : 1} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} />{mode === 'signup' && <small>Use 15–128 characters. A passphrase works well.</small>}</label>
+      {mode !== 'forgot' && <label>Password<input name="password" type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} required minLength={mode === 'signup' ? 15 : 1} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} />{mode === 'signup' && <small>Use 15–128 characters. A passphrase works well.</small>}</label>}
       {mode === 'signup' && <><PrivacyNotice /><label className="check"><input type="checkbox" required checked={privacyAccepted} onChange={(event) => setPrivacyAccepted(event.target.checked)} /> I have read the beta data-use notice.</label></>}
-      <button className="primary" disabled={busy}>{busy ? 'Please wait…' : mode === 'login' ? 'Log in' : 'Create account'}</button>
-    </form><ErrorNotice message={error} /><button className="secondary" disabled={busy} onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); setPassword('') }}>{mode === 'login' ? 'Create an account' : 'Already have an account? Log in'}</button>
+      <button className="primary" disabled={busy}>{busy ? 'Please wait…' : mode === 'login' ? 'Log in' : mode === 'forgot' ? 'Send reset link' : 'Create account'}</button>
+    </form><p role="status">{status}</p><ErrorNotice message={error} /><button className="secondary" disabled={busy} onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); setPassword(''); setStatus('') }}>{mode === 'login' ? 'Create an account' : 'Back to log in'}</button>{mode === 'login' && <button className="secondary" onClick={() => { setMode('forgot'); setError(''); setPassword(''); setStatus('') }}>Forgot your password?</button>}
   </section><Emergency /></Shell>
 }
 
@@ -173,48 +201,60 @@ function Triage({ pet, onLogin }: { pet: Pet | null; onLogin?: () => void }) {
   const [species, setSpecies] = useState<Species>('dog')
   const [question, setQuestion] = useState<Question | null>(null)
   const [session, setSession] = useState('')
+  const [guestToken, setGuestToken] = useState<string | null>(null)
+  const [expiresAt, setExpiresAt] = useState<string | null>(null)
   const [complete, setComplete] = useState(false)
   const [result, setResult] = useState<TriageResult | null>(null)
   const { busy, error, run, setError } = useRequest()
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => { if (question || complete) heading.current?.focus() }, [question, complete, result])
   const activeSpecies = pet?.species ?? species
-  async function finish(sessionId: string) {
+  async function finish(sessionId: string, token = guestToken) {
     setQuestion(null); setComplete(true)
-    setResult(await api.result(sessionId))
+    setResult(await api.result(sessionId, token))
   }
   function begin() {
     void run(async () => {
       const started = await api.startTriage(pet?.id ?? null, symptom, activeSpecies)
       setSession(started.session_id)
-      if (started.flow_complete) await finish(started.session_id)
+      setGuestToken(started.guest_token ?? null); setExpiresAt(started.expires_at ?? null)
+      if (started.flow_complete) await finish(started.session_id, started.guest_token ?? null)
       else setQuestion(started.next_question)
     })
   }
   function answer(value: string) {
     if (!question) return
     void run(async () => {
-      const next = await api.answer(session, question.id, value)
+      const next = await api.answer(session, question.id, value, guestToken)
       if (next.flow_complete) await finish(session)
       else setQuestion(next.next_question)
     })
   }
-  function restart() { setResult(null); setSession(''); setQuestion(null); setComplete(false); setError('') }
+  function restart() { setResult(null); setSession(''); setGuestToken(null); setExpiresAt(null); setQuestion(null); setComplete(false); setError('') }
+  const guestControls = guestToken ? <GuestControls session={session} token={guestToken} expiresAt={expiresAt} disabled={busy} onDeleted={restart} /> : null
   if (result) return <section className={`result ${result.resulting_urgency}`}><p className="eyebrow">Guidance for {pet?.name ?? 'your pet'}</p><h1 ref={heading} tabIndex={-1}>{urgencyLabels[result.resulting_urgency]}</h1><p className="result-copy">{result.resulting_guidance}</p>
     {result.possible_causes.length > 0 && <details className="result-detail"><summary>Possible causes to discuss with your vet</summary><ul>{result.possible_causes.map((cause) => <li key={cause}>{cause}</li>)}</ul></details>}
     {result.recommended_examinations.length > 0 && <details className="result-detail"><summary>Your vet may want to check</summary><ul>{result.recommended_examinations.map((examination) => <li key={examination}>{examination}</li>)}</ul></details>}
     <p className="fine-print">General guidance only, not a diagnosis. Beta content awaits veterinary review. If your pet worsens or you are unsure, contact your veterinary practice.</p>
     {onLogin && <button className="primary" onClick={onLogin}>Create an account for future pet profiles</button>}
     <button className="secondary" onClick={restart}>Start another check</button>
+    {guestControls}
   </section>
-  if (complete) return <section className="panel"><h1 ref={heading} tabIndex={-1}>Your questions are complete.</h1><p role="status">{busy ? 'Loading guidance…' : 'Guidance could not be loaded yet.'}</p><ErrorNotice message={error} /><button className="primary" disabled={busy} onClick={() => void run(async () => { setResult(await api.result(session)) })}>Try loading guidance again</button></section>
-  if (question) return <section className="question" aria-busy={busy}><div className="progress">Check for {pet?.name ?? `your ${species}`} <span>Adaptive questions</span></div><h1 ref={heading} tabIndex={-1}>{question.prompt}</h1><div className="options">{question.options.map((option) => <button disabled={busy} className="option" onClick={() => answer(option)} key={option}>{option}<span aria-hidden="true">→</span></button>)}</div><p role="status">{busy ? 'Saving your answer…' : ''}</p><ErrorNotice message={error} /><button className="secondary" disabled={busy} onClick={restart}>Restart this check</button></section>
+  if (complete) return <section className="panel"><h1 ref={heading} tabIndex={-1}>Your questions are complete.</h1><p role="status">{busy ? 'Loading guidance…' : 'Guidance could not be loaded yet.'}</p><ErrorNotice message={error} /><button className="primary" disabled={busy} onClick={() => void run(async () => { setResult(await api.result(session, guestToken)) })}>Try loading guidance again</button>{guestControls}</section>
+  if (question) return <section className="question" aria-busy={busy}><div className="progress">Check for {pet?.name ?? `your ${species}`} <span>Adaptive questions</span></div><h1 ref={heading} tabIndex={-1}>{question.prompt}</h1><div className="options">{question.options.map((option) => <button disabled={busy} className="option" onClick={() => answer(option)} key={option}>{option}<span aria-hidden="true">→</span></button>)}</div><p role="status">{busy ? 'Saving your answer…' : ''}</p><ErrorNotice message={error} /><button className="secondary" disabled={busy} onClick={restart}>Restart this check</button>{guestControls}</section>
   return <section className="panel" aria-busy={busy}><p className="eyebrow">A calmer next step</p><h1>What have you noticed?</h1><p className="muted">{pet ? `Checking symptoms for ${pet.name}. ` : ''}Choose the closest match. This check gives urgency guidance, not a diagnosis.</p>
     {!pet && <label className="guest-species">Who is this check for?<select disabled={busy} value={species} onChange={(event) => { setSpecies(event.target.value as Species); setSymptom(''); setError('') }}><option value="dog">Dog</option><option value="cat">Cat</option></select></label>}
     <div className="symptoms">{symptoms.filter((item) => !item.dogOnly || activeSpecies === 'dog').map((item) => <button disabled={busy} aria-pressed={symptom === item.value} className={symptom === item.value ? 'selected' : ''} onClick={() => setSymptom(item.value)} key={item.value}>{item.label}<span aria-hidden="true">＋</span></button>)}</div>
     <button className="primary wide" disabled={!symptom || busy} onClick={begin}>{busy ? 'Starting your check…' : 'Continue'}</button><ErrorNotice message={error} />
     <p className="fine-print">Cannot find the symptom? Contact your veterinary practice. Breathing trouble or collapse needs emergency care immediately.</p>
+    {!pet && <PrivacyNotice />}
   </section>
+}
+
+function GuestControls({ session, token, expiresAt, disabled, onDeleted }: { session: string; token: string; expiresAt: string | null; disabled: boolean; onDeleted: () => void }) {
+  const { busy, error, run } = useRequest()
+  const [status, setStatus] = useState('')
+  return <div className="guest-controls"><p className="fine-print">{expiresAt ? `This guest check expires ${new Date(expiresAt).toLocaleString()}. ` : ''}Closing this page loses access. Download a copy to keep it.</p><button className="secondary" disabled={disabled || busy} onClick={() => void run(async () => { downloadJson(await api.exportCheck(session, token), 'petadvice-guest-check.json'); setStatus('Your guest check has been downloaded.') })}>Download this guest check</button><button className="secondary" disabled={disabled || busy} onClick={() => void run(async () => { await api.deleteGuestCheck(session, token); onDeleted() })}>Delete this guest check</button><p role="status">{status}</p><ErrorNotice message={error} /></div>
 }
 
 function Sources({ sources }: { sources: string[] }) {
@@ -266,20 +306,20 @@ function Care({ pet }: { pet: Pet }) {
 
 function Account({ onDeleted }: { onDeleted: () => void }) {
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [password, setPassword] = useState('')
   const { busy, error, run } = useRequest()
   const [status, setStatus] = useState('')
   function exportData() {
     void run(async () => {
-      const data = await api.exportMyData()
-      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }))
-      const link = document.createElement('a'); link.href = url; link.download = 'petadvice-data.json'
-      link.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+      await api.reauthenticate(password)
+      downloadJson(await api.exportMyData(), 'petadvice-data.json')
+      setPassword('')
       setStatus('Your data export has been downloaded.')
     })
   }
-  return <section className="panel"><p className="eyebrow">Account and privacy</p><h1>Your data, your choice.</h1><PrivacyNotice /><button className="secondary" disabled={busy} onClick={exportData}>Download my data</button><p role="status">{status}</p><ErrorNotice message={error} />
+  return <section className="panel"><p className="eyebrow">Account and privacy</p><h1>Your data, your choice.</h1><PrivacyNotice /><label className="security-password">Confirm your password for account controls<input type="password" autoComplete="current-password" maxLength={128} value={password} onChange={(e) => setPassword(e.target.value)} /></label><button className="secondary" disabled={busy || !password} onClick={exportData}>Download my data</button><button className="secondary" disabled={busy || !password} onClick={() => void run(async () => { await api.reauthenticate(password); await api.logoutAll(); onDeleted() })}>Log out all devices</button><p role="status">{status}</p><ErrorNotice message={error} />
     <div className="delete-account"><h3>Delete account</h3><p>This permanently removes your account, pet profiles and associated checks from the app database.</p>
-      {!confirmDelete ? <button className="secondary" disabled={busy} onClick={() => setConfirmDelete(true)}>Delete my account…</button> : <><p role="alert">This cannot be undone. Download your data first if you want a copy.</p><button className="danger" disabled={busy} onClick={() => void run(async () => { await api.deleteMyAccount(); onDeleted() })}>Permanently delete my account</button><button className="secondary" disabled={busy} onClick={() => setConfirmDelete(false)}>Cancel</button></>}
+      {!confirmDelete ? <button className="secondary" disabled={busy} onClick={() => setConfirmDelete(true)}>Delete my account…</button> : <><p role="alert">This cannot be undone. Download your data first if you want a copy.</p><button className="danger" disabled={busy || !password} onClick={() => void run(async () => { await api.reauthenticate(password); await api.deleteMyAccount(); onDeleted() })}>Permanently delete my account</button><button className="secondary" disabled={busy} onClick={() => setConfirmDelete(false)}>Cancel</button></>}
     </div>
   </section>
 }

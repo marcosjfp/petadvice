@@ -21,10 +21,18 @@ def _override_get_session():
 
 
 @pytest.fixture(autouse=True)
-def reset_db():
+def reset_db(monkeypatch, tmp_path):
+    from app.services.rate_limit import get_limiter
+    from app.services.mail import mail_cipher
+    from app.settings import get_settings
+    get_limiter.cache_clear()
+    mail_cipher.cache_clear()
+    monkeypatch.setattr(get_settings(), 'mail_directory', str(tmp_path / 'mail'))
     SQLModel.metadata.create_all(test_engine)
     yield
     SQLModel.metadata.drop_all(test_engine)
+    get_limiter.cache_clear()
+    mail_cipher.cache_clear()
 
 
 @pytest.fixture
@@ -121,6 +129,7 @@ def test_guest_can_complete_quick_check_without_login(client):
     )
     assert started.status_code == 200
     session_id = started.json()["session_id"]
+    headers = {'X-Guest-Token': started.json()['guest_token']}
     question = started.json()["next_question"]
     answers = {
         "q-vomit-001": "Once",
@@ -133,10 +142,11 @@ def test_guest_can_complete_quick_check_without_login(client):
         response = client.post(
             f"/triage/{session_id}/answer",
             json={"question_id": question["id"], "answer": answer},
+            headers=headers,
         )
         assert response.status_code == 200
         question = response.json()["next_question"]
-    result = client.get(f"/triage/{session_id}/result")
+    result = client.get(f"/triage/{session_id}/result", headers=headers)
     assert result.status_code == 200
     assert result.json()["resulting_urgency"] == "monitor_home"
 
@@ -189,7 +199,7 @@ def test_unknown_and_incomplete_guest_checks(client):
     with Session(test_engine) as db:
         assert db.exec(select(Pet)).all() == []
     started = client.post('/triage/start', json={'symptom_tag': 'vomiting'}).json()
-    assert client.get(f"/triage/{started['session_id']}/result").status_code == 409
+    assert client.get(f"/triage/{started['session_id']}/result", headers={'X-Guest-Token': started['guest_token']}).status_code == 409
 
 
 def test_production_requires_secret(monkeypatch):

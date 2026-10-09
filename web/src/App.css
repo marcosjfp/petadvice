@@ -67,3 +67,8 @@ summary { cursor: pointer; min-height: 44px; padding: 12px 0; font-weight: 700; 
 
 .panel h1, .question h1 { font-size: 42px; margin: 0 0 12px; }
 @media (max-width: 650px) { .panel h1, .question h1 { font-size: 35px; } }
+
+.guest-controls { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--line, #ddd); }
+.security-password { display: grid; gap: .5rem; max-width: 28rem; margin: 1.5rem 0 1rem; }
+.security-password input { width: 100%; box-sizing: border-box; }
+.form-field { display: grid; gap: 7px; }
