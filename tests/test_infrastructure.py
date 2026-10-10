@@ -86,3 +86,18 @@ def test_redis_limits_are_shared_across_instances():
     assert not first.hit(budget, scope)
     assert first.storage.check() and second.storage.check()
     first.clear(budget, scope)
+
+
+def test_postgres_first_report_is_frozen_under_concurrency(postgres_engine):
+    from app.content.loader import content_library
+    from app.services.triage_engine import compute_result
+    migrate(postgres_engine); seed(postgres_engine); content_library.load()
+    with postgres_engine.begin() as db:
+        db.execute(text("UPDATE triagesession SET current_question_id=NULL WHERE id='check'"))
+    def result(_):
+        with Session(postgres_engine) as db:
+            return compute_result(db, 'check').model_dump(mode='json')
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        results = list(pool.map(result, range(4)))
+    assert all(report == results[0] for report in results)
+    assert results[0]['content_version'] and results[0]['pet']['name'] == 'Rex'

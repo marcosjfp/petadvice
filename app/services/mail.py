@@ -1,8 +1,10 @@
 """Encrypted transactional outbox, delivered by the worker. No tokens in logs."""
+import httpx
 import json
 import os
 import smtplib
 import ssl
+import time
 from email.message import EmailMessage
 from functools import lru_cache
 from pathlib import Path
@@ -42,14 +44,16 @@ def queue_mail(db: Session, owner, subject: str, body: str, expires_at, action_h
     db.add(EmailDelivery(owner_id=owner.id, encrypted_payload=mail_cipher().encrypt(payload).decode(), expires_at=expires_at))
 
 
-def deliver_pending(db: Session):
+def deliver_pending(db: Session, limit: int = 50, deadline: float | None = None):
     settings = get_settings()
     now = utcnow()
-    query = select(EmailDelivery).where(EmailDelivery.next_attempt_at <= now, EmailDelivery.expires_at > now).order_by(EmailDelivery.created_at).limit(50)
+    query = select(EmailDelivery).where(EmailDelivery.next_attempt_at <= now, EmailDelivery.expires_at > now).order_by(EmailDelivery.created_at).limit(limit)
     if db.bind.dialect.name == 'postgresql':
         query = query.with_for_update(skip_locked=True)
     count = 0
     for delivery in db.exec(query).all():
+        if deadline is not None and time.monotonic() >= deadline:
+            break
         try:
             payload = json.loads(mail_cipher().decrypt(delivery.encrypted_payload.encode()))
             if payload.get('action_hash'):
@@ -69,6 +73,13 @@ def deliver_pending(db: Session):
                 with path.open('w') as file:
                     os.chmod(path, 0o600)
                     file.write(message.as_string())
+            elif settings.mail_backend == 'resend':
+                response = httpx.post('https://api.resend.com/emails',
+                    headers={'Authorization': f'Bearer {settings.resend_api_key}', 'Idempotency-Key': f'petadvice/{delivery.id}'},
+                    json={'from': settings.smtp_from, 'to': [payload['to']], 'subject': payload['subject'], 'text': payload['body']},
+                    # Divide remaining time across connect/write/read/pool phases.
+                    timeout=min(10, max(0.1, (deadline-time.monotonic())/4)) if deadline is not None else 10)
+                response.raise_for_status()
             elif settings.mail_backend == 'smtp':
                 factory = smtplib.SMTP_SSL if settings.smtp_ssl else smtplib.SMTP
                 kwargs = {'context': ssl.create_default_context()} if settings.smtp_ssl else {}

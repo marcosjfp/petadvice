@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { api, ApiError, urgencyLabels, type Condition, type Owner, type Privacy, type Pet, type Question, type Species, type TriageResult, type PreventiveCareItem } from './api'
 import AccountLink from './AccountLink'
+import CheckResult from './CheckResult'
+import CheckHistory from './CheckHistory'
 import { downloadJson } from './download'
 import { errorMessage, useRequest } from './useRequest'
 import fullLogo from './assets/brand/Logo_new.png'
@@ -8,7 +10,7 @@ import nameLogo from './assets/brand/Logo_Just_Name.png'
 import petsLogo from './assets/brand/Logo_Just_Pets.png'
 import './App.css'
 
-type View = 'triage' | 'library' | 'care' | 'account'
+type View = 'triage' | 'library' | 'care' | 'history' | 'account'
 
 function ErrorNotice({ message }: { message: string }) {
   return message ? <p className="error" role="alert">{message}</p> : null
@@ -28,6 +30,7 @@ function App() {
   const [showPetForm, setShowPetForm] = useState(false)
   const [showAuth, setShowAuth] = useState(false)
   const [showQuickCheck, setShowQuickCheck] = useState(false)
+  const [publicView, setPublicView] = useState<'library' | 'care' | null>(null)
   const [load, setLoad] = useState(0)
   const [petsLoaded, setPetsLoaded] = useState(false)
   const [loadError, setLoadError] = useState('')
@@ -100,7 +103,8 @@ function App() {
   if (auth === 'guest') {
     if (showAuth) return <AuthPanel onBack={() => setShowAuth(false)} onAuthenticated={() => { setShowAuth(false); setShowQuickCheck(false); retryLoad() }} />
     if (showQuickCheck) return <Shell onBack={() => setShowQuickCheck(false)}><Triage pet={null} onLogin={() => setShowAuth(true)} /><Emergency /></Shell>
-    return <PublicLanding onQuickCheck={() => setShowQuickCheck(true)} onLogin={() => setShowAuth(true)} />
+    if (publicView) return <PublicEducation initialView={publicView} onBack={() => setPublicView(null)} />
+    return <PublicLanding onBrowse={setPublicView} onQuickCheck={() => setShowQuickCheck(true)} onLogin={() => setShowAuth(true)} />
   }
 
   if (owner?.email_verification_required && !owner.email_verified_at) return <Shell><VerificationNotice email={owner.email} onLogout={resetAccount} /><Account onDeleted={resetAccount} /><Emergency /></Shell>
@@ -127,11 +131,12 @@ function App() {
       <button className="start-fresh" onClick={() => { setShowPetForm(true); setView('triage') }}>New pet</button>
       <button className="start-fresh" disabled={busy} onClick={() => void run(async () => { await api.logout(); resetAccount() })}>Log out</button>
     </div></header>
-    <nav className="tabs" aria-label="Main navigation">{(['triage', 'library', 'care', 'account'] as View[]).map((item) => <button aria-current={view === item ? 'page' : undefined} className={view === item ? 'active' : ''} onClick={() => setView(item)} key={item}>{({ triage: 'Check symptoms', library: 'Learn', care: 'Care plan', account: 'Account' })[item]}</button>)}</nav>
+    <nav className="tabs" aria-label="Main navigation">{(['triage', 'library', 'care', 'history', 'account'] as View[]).map((item) => <button aria-current={view === item ? 'page' : undefined} className={view === item ? 'active' : ''} onClick={() => setView(item)} key={item}>{({ triage: 'Check symptoms', library: 'Learn', care: 'Care plan', history: 'Check history', account: 'Account' })[item]}</button>)}</nav>
     <ErrorNotice message={error} />
     {view === 'triage' && pet && <Triage key={pet.id} pet={pet} />}
-    {view === 'library' && pet && <Library key={pet.species} pet={pet} />}
+    {view === 'library' && pet && <Library key={pet.species} species={pet.species} />}
     {view === 'care' && pet && <Care key={pet.id} pet={pet} />}
+    {view === 'history' && pet && <CheckHistory key={pet.id} pet={pet} />}
     {view === 'account' && <Account onDeleted={resetAccount} />}
     <Emergency />
   </main>
@@ -141,14 +146,24 @@ function Shell({ children, onBack }: { children: React.ReactNode; onBack?: () =>
   return <main className="shell"><header><img className="name-logo" src={nameLogo} alt="PETAdvice" />{onBack && <button className="cancel-fresh" onClick={onBack}>Back</button>}</header>{children}</main>
 }
 
-function PublicLanding({ onQuickCheck, onLogin }: { onQuickCheck: () => void; onLogin: () => void }) {
+function PublicLanding({ onQuickCheck, onLogin, onBrowse }: { onQuickCheck: () => void; onLogin: () => void; onBrowse: (view: 'library' | 'care') => void }) {
   return <main className="shell"><header><img className="main-logo" src={fullLogo} alt="PETAdvice dog and cat logo" /><button className="start-fresh" onClick={onLogin}>Log in</button></header>
     <section className="intro"><p className="eyebrow">Friendly guidance for everyday pet worries</p><h1>A clearer next step for your pet.</h1><p className="intro-lead">When something feels different, PETAdvice helps you work out what to look for, how urgently to act, and what to discuss with your vet.</p>
       <div className="intro-actions"><button className="primary" onClick={onQuickCheck}>Start a quick check <span aria-hidden="true">→</span></button><button className="secondary" onClick={onLogin}>Save my pet profiles</button></div>
+      <div className="public-links"><button className="secondary" onClick={() => onBrowse('library')}>Browse Learn</button><button className="secondary" onClick={() => onBrowse('care')}>Browse Care</button></div>
       <div className="intro-points"><article><span>01</span><div><h2>Make sense of symptoms</h2><p>Find straightforward information about common concerns.</p></div></article><article><span>02</span><div><h2>Know how urgent it is</h2><p>Answer focused questions to help decide when to contact a vet.</p></div></article><article><span>03</span><div><h2>Keep care on track</h2><p>Save pet profiles and browse care information for their life stage.</p></div></article></div>
       <p className="intro-boundary">General educational guidance, not a diagnosis. This beta's content is awaiting veterinary review. No account is needed for a quick check.</p>
     </section><Emergency />
   </main>
+}
+
+function PublicEducation({ initialView, onBack }: { initialView: 'library' | 'care'; onBack: () => void }) {
+  const [view, setView] = useState(initialView)
+  const [species, setSpecies] = useState<Species>('dog')
+  return <Shell onBack={onBack}><nav className="tabs" aria-label="Public learning navigation">{(['library', 'care'] as const).map((item) => <button key={item} aria-current={view === item ? 'page' : undefined} className={view === item ? 'active' : ''} onClick={() => setView(item)}>{item === 'library' ? 'Learn' : 'Care'}</button>)}</nav>
+    <label className="guest-species">Browse information for<select value={species} onChange={(event) => setSpecies(event.target.value as Species)}><option value="dog">Dogs</option><option value="cat">Cats</option></select></label>
+    {view === 'library' ? <Library key={species} species={species} /> : <Care key={species} species={species} />}<Emergency />
+  </Shell>
 }
 
 function PrivacyNotice() {
@@ -232,14 +247,11 @@ function Triage({ pet, onLogin }: { pet: Pet | null; onLogin?: () => void }) {
   }
   function restart() { setResult(null); setSession(''); setGuestToken(null); setExpiresAt(null); setQuestion(null); setComplete(false); setError('') }
   const guestControls = guestToken ? <GuestControls session={session} token={guestToken} expiresAt={expiresAt} disabled={busy} onDeleted={restart} /> : null
-  if (result) return <section className={`result ${result.resulting_urgency}`}><p className="eyebrow">Guidance for {pet?.name ?? 'your pet'}</p><h1 ref={heading} tabIndex={-1}>{urgencyLabels[result.resulting_urgency]}</h1><p className="result-copy">{result.resulting_guidance}</p>
-    {result.possible_causes.length > 0 && <details className="result-detail"><summary>Possible causes to discuss with your vet</summary><ul>{result.possible_causes.map((cause) => <li key={cause}>{cause}</li>)}</ul></details>}
-    {result.recommended_examinations.length > 0 && <details className="result-detail"><summary>Your vet may want to check</summary><ul>{result.recommended_examinations.map((examination) => <li key={examination}>{examination}</li>)}</ul></details>}
-    <p className="fine-print">General guidance only, not a diagnosis. Beta content awaits veterinary review. If your pet worsens or you are unsure, contact your veterinary practice.</p>
+  if (result) return <CheckResult result={result} petName={pet?.name}>
     {onLogin && <button className="primary" onClick={onLogin}>Create an account for future pet profiles</button>}
     <button className="secondary" onClick={restart}>Start another check</button>
     {guestControls}
-  </section>
+  </CheckResult>
   if (complete) return <section className="panel"><h1 ref={heading} tabIndex={-1}>Your questions are complete.</h1><p role="status">{busy ? 'Loading guidance…' : 'Guidance could not be loaded yet.'}</p><ErrorNotice message={error} /><button className="primary" disabled={busy} onClick={() => void run(async () => { setResult(await api.result(session, guestToken)) })}>Try loading guidance again</button>{guestControls}</section>
   if (question) return <section className="question" aria-busy={busy}><div className="progress">Check for {pet?.name ?? `your ${species}`} <span>Adaptive questions</span></div><h1 ref={heading} tabIndex={-1}>{question.prompt}</h1><div className="options">{question.options.map((option) => <button disabled={busy} className="option" onClick={() => answer(option)} key={option}>{option}<span aria-hidden="true">→</span></button>)}</div><p role="status">{busy ? 'Saving your answer…' : ''}</p><ErrorNotice message={error} /><button className="secondary" disabled={busy} onClick={restart}>Restart this check</button>{guestControls}</section>
   return <section className="panel" aria-busy={busy}><p className="eyebrow">A calmer next step</p><h1>What have you noticed?</h1><p className="muted">{pet ? `Checking symptoms for ${pet.name}. ` : ''}Choose the closest match. This check gives urgency guidance, not a diagnosis.</p>
@@ -262,20 +274,20 @@ function Sources({ sources }: { sources: string[] }) {
   return links.length ? <details className="sources"><summary>Sources</summary><ul>{links.map((source) => <li key={source}><a href={source} target="_blank" rel="noopener noreferrer">{new URL(source).hostname} (opens a new tab)</a></li>)}</ul></details> : null
 }
 
-function Library({ pet }: { pet: Pet }) {
+function Library({ species }: { species: Species }) {
   const [items, setItems] = useState<Condition[] | null>(null)
   const [query, setQuery] = useState('')
   const [error, setError] = useState('')
   const [retry, setRetry] = useState(0)
   useEffect(() => {
     let cancelled = false
-    api.listConditions(pet.species).then((data) => { if (!cancelled) setItems(data) })
+    api.listConditions(species).then((data) => { if (!cancelled) setItems(data) })
       .catch((failure) => { if (!cancelled) setError(errorMessage(failure)) })
     return () => { cancelled = true }
-  }, [pet.species, retry])
-  const filtered = items?.filter((item) => `${item.name} ${item.category}`.toLowerCase().includes(query.toLowerCase())) ?? []
+  }, [species, retry])
+  const filtered = items?.filter((item) => `${item.name} ${item.category.replaceAll('_', ' ')} ${(item.symptom_tags ?? []).join(' ').replaceAll('_', ' ')}`.toLowerCase().includes(query.toLowerCase())) ?? []
   return <section className="panel"><p className="eyebrow">Reference library</p><h1>Plain-language starting points</h1><p className="muted">Information for conversations with your vet. Beta content awaits veterinary review.</p>
-    <label className="search-label">Search the library<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by name or category" /></label>
+    <label className="search-label">Search the library<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by symptom, name or category" /></label>
     {!items && !error && <p role="status">Loading the library…</p>}<ErrorNotice message={error} />
     {error && <button className="secondary" onClick={() => { setError(''); setRetry((value) => value + 1) }}>Try again</button>}
     {items && <p role="status">{filtered.length} {filtered.length === 1 ? 'entry' : 'entries'}</p>}
@@ -287,17 +299,17 @@ function Library({ pet }: { pet: Pet }) {
   </section>
 }
 
-function Care({ pet }: { pet: Pet }) {
+function Care({ pet, species = pet?.species ?? 'dog' }: { pet?: Pet; species?: Species }) {
   const [items, setItems] = useState<PreventiveCareItem[] | null>(null)
   const [error, setError] = useState('')
   const [retry, setRetry] = useState(0)
   useEffect(() => {
     let cancelled = false
-    api.listPreventive(pet.species, pet.life_stage).then((data) => { if (!cancelled) setItems(data) })
+    api.listPreventive(species, pet?.life_stage ?? null).then((data) => { if (!cancelled) setItems(data) })
       .catch((failure) => { if (!cancelled) setError(errorMessage(failure)) })
     return () => { cancelled = true }
-  }, [pet.species, pet.life_stage, retry])
-  return <section className="panel"><p className="eyebrow">Preventive care</p><h1>Small check-ins, less worry.</h1><p className="muted">{pet.life_stage ? `Based on ${pet.name}'s ${pet.life_stage.replaceAll('_', ' ')} life stage.` : `Showing all available ${pet.species} care information because ${pet.name}'s age is unknown. Ask your vet which items apply.`} This is information, with no scheduled reminders yet.</p>
+  }, [species, pet?.life_stage, retry])
+  return <section className="panel"><p className="eyebrow">Preventive care</p><h1>Small check-ins, less worry.</h1><p className="muted">{pet?.life_stage ? `Based on ${pet.name}'s ${pet.life_stage.replaceAll('_', ' ')} life stage.` : pet ? `Showing all available ${species} care information because ${pet.name}'s age is unknown. Ask your vet which items apply.` : `Showing all available ${species} care information. Ask your vet which items apply to your pet's age and circumstances.`} This is information, with no scheduled reminders yet.</p>
     {!items && !error && <p role="status">Loading care information…</p>}<ErrorNotice message={error} />{error && <button className="secondary" onClick={() => { setError(''); setRetry((value) => value + 1) }}>Try again</button>}
     {items?.length === 0 && <p>No care items are published for this life stage yet. Ask your vet about routine check-ups, vaccinations, parasite prevention and dental care.</p>}
     <div className="care-list">{items?.map((item) => <article key={item.id}><div><h3>{item.title}</h3><p>{item.description}</p>{item.recurrence && <p className="recurrence">Timing: {item.recurrence}</p>}<Sources sources={item.sources} /></div></article>)}</div>

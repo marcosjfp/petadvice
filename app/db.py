@@ -4,6 +4,7 @@ from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
 from alembic.script import ScriptDirectory
 from sqlalchemy import event, text
+from sqlalchemy.pool import NullPool
 from sqlmodel import Session, create_engine
 
 from app.settings import get_settings
@@ -19,7 +20,16 @@ def normalize_database_url(url: str) -> str:
 
 DATABASE_URL = normalize_database_url(get_settings().database_url)
 connect_args = {'check_same_thread': False} if DATABASE_URL.startswith('sqlite') else {'options': '-c timezone=UTC'}
-engine = create_engine(DATABASE_URL, connect_args=connect_args, pool_pre_ping=True)
+if get_settings().deployment_mode == 'scheduled' and not DATABASE_URL.startswith('sqlite'):
+    # The managed transaction pool owns connections. Avoid prepared statements
+    # and session-level startup parameters across pooled transactions.
+    connect_args = {'connect_timeout': 5, 'prepare_threshold': None}
+    engine = create_engine(DATABASE_URL, connect_args=connect_args, poolclass=NullPool)
+    @event.listens_for(engine, 'begin')
+    def transaction_timezone(connection):
+        connection.execute(text("SET LOCAL TIME ZONE 'UTC'"))
+else:
+    engine = create_engine(DATABASE_URL, connect_args=connect_args, pool_pre_ping=True)
 
 if DATABASE_URL.startswith('sqlite'):
     @event.listens_for(engine, 'connect')

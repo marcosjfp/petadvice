@@ -7,7 +7,7 @@ from app.settings import get_settings
 from app.models import schema  # noqa: F401
 
 config = context.config
-url = normalize_database_url(get_settings().database_url)
+url = normalize_database_url(get_settings().direct_database_url or get_settings().database_url)
 
 if context.is_offline_mode():
     context.configure(url=url, target_metadata=SQLModel.metadata, literal_binds=True)

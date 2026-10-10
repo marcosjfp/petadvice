@@ -12,7 +12,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from sqlalchemy import text
 from sqlmodel import Session
 
-from app.api import auth, conditions, pets, preventive_care, triage
+from app.api import jobs, auth, conditions, pets, preventive_care, triage
 from app.content.loader import content_library
 from app.db import get_session, init_db
 from app.jobs.worker import worker_status
@@ -42,14 +42,14 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title='PETAdvice API', version='0.2.0', lifespan=lifespan, dependencies=[Depends(limit_requests('global', '240/minute'))])
 app.add_middleware(CORSMiddleware, allow_origins=settings.origins, allow_credentials=True, allow_methods=['GET', 'POST', 'DELETE'], allow_headers=['Content-Type', 'Authorization', 'X-Guest-Token'])
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=[host.strip() for host in settings.trusted_hosts.split(',') if host.strip()])
-for router in [pets.router, auth.router, conditions.router, triage.router, preventive_care.router]:
+for router in [jobs.router, pets.router, auth.router, conditions.router, triage.router, preventive_care.router]:
     app.include_router(router)
 
 
 @app.exception_handler(StarletteHTTPException)
 async def clear_invalid_browser_session(request, error):
     response = await http_exception_handler(request, error)
-    if error.status_code == 401 and request.cookies.get(COOKIE_NAME) and not request.headers.get('authorization') and request.url.path != '/auth/login':
+    if error.status_code == 401 and request.cookies.get(COOKIE_NAME) and not request.headers.get('authorization') and request.scope['path'].removeprefix(request.scope.get('root_path', '')) != '/auth/login':
         clear_session_cookie(response)
     return response
 
@@ -71,7 +71,8 @@ async def security_headers(request, call_next):
     response.headers['Referrer-Policy'] = 'no-referrer'
     if settings.production:
         response.headers['Strict-Transport-Security'] = 'max-age=31536000'
-    if request.url.path.startswith(('/auth', '/pets', '/triage', '/ready', '/privacy')):
+    api_path = request.scope['path'].removeprefix(request.scope.get('root_path', ''))
+    if api_path.startswith(('/auth', '/pets', '/triage', '/ready', '/privacy', '/jobs')):
         response.headers['Cache-Control'] = 'no-store'
     route = request.scope.get('route')
     logger.info(json.dumps({'event': 'request', 'request_id': request_id, 'method': request.method, 'route': getattr(route, 'path', 'unmatched'), 'status': response.status_code, 'duration_ms': round((time.monotonic() - started) * 1000)}))

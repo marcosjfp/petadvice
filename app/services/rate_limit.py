@@ -1,6 +1,8 @@
 """Shared abuse controls. Production never falls back to process-local storage."""
 import hashlib
 import hmac
+import os
+from ipaddress import ip_address
 import time
 from functools import lru_cache
 
@@ -33,10 +35,22 @@ def check_limit(scope: str, identity: str, budget: str):
         raise HTTPException(429, 'Too many requests. Please try again later.', headers={'Retry-After': str(retry_after)})
 
 
+def client_identity(request: Request) -> str:
+    # Trust the platform-overwritten header only inside the Vercel runtime.
+    # Self-hosted deployments continue to use Uvicorn's configured proxy trust.
+    if os.environ.get('VERCEL') == '1':
+        forwarded = request.headers.get('x-vercel-forwarded-for', '')
+        try:
+            return str(ip_address(forwarded))
+        except ValueError:
+            pass
+    return request.client.host if request.client else 'unknown'
+
+
 def limit_requests(scope: str, budget: str, email_budget: str | None = None):
     async def dependency(request: Request):
         # Uvicorn accepts forwarded addresses only from the explicitly configured proxy.
-        await run_in_threadpool(check_limit, scope, request.client.host if request.client else 'unknown', budget)
+        await run_in_threadpool(check_limit, scope, client_identity(request), budget)
         if email_budget:
             try:
                 body = await request.json()

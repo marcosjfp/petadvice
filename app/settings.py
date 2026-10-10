@@ -11,6 +11,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file='.env', extra='ignore')
     app_env: Literal['development', 'test', 'production'] = 'development'
+    direct_database_url: str = ''
+    deployment_mode: Literal['worker', 'scheduled'] = 'worker'
     database_url: str = 'sqlite:///./petadvice.db'
     jwt_secret_key: str = Field(default_factory=lambda: secrets.token_urlsafe(48))
     cors_origins: str = 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174'
@@ -19,7 +21,13 @@ class Settings(BaseSettings):
     rate_limit_storage_uri: str = 'memory://'
     guest_retention_hours: int = Field(default=24, ge=1, le=720)
     require_email_verification: bool = False
-    mail_backend: Literal['file', 'smtp'] = 'file'
+    mail_backend: Literal['file', 'smtp', 'resend'] = 'file'
+    resend_api_key: str = ''
+    qstash_token: str = ''
+    vercel_automation_bypass_secret: str = ''
+    qstash_current_signing_key: str = ''
+    qstash_next_signing_key: str = ''
+    qstash_url: str = 'https://qstash-eu-central-1.upstash.io'
     mail_directory: str = '.mail'
     mail_encryption_key: str = ''
     backup_encryption_key: str = ''
@@ -47,6 +55,10 @@ class Settings(BaseSettings):
     def origins(self) -> list[str]:
         return [value.strip().rstrip('/') for value in self.cors_origins.split(',') if value.strip()]
 
+    @property
+    def job_callback_url(self) -> str:
+        return self.public_web_url.rstrip('/') + '/api/jobs/run'
+
     def validate_production(self) -> None:
         if not self.production:
             return
@@ -69,10 +81,18 @@ class Settings(BaseSettings):
                 raise RuntimeError('CORS_ORIGINS must contain exact HTTPS site origins')
         if not self.trusted_hosts or '*' in self.trusted_hosts:
             raise RuntimeError('Production requires explicit TRUSTED_HOSTS')
-        if self.mail_backend != 'smtp' or not self.smtp_host or not self.smtp_from or not self.mail_encryption_key:
-            raise RuntimeError('Production requires SMTP delivery and MAIL_ENCRYPTION_KEY')
-        if not self.smtp_ssl and not self.smtp_starttls:
-            raise RuntimeError('SMTP delivery requires TLS')
+        if self.mail_backend not in ('smtp', 'resend') or not self.smtp_from or not self.mail_encryption_key:
+            raise RuntimeError('Production requires email delivery, SMTP_FROM and MAIL_ENCRYPTION_KEY')
+        if self.mail_backend == 'smtp' and (not self.smtp_host or not (self.smtp_ssl or self.smtp_starttls)):
+            raise RuntimeError('SMTP delivery requires a host and TLS')
+        if self.mail_backend == 'resend' and not self.resend_api_key:
+            raise RuntimeError('Resend delivery requires RESEND_API_KEY')
+        if self.deployment_mode == 'scheduled':
+            if not all((self.qstash_token, self.qstash_current_signing_key, self.qstash_next_signing_key)):
+                raise RuntimeError('Scheduled deployment requires QStash token and both signing keys')
+            endpoint = urlsplit(self.qstash_url)
+            if endpoint.scheme != 'https' or not endpoint.hostname or not endpoint.hostname.endswith('.upstash.io') or endpoint.username or endpoint.password or endpoint.path not in ('', '/') or endpoint.query or endpoint.fragment:
+                raise RuntimeError('QSTASH_URL must be a clean HTTPS Upstash origin')
         from cryptography.fernet import Fernet
         try:
             Fernet(self.mail_encryption_key)

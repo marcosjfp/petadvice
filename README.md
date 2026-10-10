@@ -6,10 +6,15 @@ PETAdvice combines React/TypeScript and FastAPI for dog/cat symptom urgency and 
 
 - Guest checks with branching questions, urgency guidance, private access tokens, expiry, download and deletion.
 - Cookie login, Argon2id passwords, email verification, single-use recovery links, revocable sessions and logout across devices.
-- Pet profiles/switching, searchable condition details, sources and life-stage care information.
+- Public dog/cat Learn and Care pages, including search by everyday symptom words.
+- Pet profiles/switching and private, paginated check history.
+- Results explain existing urgency rules and include recorded answers and original context.
+- Printable/PDF and downloadable HTML summaries preserve the advice, sources and content version shown at the time. Older checks preserve saved guidance and identify missing historical details.
 - Password confirmation for account export/deletion and session controls.
 - PostgreSQL/Alembic, shared Redis rate limits, encrypted mail outbox, retention worker and readiness monitoring.
-- Same-origin container deployment with Caddy, a non-root API/worker, local font assets and PWA shell. Checks need an online API; reminders/history editing are future product work.
+- Same-origin container deployment with Caddy, a non-root API/worker, local font assets and PWA shell. Checks need an online API; reminders and answer editing are future product work.
+
+For Vercel, start with the [release guide](docs/vercel-release.md).
 
 Read the [implementation review](docs/modernization-review.md), [operations runbook](docs/operations/runbook.md) and [unpublished privacy-policy draft](docs/privacy-policy-draft.md).
 
@@ -39,9 +44,9 @@ The application checks the Alembic schema at startup and refuses pending migrati
 
 ## Deployment and privacy
 
-Use `compose.yaml` and the [runbook](docs/operations/runbook.md) for local containers, PostgreSQL import, encrypted backups/restores, retention and rollback. The old ephemeral backend-only Render manifest has been retired. Choose hosting, domain and SMTP before remote deployment; no provider has been selected or deployed.
+Use `compose.yaml` and the [runbook](docs/operations/runbook.md) for local containers, PostgreSQL import, encrypted backups/restores, retention and rollback. The old ephemeral backend-only Render manifest has been retired. The selected release path is Vercel + Neon PostgreSQL + Upstash Redis/QStash + Resend. Configuration, signed scheduled jobs and static build preparation are included; provider accounts and a cloud deployment are pending. See the [Vercel release guide](docs/vercel-release.md).
 
-Production requires stable keys, exact HTTPS origins/hosts, SMTP/TLS, a restricted database role, operator/contact and a published policy URL. Verification is mandatory in production. Browser tokens use one-hour HttpOnly/SameSite cookies; mutations validate trusted origins. Tokens are checked against stored sessions, so logout/password reset revoke access. API clients may use Bearer tokens with the same revocation rules.
+Production requires stable keys, exact HTTPS origins/hosts, SMTP/TLS or Resend HTTPS delivery, a restricted database role, operator/contact and a published policy URL. Verification is mandatory in production. Browser tokens use one-hour HttpOnly/SameSite cookies; mutations validate trusted origins. Tokens are checked against stored sessions, so logout/password reset revoke access. API clients may use Bearer tokens with the same revocation rules.
 
 Guest access expires after 24 hours by default, with configurable scheduled cleanup. Accounts are retained until deletion. Backup/log retention and restored-deletion handling need an operator decision before launch. Account notice acknowledgement records the policy version; technical controls do not establish legal compliance.
 

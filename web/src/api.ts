@@ -53,10 +53,18 @@ export type Condition = {
   home_care_guidance: string | null; prevention_tips: string | null;
   red_flags: { description: string; escalates_to: Urgency }[];
   sources: string[]; vet_reviewed_by: string | null; last_reviewed_date: string | null;
+  symptom_tags?: string[];
 }
 export type PreventiveCareItem = { id: string; title: string; description: string; recurrence: string | null; sources: string[] }
 export type Question = { id: string; prompt: string; options: string[] }
-export type TriageResult = { resulting_urgency: Urgency; resulting_guidance: string; matched_condition_ids: string[]; possible_causes: string[]; recommended_examinations: string[] }
+export type TriageResult = {
+  resulting_urgency: Urgency; resulting_guidance: string; matched_condition_ids: string[]; possible_causes: string[]; recommended_examinations: string[];
+  session_id?: string; symptom?: string; started_at?: string | null; recorded_at?: string | null; historical?: boolean; content_version?: string | null;
+  pet?: { name: string; species: Species; date_of_birth: string | null; life_stage: string | null; sex: string | null; neutered: boolean | null; breed_size: string | null } | null;
+  reasons?: { kind: string; detail: string; urgency: Urgency }[];
+  answers?: { question_id: string; prompt: string; answer: string }[]; sources?: string[];
+}
+export type CheckHistory = { checks: { session_id: string; started_at: string; symptom: string; complete: boolean; urgency: Urgency | null }[]; next_cursor: string | null }
 export type TriageStart = { session_id: string; next_question: Question | null; flow_complete: boolean; guest_token?: string | null; expires_at?: string | null }
 export type TriageAnswer = { next_question: Question | null; flow_complete: boolean }
 export type Owner = { id: string; email: string; email_verified_at?: string | null; email_verification_required?: boolean }
@@ -84,6 +92,7 @@ export const api = {
   startTriage: (petId: string | null, symptom: string, species: Species = 'dog') => request<TriageStart>('/triage/start', { method: 'POST', body: JSON.stringify({ pet_id: petId, symptom_tag: symptom, species }) }),
   answer: (sessionId: string, questionId: string, answer: string, guestToken?: string | null) => request<TriageAnswer>(`/triage/${encodeURIComponent(sessionId)}/answer`, { method: 'POST', headers: guestHeaders(guestToken), body: JSON.stringify({ question_id: questionId, answer }) }),
   result: (sessionId: string, guestToken?: string | null) => request<TriageResult>(`/triage/${encodeURIComponent(sessionId)}/result`, { headers: guestHeaders(guestToken) }),
+  history: (petId: string, before?: string) => request<CheckHistory>(`/triage/history/${encodeURIComponent(petId)}${before ? `?${new URLSearchParams({ before })}` : ''}`),
   exportCheck: (sessionId: string, guestToken: string) => request<unknown>(`/triage/${encodeURIComponent(sessionId)}/export`, { headers: guestHeaders(guestToken) }),
   deleteGuestCheck: (sessionId: string, guestToken: string) => request(`/triage/${encodeURIComponent(sessionId)}`, { method: 'DELETE', headers: guestHeaders(guestToken) }),
 }

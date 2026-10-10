@@ -10,6 +10,7 @@ from sqlmodel import Session, select
 from app.models.schema import AccountAction, Owner
 from app.services.auth import utcnow
 from app.services.mail import queue_mail
+from app.jobs.dispatch import trigger_mail
 from app.settings import get_settings
 
 
@@ -34,6 +35,7 @@ def request_action(db: Session, owner: Owner, kind: str):
     body = f'{title}:\n\n{link}\n\nThis link expires in {"30 minutes" if kind == "reset" else "24 hours"}. If you did not request it, ignore this email.'
     queue_mail(db, owner, title, body, expires, action_hash=token_hash(token))
     db.commit()
+    trigger_mail()
 
 
 def consume_action(db: Session, token: str, kind: str):

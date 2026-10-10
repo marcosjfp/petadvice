@@ -2,13 +2,13 @@ import secrets
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from app.content.loader import content_library
 from app.db import get_session
 from app.models.schema import GuestAccess, Owner, Pet, TriageAnswerRequest, TriageSession, TriageStartRequest
 from app.services import triage_engine
-from app.services.auth import as_utc, get_optional_owner, utcnow, verify_auth_origin
+from app.services.auth import as_utc, get_current_owner, get_optional_owner, utcnow, verify_auth_origin
 from app.services.account_actions import token_hash
 from app.services.rate_limit import limit_requests
 from app.settings import get_settings
@@ -44,6 +44,20 @@ def _verify_session_ownership(db: Session, session_id: str, owner: Owner | None,
 def get_triage_questions(symptom_tag: str):
     """Return the full question tree for content review tooling."""
     return content_library.questions_for_symptom(symptom_tag)
+
+
+@router.get('/history/{pet_id}')
+def check_history(pet_id: str, before: str | None = None, owner: Owner = Depends(get_current_owner), db: Session = Depends(get_session)):
+    _get_owned_pet(db, pet_id, owner)
+    query = select(TriageSession).where(TriageSession.pet_id == pet_id)
+    if before:
+        # Cursor is a check ID scoped to this pet, not an unbounded offset.
+        anchor = db.get(TriageSession, before)
+        if anchor is None or anchor.pet_id != pet_id:
+            raise HTTPException(404, 'Check not found')
+        query = query.where((TriageSession.started_at < anchor.started_at) | ((TriageSession.started_at == anchor.started_at) & (TriageSession.id < anchor.id)))
+    rows = db.exec(query.order_by(TriageSession.started_at.desc(), TriageSession.id.desc()).limit(21)).all()
+    return {'checks': [{'session_id': row.id, 'started_at': as_utc(row.started_at), 'symptom': row.symptom_entry_point, 'complete': row.current_question_id is None, 'urgency': row.resulting_urgency} for row in rows[:20]], 'next_cursor': rows[19].id if len(rows) > 20 else None}
 
 
 @router.post("/start", dependencies=[Depends(limit_requests('triage-start', '30/minute'))])

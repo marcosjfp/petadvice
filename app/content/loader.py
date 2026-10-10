@@ -1,4 +1,5 @@
 import json
+import hashlib
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -14,6 +15,7 @@ class ContentLibrary:
         self.conditions: list[ConditionEntry] = []
         self.preventive_items: list[PreventiveCareItem] = []
         self.questions: list[TriageQuestion] = []
+        self.version: str | None = None
 
     def load(self) -> None:
         self.conditions, self.preventive_items = [], []
@@ -48,6 +50,12 @@ class ContentLibrary:
         self.conditions = conditions
         self.preventive_items = preventive_items
         self.questions = questions
+        digest = hashlib.sha256()
+        for path in [*batch_files, QUESTIONS_FILE]:
+            if path.exists():
+                digest.update(path.name.encode())
+                digest.update(path.read_bytes())
+        self.version = digest.hexdigest()
 
     @staticmethod
     def _validate_questions(questions: list[TriageQuestion]) -> None:

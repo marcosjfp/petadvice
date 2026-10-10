@@ -16,3 +16,8 @@ htmlcov/
 .mail/
 .backups/
 *.sqlite3
+
+# Generated Vercel artifacts and local project link
+/public/
+/.vercel/
+!.env.vercel.example

@@ -28,7 +28,7 @@ def test_fresh_schema_is_versioned_and_idempotent(tmp_path):
     engine = create_engine(f'sqlite:///{tmp_path / "fresh.sqlite3"}')
     migrate(engine); migrate(engine)
     with engine.connect() as db:
-        assert MigrationContext.configure(db).get_current_revision() == '0003'
+        assert MigrationContext.configure(db).get_current_revision() == '0004'
         assert db.execute(text('PRAGMA foreign_key_check')).all() == []
     assert {'owner', 'pet', 'triagesession', 'authsession', 'guestaccess', 'emaildelivery', 'accountaction'} <= set(inspect(engine).get_table_names())
     engine.dispose()
@@ -86,3 +86,19 @@ def test_encrypted_backup_restore_and_tamper_detection(tmp_path, monkeypatch):
     with pytest.raises(Exception):
         restore(corrupted, f'sqlite:///{destination}')
     assert not destination.exists()
+
+
+def test_report_upgrade_preserves_preexisting_results(tmp_path):
+    engine = create_engine(f'sqlite:///{tmp_path / "old-results.sqlite3"}')
+    migrate(engine, '0003'); seed(engine)
+    with engine.begin() as db:
+        db.execute(text("UPDATE triagesession SET current_question_id=NULL, resulting_urgency='vet_soon', resulting_guidance='Original saved advice', condition_entries_matched_raw='old-condition' WHERE id='check'"))
+    migrate(engine)
+    with Session(engine) as db:
+        check = db.get(TriageSession, 'check')
+        assert check.result_snapshot is None
+        assert check.resulting_guidance == 'Original saved advice'
+        assert check.condition_entries_matched_raw == 'old-condition'
+        assert check.pet_id == 'pet'
+    assert 'ix_triagesession_pet_started_id' in {index['name'] for index in inspect(engine).get_indexes('triagesession')}
+    engine.dispose()

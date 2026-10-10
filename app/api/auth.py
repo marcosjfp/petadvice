@@ -9,6 +9,7 @@ from app.models.schema import AccountAction, ActionRequest, AuthSession, EmailDe
 from app.services.account_actions import consume_action, request_action
 from app.services.auth import COOKIE_NAME, clear_session_cookie, find_session, get_current_owner, hash_password, issue_session, require_recent_owner, revoke_all_sessions, set_session_cookie, utcnow, verify_auth_origin, verify_dummy_password, verify_password
 from app.services.mail import queue_mail
+from app.jobs.dispatch import trigger_mail
 from app.services.rate_limit import limit_requests
 from app.settings import get_settings
 
@@ -91,6 +92,8 @@ def forgot_password(payload: EmailRequest, db: Session = Depends(get_session)):
     owner = db.exec(select(Owner).where(Owner.email == payload.email)).first()
     if owner:
         request_action(db, owner, 'reset')
+    else:
+        trigger_mail()
     return GENERIC_LINK_RESPONSE
 
 
@@ -100,6 +103,8 @@ def resend_verification(payload: EmailRequest, db: Session = Depends(get_session
     owner = db.exec(select(Owner).where(Owner.email == payload.email)).first()
     if owner and owner.email_verified_at is None:
         request_action(db, owner, 'verify')
+    else:
+        trigger_mail()
     return GENERIC_LINK_RESPONSE
 
 
@@ -124,6 +129,7 @@ def reset_password(payload: ResetPasswordRequest, response: Response, db: Sessio
         db.add(action)
     queue_mail(db, owner, 'Your PETAdvice password was changed', 'Your password was changed and all active sessions were signed out. If you did not make this change, request a new password reset immediately.', utcnow() + timedelta(hours=24))
     db.commit()
+    trigger_mail()
     clear_session_cookie(response)
     return {'message': 'Password changed. Sign in with your new password.'}
 

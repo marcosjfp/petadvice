@@ -13,13 +13,13 @@ from app.services.auth import utcnow
 from app.settings import get_settings
 
 
-def cleanup(db: Session, apply: bool = False):
+def cleanup(db: Session, apply: bool = False, limit: int | None = None):
     now = utcnow()
     cutoff = now - timedelta(hours=get_settings().guest_retention_hours)
     expired = db.exec(select(TriageSession).join(Pet).outerjoin(GuestAccess, GuestAccess.session_id == TriageSession.id).where(
         Pet.owner_id.is_(None),
         or_(GuestAccess.expires_at <= now, GuestAccess.session_id.is_(None) & (TriageSession.started_at <= cutoff)),
-    )).all()
+    ).limit(limit)).all()
     counts = {'guest_checks': len(expired), 'auth_sessions': 0, 'account_links': 0, 'queued_emails': 0, 'development_emails': 0}
     for check in expired:
         if apply:
@@ -32,14 +32,14 @@ def cleanup(db: Session, apply: bool = False):
         db.flush()
         # A guest pet is an ephemeral wrapper for one check, not a saved profile.
         has_check = select(TriageSession.id).where(TriageSession.pet_id == Pet.id).exists()
-        for pet in db.exec(select(Pet).where(Pet.owner_id.is_(None), ~has_check)).all():
+        for pet in db.exec(select(Pet).where(Pet.owner_id.is_(None), ~has_check).limit(limit)).all():
             db.delete(pet)
     for model, name, predicate in [
         (AuthSession, 'auth_sessions', (AuthSession.expires_at <= now - timedelta(days=1)) | (AuthSession.revoked_at <= now - timedelta(days=1))),
         (AccountAction, 'account_links', (AccountAction.expires_at <= now) | AccountAction.used_at.is_not(None)),
         (EmailDelivery, 'queued_emails', EmailDelivery.expires_at <= now),
     ]:
-        records = db.exec(select(model).where(predicate)).all()
+        records = db.exec(select(model).where(predicate).limit(limit)).all()
         counts[name] = len(records)
         if apply:
             for record in records:

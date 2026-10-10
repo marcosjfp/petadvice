@@ -16,8 +16,9 @@ from app.settings import get_settings
 
 def worker_status(db: Session):
     delayed = db.exec(select(EmailDelivery).where(EmailDelivery.created_at < utcnow() - timedelta(minutes=10), EmailDelivery.expires_at > utcnow())).first()
+    freshness_minutes = 90 if get_settings().deployment_mode == 'scheduled' else 2
     heartbeat = db.get(MaintenanceStatus, 'maintenance')
-    return {'mail_backlog_delayed': delayed is not None, 'worker_stale': heartbeat is None or as_utc(heartbeat.last_success_at) < utcnow() - timedelta(minutes=2)}
+    return {'mail_backlog_delayed': delayed is not None, 'worker_stale': heartbeat is None or as_utc(heartbeat.last_success_at) < utcnow() - timedelta(minutes=freshness_minutes)}
 
 
 def main():

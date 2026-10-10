@@ -6,7 +6,7 @@ from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel, EmailStr, Field as PydanticField, field_validator
-from sqlalchemy import JSON, Column, Enum as SAEnum
+from sqlalchemy import JSON, Column, Index, Enum as SAEnum
 from sqlmodel import Field, SQLModel
 
 
@@ -118,6 +118,7 @@ class Pet(SQLModel, table=True):
 
 
 class TriageSession(SQLModel, table=True):
+    __table_args__ = (Index('ix_triagesession_pet_started_id', 'pet_id', 'started_at', 'id'),)
     id: str = Field(default_factory=_new_id, primary_key=True)
     pet_id: str = Field(index=True, foreign_key="pet.id")
     started_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -127,6 +128,7 @@ class TriageSession(SQLModel, table=True):
     resulting_urgency: Optional[UrgencyLevel] = Field(default=None, sa_type=SAEnum(UrgencyLevel, native_enum=False, length=13))
     resulting_guidance: Optional[str] = None
     condition_entries_matched_raw: str = ""
+    result_snapshot: Optional[dict] = Field(default=None, sa_column=Column(JSON(none_as_null=True), nullable=True))
 
 
 class AuthSession(SQLModel, table=True):
@@ -266,6 +268,28 @@ class TriageAnswerRequest(BaseModel):
     answer: str
 
 
+class ResultReason(BaseModel):
+    kind: str
+    detail: str
+    urgency: UrgencyLevel
+
+
+class RecordedAnswer(BaseModel):
+    question_id: str
+    prompt: str
+    answer: str
+
+
+class ReportPet(BaseModel):
+    name: str
+    species: Species
+    date_of_birth: Optional[date] = None
+    life_stage: Optional[str] = None
+    sex: Optional[Sex] = None
+    neutered: Optional[bool] = None
+    breed_size: Optional[BreedSize] = None
+
+
 class TriageResult(BaseModel):
     session_id: str
     resulting_urgency: UrgencyLevel
@@ -273,6 +297,15 @@ class TriageResult(BaseModel):
     matched_condition_ids: list[str]
     possible_causes: list[str] = PydanticField(default_factory=list)
     recommended_examinations: list[str] = PydanticField(default_factory=list)
+    reasons: list[ResultReason] = PydanticField(default_factory=list)
+    answers: list[RecordedAnswer] = PydanticField(default_factory=list)
+    pet: Optional[ReportPet] = None
+    started_at: Optional[datetime] = None
+    recorded_at: Optional[datetime] = None
+    symptom: str = ""
+    sources: list[str] = PydanticField(default_factory=list)
+    content_version: Optional[str] = None
+    historical: bool = False
 
 
 class OwnerLogin(BaseModel):
