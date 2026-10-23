@@ -28,7 +28,7 @@ def test_fresh_schema_is_versioned_and_idempotent(tmp_path):
     engine = create_engine(f'sqlite:///{tmp_path / "fresh.sqlite3"}')
     migrate(engine); migrate(engine)
     with engine.connect() as db:
-        assert MigrationContext.configure(db).get_current_revision() == '0004'
+        assert MigrationContext.configure(db).get_current_revision() == '0005'
         assert db.execute(text('PRAGMA foreign_key_check')).all() == []
     assert {'owner', 'pet', 'triagesession', 'authsession', 'guestaccess', 'emaildelivery', 'accountaction'} <= set(inspect(engine).get_table_names())
     engine.dispose()

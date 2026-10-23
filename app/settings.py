@@ -1,4 +1,5 @@
 """Runtime configuration. Secrets stay in environment variables or an ignored .env."""
+import os
 import secrets
 from functools import lru_cache
 from typing import Literal
@@ -11,6 +12,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file='.env', extra='ignore')
     app_env: Literal['development', 'test', 'production'] = 'development'
+    guest_only_preview: bool = False
+    accounts_without_email_preview: bool = False
     direct_database_url: str = ''
     deployment_mode: Literal['worker', 'scheduled'] = 'worker'
     database_url: str = 'sqlite:///./petadvice.db'
@@ -49,7 +52,11 @@ class Settings(BaseSettings):
 
     @property
     def email_verification_required(self) -> bool:
-        return self.production or self.require_email_verification
+        return not self.email_disabled and (self.production or self.require_email_verification)
+
+    @property
+    def email_disabled(self) -> bool:
+        return self.guest_only_preview or self.accounts_without_email_preview
 
     @property
     def origins(self) -> list[str]:
@@ -62,6 +69,10 @@ class Settings(BaseSettings):
     def validate_production(self) -> None:
         if not self.production:
             return
+        if self.guest_only_preview and self.accounts_without_email_preview:
+            raise RuntimeError('Choose either guest-only or account preview mode')
+        if self.email_disabled and (os.getenv('VERCEL') != '1' or os.getenv('VERCEL_ENV') != 'preview'):
+            raise RuntimeError('Email-disabled modes are restricted to Vercel preview deployments')
         if 'jwt_secret_key' not in self.model_fields_set or len(self.jwt_secret_key) < 32 or self.jwt_secret_key == 'dev-only-insecure-secret-change-me':
             raise RuntimeError('Production requires a stable random JWT_SECRET_KEY of at least 32 characters')
         if not self.database_url.startswith(('postgresql://', 'postgresql+psycopg://', 'postgres://')):
@@ -81,11 +92,11 @@ class Settings(BaseSettings):
                 raise RuntimeError('CORS_ORIGINS must contain exact HTTPS site origins')
         if not self.trusted_hosts or '*' in self.trusted_hosts:
             raise RuntimeError('Production requires explicit TRUSTED_HOSTS')
-        if self.mail_backend not in ('smtp', 'resend') or not self.smtp_from or not self.mail_encryption_key:
+        if not self.email_disabled and (self.mail_backend not in ('smtp', 'resend') or not self.smtp_from or not self.mail_encryption_key):
             raise RuntimeError('Production requires email delivery, SMTP_FROM and MAIL_ENCRYPTION_KEY')
-        if self.mail_backend == 'smtp' and (not self.smtp_host or not (self.smtp_ssl or self.smtp_starttls)):
+        if not self.email_disabled and self.mail_backend == 'smtp' and (not self.smtp_host or not (self.smtp_ssl or self.smtp_starttls)):
             raise RuntimeError('SMTP delivery requires a host and TLS')
-        if self.mail_backend == 'resend' and not self.resend_api_key:
+        if not self.email_disabled and self.mail_backend == 'resend' and not self.resend_api_key:
             raise RuntimeError('Resend delivery requires RESEND_API_KEY')
         if self.deployment_mode == 'scheduled':
             if not all((self.qstash_token, self.qstash_current_signing_key, self.qstash_next_signing_key)):
@@ -93,12 +104,13 @@ class Settings(BaseSettings):
             endpoint = urlsplit(self.qstash_url)
             if endpoint.scheme != 'https' or not endpoint.hostname or not endpoint.hostname.endswith('.upstash.io') or endpoint.username or endpoint.password or endpoint.path not in ('', '/') or endpoint.query or endpoint.fragment:
                 raise RuntimeError('QSTASH_URL must be a clean HTTPS Upstash origin')
-        from cryptography.fernet import Fernet
-        try:
-            Fernet(self.mail_encryption_key)
-        except (ValueError, TypeError) as error:
-            raise RuntimeError('MAIL_ENCRYPTION_KEY must be a valid Fernet key') from error
-        if not self.privacy_operator or not self.privacy_email or not self.privacy_policy_url.startswith('https://'):
+        if not self.email_disabled:
+            from cryptography.fernet import Fernet
+            try:
+                Fernet(self.mail_encryption_key)
+            except (ValueError, TypeError) as error:
+                raise RuntimeError('MAIL_ENCRYPTION_KEY must be a valid Fernet key') from error
+        if not self.email_disabled and (not self.privacy_operator or not self.privacy_email or not self.privacy_policy_url.startswith('https://')):
             raise RuntimeError('Complete operator, privacy contact and policy URL before public release')
 
 

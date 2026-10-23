@@ -1,6 +1,6 @@
 # PETAdvice Vercel release
 
-Prepared 2026-10-10. Enhancements 1–4 are implemented: public Learn/Care, rule-based result explanations, printable/downloadable reports, and private pet history. The clinical content/question files and escalation decisions are preserved. No reviewer attribution was added. No provider resources or public deployment have been created.
+Prepared 2026-10-10. Enhancements 1–4 are implemented: public Learn/Care, rule-based result explanations, printable/downloadable reports, and private pet history. The clinical content/question files and escalation decisions are preserved. No reviewer attribution was added. A protected Vercel/Supabase account preview was configured on 2026-10-23; see the [current setup notes](operations/vercel-supabase-setup.md). The full-release requirements below still apply before a public launch.
 
 ## Architecture
 
@@ -45,7 +45,7 @@ Use a private migration environment with the direct TLS URL for the same restric
 .venv/bin/python -m alembic check
 ```
 
-Head is `0004`: it adds nullable JSON report snapshots and a history pagination index. Existing checks/relationships remain intact. Old saved urgency/guidance is preserved; missing historical context and explanations are not reconstructed from today's content. New reports freeze on their first result retrieval, when the app displays the guidance. Incomplete checks appear in history but cannot provide a completed report.
+Head is `0005`: `0004` adds nullable JSON report snapshots and a history pagination index; `0005` converts PostgreSQL timestamps to timezone-aware storage, interpreting historical values as UTC. Existing checks/relationships remain intact. Old saved urgency/guidance is preserved; missing historical context and explanations are not reconstructed from today's content. New reports freeze on their first result retrieval, when the app displays the guidance. Incomplete checks appear in history but cannot provide a completed report.
 
 If keeping existing local data, privately back up the SQLite file first. Migrate **a copy** to head, then use `scripts/import_sqlite.py` to review a dry run against an empty migrated PostgreSQL destination; use `--apply` only for the intended cutover. Do not migrate or overwrite the original merely to test a release. Sessions, recovery links and queued emails are intentionally not imported. Existing imported accounts will need sign-in and, in production, email verification. The runbook explains backup/restore and restricted-role setup. Run a restore exercise before launch.
 

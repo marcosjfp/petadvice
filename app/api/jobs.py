@@ -54,6 +54,8 @@ def run_job(body: JobRequest, db: Session = Depends(get_session)):
     # Duplicate callbacks are safe: locks skip in-flight outbox rows; Resend
     # uses a stable idempotency key. Cleanup only removes expired records.
     if body.kind == 'mail':
+        if get_settings().email_disabled:
+            raise HTTPException(403, 'Email is disabled in this private preview')
         delivered = deliver_pending(db, limit=3, deadline=time.monotonic()+40)
         pending = db.exec(select(EmailDelivery.id).where(EmailDelivery.expires_at > utcnow()).limit(1)).first()
         if pending:

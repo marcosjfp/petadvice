@@ -18,6 +18,8 @@ async def lifespan(app):
         settings = get_settings()
         if not settings.production or settings.deployment_mode != 'scheduled':
             raise RuntimeError('Vercel deployments require APP_ENV=production and DEPLOYMENT_MODE=scheduled')
+        if settings.email_disabled and os.environ.get('VERCEL_ENV') != 'preview':
+            raise RuntimeError('Email-disabled modes require a protected preview deployment')
     # Mounted applications do not automatically receive parent lifespan events.
     async with api.router.lifespan_context(api):
         yield

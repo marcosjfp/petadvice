@@ -17,13 +17,15 @@ function ErrorNotice({ message }: { message: string }) {
 }
 
 function App() {
+  const guestOnlyPreview = import.meta.env.VITE_GUEST_ONLY_PREVIEW === 'true'
   const [accountLink, setAccountLink] = useState(() => {
+    if (guestOnlyPreview) return null
     const values = new URLSearchParams(window.location.hash.slice(1))
     const action = values.get('action'), token = values.get('token')
     return (action === 'verify' || action === 'reset') && token ? { action, token } as { action: 'verify' | 'reset'; token: string } : null
   })
   const [owner, setOwner] = useState<Owner | null>(null)
-  const [auth, setAuth] = useState<'checking' | 'signed-in' | 'guest' | 'error'>('checking')
+  const [auth, setAuth] = useState<'checking' | 'signed-in' | 'guest' | 'error'>(guestOnlyPreview ? 'guest' : 'checking')
   const [view, setView] = useState<View>('triage')
   const [pets, setPets] = useState<Pet[]>([])
   const [selectedPetId, setSelectedPetId] = useState<string | null>(null)
@@ -48,6 +50,7 @@ function App() {
   useEffect(() => {
     // Remove credentials stored by the previous version. Cookies are HttpOnly.
     try { localStorage.removeItem('petadvice_token') } catch { /* Storage can be disabled; cookie auth still works. */ }
+    if (guestOnlyPreview) return
     let cancelled = false
     api.getMe().then((data) => { if (!cancelled) { setOwner(data); setAuth('signed-in') } })
       .catch((failure) => { if (!cancelled) setAuth(failure instanceof ApiError && failure.status === 401 ? 'guest' : 'error') })
@@ -58,7 +61,7 @@ function App() {
     }
     window.addEventListener('petadvice:session-expired', expired)
     return () => { cancelled = true; window.removeEventListener('petadvice:session-expired', expired) }
-  }, [load])
+  }, [load, guestOnlyPreview])
 
   useEffect(() => {
     if (auth !== 'signed-in') return
@@ -102,9 +105,9 @@ function App() {
   if (auth === 'error' || loadError) return <Shell><h1>We could not load your account.</h1><ErrorNotice message={loadError || 'Check your connection and try again.'} /><button className="primary" onClick={retryLoad}>Try again</button><Emergency /></Shell>
   if (auth === 'guest') {
     if (showAuth) return <AuthPanel onBack={() => setShowAuth(false)} onAuthenticated={() => { setShowAuth(false); setShowQuickCheck(false); retryLoad() }} />
-    if (showQuickCheck) return <Shell onBack={() => setShowQuickCheck(false)}><Triage pet={null} onLogin={() => setShowAuth(true)} /><Emergency /></Shell>
+    if (showQuickCheck) return <Shell onBack={() => setShowQuickCheck(false)}><Triage pet={null} onLogin={guestOnlyPreview ? undefined : () => setShowAuth(true)} /><Emergency /></Shell>
     if (publicView) return <PublicEducation initialView={publicView} onBack={() => setPublicView(null)} />
-    return <PublicLanding onBrowse={setPublicView} onQuickCheck={() => setShowQuickCheck(true)} onLogin={() => setShowAuth(true)} />
+    return <PublicLanding onBrowse={setPublicView} onQuickCheck={() => setShowQuickCheck(true)} onLogin={guestOnlyPreview ? undefined : () => setShowAuth(true)} />
   }
 
   if (owner?.email_verification_required && !owner.email_verified_at) return <Shell><VerificationNotice email={owner.email} onLogout={resetAccount} /><Account onDeleted={resetAccount} /><Emergency /></Shell>
@@ -146,12 +149,14 @@ function Shell({ children, onBack }: { children: React.ReactNode; onBack?: () =>
   return <main className="shell"><header><img className="name-logo" src={nameLogo} alt="PETAdvice" />{onBack && <button className="cancel-fresh" onClick={onBack}>Back</button>}</header>{children}</main>
 }
 
-function PublicLanding({ onQuickCheck, onLogin, onBrowse }: { onQuickCheck: () => void; onLogin: () => void; onBrowse: (view: 'library' | 'care') => void }) {
-  return <main className="shell"><header><img className="main-logo" src={fullLogo} alt="PETAdvice dog and cat logo" /><button className="start-fresh" onClick={onLogin}>Log in</button></header>
+function PublicLanding({ onQuickCheck, onLogin, onBrowse }: { onQuickCheck: () => void; onLogin?: () => void; onBrowse: (view: 'library' | 'care') => void }) {
+  return <main className="shell"><header><img className="main-logo" src={fullLogo} alt="PETAdvice dog and cat logo" />{onLogin && <button className="start-fresh" onClick={onLogin}>Log in</button>}</header>
+    {!onLogin && <aside className="panel"><strong>Private guest preview</strong><p>Try symptom checks, Learn and Care. Accounts and email are unavailable in this preview. Use synthetic test information only.</p></aside>}
+    {import.meta.env.VITE_ACCOUNTS_WITHOUT_EMAIL_PREVIEW === 'true' && <aside className="panel"><strong>Private account preview</strong><p>Accounts are available for testing. Email verification and password recovery are unavailable. Use test information and a password you do not use elsewhere.</p></aside>}
     <section className="intro"><p className="eyebrow">Friendly guidance for everyday pet worries</p><h1>A clearer next step for your pet.</h1><p className="intro-lead">When something feels different, PETAdvice helps you work out what to look for, how urgently to act, and what to discuss with your vet.</p>
-      <div className="intro-actions"><button className="primary" onClick={onQuickCheck}>Start a quick check <span aria-hidden="true">→</span></button><button className="secondary" onClick={onLogin}>Save my pet profiles</button></div>
+      <div className="intro-actions"><button className="primary" onClick={onQuickCheck}>Start a quick check <span aria-hidden="true">→</span></button>{onLogin && <button className="secondary" onClick={onLogin}>Save my pet profiles</button>}</div>
       <div className="public-links"><button className="secondary" onClick={() => onBrowse('library')}>Browse Learn</button><button className="secondary" onClick={() => onBrowse('care')}>Browse Care</button></div>
-      <div className="intro-points"><article><span>01</span><div><h2>Make sense of symptoms</h2><p>Find straightforward information about common concerns.</p></div></article><article><span>02</span><div><h2>Know how urgent it is</h2><p>Answer focused questions to help decide when to contact a vet.</p></div></article><article><span>03</span><div><h2>Keep care on track</h2><p>Save pet profiles and browse care information for their life stage.</p></div></article></div>
+      <div className="intro-points"><article><span>01</span><div><h2>Make sense of symptoms</h2><p>Find straightforward information about common concerns.</p></div></article><article><span>02</span><div><h2>Know how urgent it is</h2><p>Answer focused questions to help decide when to contact a vet.</p></div></article><article><span>03</span><div><h2>Keep care on track</h2><p>{onLogin ? 'Save pet profiles and browse care information for their life stage.' : 'Browse preventive care information for dogs and cats.'}</p></div></article></div>
       <p className="intro-boundary">General educational guidance, not a diagnosis. This beta's content is awaiting veterinary review. No account is needed for a quick check.</p>
     </section><Emergency />
   </main>
@@ -167,8 +172,10 @@ function PublicEducation({ initialView, onBack }: { initialView: 'library' | 'ca
 }
 
 function PrivacyNotice() {
+  const guestOnlyPreview = import.meta.env.VITE_GUEST_ONLY_PREVIEW === 'true'
   const [notice, setNotice] = useState<Privacy | null>(null)
   useEffect(() => { let active = true; api.privacy().then((data) => { if (active) setNotice(data) }).catch(() => {}); return () => { active = false } }, [])
+  if (guestOnlyPreview) return <details className="privacy-notice"><summary>How your data is used</summary><p>This private preview stores guest symptom checks. Accounts and email are disabled; use synthetic test information only.</p><p>{notice ? `Guest access expires after ${notice.guest_retention_hours} hours. Scheduled cleanup removes expired checks.` : 'Guest access is temporary; the retention notice could not be loaded.'} You can download or delete your check while it is open. Closing or refreshing the page loses access.</p><p>The privacy policy is still a draft. This preview is for private testing.</p></details>
   return <details className="privacy-notice"><summary>How your data is used</summary><p>The app stores your email, a password hash, pet profiles, symptom checks and security records. You can download account data or delete your account and its profiles and checks from the app database.</p><p>{notice ? `Guest checks expire after ${notice.guest_retention_hours} hours and are removed by scheduled cleanup. You can also download or delete a guest check while it is open.` : 'Guest checks have a limited retention period; the current notice could not be loaded.'} Closing the page loses access to that guest check.</p><p>Account data is kept until you delete the account. Backups follow the deployment operator’s separate retention schedule.</p>{notice?.policy_url && /^https:\/\//.test(notice.policy_url) ? <p><a href={notice.policy_url} target="_blank" rel="noopener noreferrer">Read the privacy policy</a> · {notice.operator}{notice.contact && <> · <a href={`mailto:${notice.contact}`}>{notice.contact}</a></>}</p> : <p>This beta notice is a draft. Operator, hosting, backup retention and privacy contact details are still pending before public release.</p>}<p>Do not enter personal or sensitive details in pet names.</p></details>
 }
 
@@ -179,6 +186,7 @@ function VerificationNotice({ email, onLogout }: { email: string; onLogout: () =
 }
 
 function AuthPanel({ onBack, onAuthenticated }: { onBack: () => void; onAuthenticated: () => void }) {
+  const withoutEmail = import.meta.env.VITE_ACCOUNTS_WITHOUT_EMAIL_PREVIEW === 'true'
   const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -195,12 +203,13 @@ function AuthPanel({ onBack, onAuthenticated }: { onBack: () => void; onAuthenti
     })
   }
   return <Shell onBack={onBack}><section className="welcome auth-panel"><p className="eyebrow">Private guidance for your pets</p><h1>{mode === 'login' ? 'Welcome back.' : mode === 'forgot' ? 'Recover your account.' : 'Create your account.'}</h1><p className="lead">{mode === 'forgot' ? 'Enter your email to request a password reset link.' : 'Your pet profiles and checks stay tied to your account.'}</p>
+    {withoutEmail && <p role="note">Email verification and password recovery are unavailable in this private preview. Keep your test password; the app cannot email a reset link.</p>}
     <form className="profile-form auth-form" onSubmit={submit} aria-busy={busy}>
       <label>Email<input name="email" type="email" autoComplete="username" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} /></label>
       {mode !== 'forgot' && <label>Password<input name="password" type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} required minLength={mode === 'signup' ? 15 : 1} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} />{mode === 'signup' && <small>Use 15–128 characters. A passphrase works well.</small>}</label>}
       {mode === 'signup' && <><PrivacyNotice /><label className="check"><input type="checkbox" required checked={privacyAccepted} onChange={(event) => setPrivacyAccepted(event.target.checked)} /> I have read the beta data-use notice.</label></>}
       <button className="primary" disabled={busy}>{busy ? 'Please wait…' : mode === 'login' ? 'Log in' : mode === 'forgot' ? 'Send reset link' : 'Create account'}</button>
-    </form><p role="status">{status}</p><ErrorNotice message={error} /><button className="secondary" disabled={busy} onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); setPassword(''); setStatus('') }}>{mode === 'login' ? 'Create an account' : 'Back to log in'}</button>{mode === 'login' && <button className="secondary" onClick={() => { setMode('forgot'); setError(''); setPassword(''); setStatus('') }}>Forgot your password?</button>}
+    </form><p role="status">{status}</p><ErrorNotice message={error} /><button className="secondary" disabled={busy} onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); setPassword(''); setStatus('') }}>{mode === 'login' ? 'Create an account' : 'Back to log in'}</button>{mode === 'login' && !withoutEmail && <button className="secondary" onClick={() => { setMode('forgot'); setError(''); setPassword(''); setStatus('') }}>Forgot your password?</button>}
   </section><Emergency /></Shell>
 }
 

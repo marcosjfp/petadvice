@@ -1,4 +1,4 @@
-"""Review or apply the two QStash schedules. Never sends user data."""
+"""Review or apply QStash schedules. Never sends user data."""
 import argparse
 import json
 import hashlib
@@ -17,7 +17,8 @@ def main():
     args = parser.parse_args()
     settings = get_settings()
     site_key = hashlib.sha256(settings.public_web_url.rstrip('/').encode()).hexdigest()[:12]
-    for kind, cron in [('mail', '*/15 * * * *'), ('maintenance', '0 * * * *')]:
+    schedules = [('maintenance', '0 * * * *')] if settings.email_disabled else [('mail', '*/15 * * * *'), ('maintenance', '0 * * * *')]
+    for kind, cron in schedules:
         schedule_id = f'petadvice-{site_key}-{kind}'
         if args.apply:
             if not settings.production or settings.deployment_mode != 'scheduled':
@@ -28,7 +29,7 @@ def main():
                        'Upstash-Retry-Delay': 'min(600000, 60000 * pow(2, retried))'}
             if settings.vercel_automation_bypass_secret:
                 headers['Upstash-Forward-x-vercel-protection-bypass'] = settings.vercel_automation_bypass_secret
-                headers['Upstash-Redact-Fields'] = 'headers'
+                headers['Upstash-Redact-Fields'] = 'header[x-vercel-protection-bypass]'
             response = httpx.post(settings.qstash_url.rstrip('/') + '/v2/schedules/' + settings.job_callback_url,
                 headers=headers,
                 json={'kind': kind}, timeout=15)

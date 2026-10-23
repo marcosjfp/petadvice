@@ -40,6 +40,8 @@ def mail_cipher():
 
 
 def queue_mail(db: Session, owner, subject: str, body: str, expires_at, action_hash: str | None = None):
+    if get_settings().email_disabled:
+        raise RuntimeError('Email is disabled in this private preview')
     payload = json.dumps({'to': owner.email, 'subject': subject, 'body': body, 'action_hash': action_hash}).encode()
     db.add(EmailDelivery(owner_id=owner.id, encrypted_payload=mail_cipher().encrypt(payload).decode(), expires_at=expires_at))
 

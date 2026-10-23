@@ -149,7 +149,7 @@ def test_wakeup_sends_only_job_kind_and_redacts_preview_bypass(monkeypatch):
     trigger_mail()
     assert sender.call_args.kwargs['json'] == {'kind': 'mail'}
     assert sender.call_args.kwargs['headers']['Upstash-Forward-x-vercel-protection-bypass'] == 'test-bypass'
-    assert sender.call_args.kwargs['headers']['Upstash-Redact-Fields'] == 'headers'
+    assert sender.call_args.kwargs['headers']['Upstash-Redact-Fields'] == 'header[x-vercel-protection-bypass]'
 
 
 def test_mail_batch_leaves_overflow_for_scheduler_retry(client, scheduled):
@@ -205,7 +205,7 @@ def test_schedule_plan_has_no_external_effects_and_apply_separates_sites(monkeyp
     assert sender.call_count == 3  # Two schedules, then initial maintenance.
     preview_ids = [call.kwargs['headers']['Upstash-Schedule-Id'] for call in sender.call_args_list[:2]]
     assert sender.call_args.kwargs['json'] == {'kind': 'maintenance'}
-    assert sender.call_args.kwargs['headers']['Upstash-Redact-Fields'] == 'headers'
+    assert sender.call_args.kwargs['headers']['Upstash-Redact-Fields'] == 'header[x-vercel-protection-bypass]'
     monkeypatch.setattr(settings, 'public_web_url', 'https://production.example')
     sender.reset_mock(); helper.main()
     production_ids = [call.kwargs['headers']['Upstash-Schedule-Id'] for call in sender.call_args_list[:2]]

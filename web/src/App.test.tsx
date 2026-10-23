@@ -18,11 +18,38 @@ const pets = [
   { id: 'cat', name: 'Miso', species: 'cat' as const, life_stage: null },
 ]
 beforeEach(() => {
+  vi.unstubAllEnvs()
   vi.resetAllMocks()
   vi.mocked(api.history).mockResolvedValue({ checks: [], next_cursor: null })
   vi.mocked(api.getMe).mockResolvedValue({ id: 'owner', email: 'test@example.com' })
   vi.mocked(api.listPets).mockResolvedValue(pets)
   vi.mocked(api.privacy).mockResolvedValue({ status: 'draft', operator: null, contact: null, policy_url: null, policy_version: 'test', guest_retention_hours: 24, account_retention: 'Until deletion', backup_retention: 'Pending' })
+})
+
+test('guest-only preview offers checks and education without account entry points', async () => {
+  vi.stubEnv('VITE_GUEST_ONLY_PREVIEW', 'true')
+  const user = userEvent.setup()
+  render(<App />)
+  expect(await screen.findByText('Private guest preview')).toBeVisible()
+  expect(screen.queryByRole('button', { name: 'Log in' })).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Save my pet profiles' })).not.toBeInTheDocument()
+  expect(api.getMe).not.toHaveBeenCalled()
+  await user.click(screen.getByRole('button', { name: /Start a quick check/ }))
+  expect(await screen.findByRole('button', { name: 'Vomiting' })).toBeVisible()
+  expect(screen.queryByRole('button', { name: /Create an account/ })).not.toBeInTheDocument()
+})
+
+test('private account preview allows login while hiding unavailable recovery', async () => {
+  const { ApiError } = await import('./api')
+  vi.stubEnv('VITE_ACCOUNTS_WITHOUT_EMAIL_PREVIEW', 'true')
+  vi.mocked(api.getMe).mockRejectedValue(new ApiError('Not authenticated', 401))
+  const user = userEvent.setup()
+  render(<App />)
+  expect(await screen.findByText('Private account preview')).toBeVisible()
+  await user.click(screen.getByRole('button', { name: 'Log in' }))
+  expect(screen.getByRole('button', { name: 'Log in' })).toBeVisible()
+  expect(screen.queryByRole('button', { name: 'Forgot your password?' })).not.toBeInTheDocument()
+  expect(screen.getByRole('note')).toHaveTextContent('password recovery are unavailable')
 })
 
 test('switching pets discards the previous pet question and hides dog-only symptoms', async () => {

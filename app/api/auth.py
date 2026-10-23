@@ -17,6 +17,11 @@ router = APIRouter(prefix='/auth', tags=['auth'], dependencies=[Depends(verify_a
 GENERIC_LINK_RESPONSE = {'message': 'If this address belongs to an eligible account, an email will arrive shortly.'}
 
 
+def require_email_enabled():
+    if get_settings().email_disabled:
+        raise HTTPException(403, 'Email verification and password recovery are unavailable in this private preview')
+
+
 @router.post('/signup', response_model=TokenResponse, dependencies=[Depends(limit_requests('signup', '10/hour'))])
 def signup(payload: OwnerSignup, response: Response, db: Session = Depends(get_session)):
     if db.exec(select(Owner).where(Owner.email == payload.email)).first():
@@ -29,7 +34,8 @@ def signup(payload: OwnerSignup, response: Response, db: Session = Depends(get_s
         db.rollback()
         raise HTTPException(400, 'An account with this email already exists') from error
     db.refresh(owner)
-    request_action(db, owner, 'verify')
+    if not get_settings().email_disabled:
+        request_action(db, owner, 'verify')
     token = issue_session(db, owner)
     set_session_cookie(response, token)
     return TokenResponse(access_token=token)
@@ -86,7 +92,7 @@ def reauthenticate(payload: ReauthenticateRequest, request: Request, owner: Owne
     return {'status': 'password confirmed'}
 
 
-@router.post('/forgot-password', status_code=202, dependencies=[Depends(limit_requests('recovery', '10/hour', '3/hour'))])
+@router.post('/forgot-password', status_code=202, dependencies=[Depends(require_email_enabled), Depends(limit_requests('recovery', '10/hour', '3/hour'))])
 def forgot_password(payload: EmailRequest, db: Session = Depends(get_session)):
     verify_dummy_password('recovery-request')  # Both known and unknown accounts incur password-hash work.
     owner = db.exec(select(Owner).where(Owner.email == payload.email)).first()
@@ -97,7 +103,7 @@ def forgot_password(payload: EmailRequest, db: Session = Depends(get_session)):
     return GENERIC_LINK_RESPONSE
 
 
-@router.post('/resend-verification', status_code=202, dependencies=[Depends(limit_requests('verification-request', '10/hour', '3/hour'))])
+@router.post('/resend-verification', status_code=202, dependencies=[Depends(require_email_enabled), Depends(limit_requests('verification-request', '10/hour', '3/hour'))])
 def resend_verification(payload: EmailRequest, db: Session = Depends(get_session)):
     verify_dummy_password('verification-request')
     owner = db.exec(select(Owner).where(Owner.email == payload.email)).first()
@@ -108,7 +114,7 @@ def resend_verification(payload: EmailRequest, db: Session = Depends(get_session
     return GENERIC_LINK_RESPONSE
 
 
-@router.post('/verify-email', dependencies=[Depends(limit_requests('verify-email', '20/minute'))])
+@router.post('/verify-email', dependencies=[Depends(require_email_enabled), Depends(limit_requests('verify-email', '20/minute'))])
 def verify_email(payload: ActionRequest, db: Session = Depends(get_session)):
     owner = consume_action(db, payload.token, 'verify')
     owner.email_verified_at = utcnow()
@@ -117,7 +123,7 @@ def verify_email(payload: ActionRequest, db: Session = Depends(get_session)):
     return {'message': 'Email verified. You can now sign in and save your pet profiles.'}
 
 
-@router.post('/reset-password', dependencies=[Depends(limit_requests('reset-password', '10/minute'))])
+@router.post('/reset-password', dependencies=[Depends(require_email_enabled), Depends(limit_requests('reset-password', '10/minute'))])
 def reset_password(payload: ResetPasswordRequest, response: Response, db: Session = Depends(get_session)):
     new_hash = hash_password(payload.password)
     owner = consume_action(db, payload.token, 'reset')

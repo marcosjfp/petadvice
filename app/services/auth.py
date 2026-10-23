@@ -121,6 +121,8 @@ def revoke_all_sessions(db: Session, owner_id: str):
 
 
 def get_optional_owner(request: Request, credentials: HTTPAuthorizationCredentials | None = Depends(_bearer_scheme), db: Session = Depends(get_session)):
+    if get_settings().guest_only_preview:
+        return None
     token = credentials.credentials if credentials else request.cookies.get(COOKIE_NAME)
     if token is None:
         return None

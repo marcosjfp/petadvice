@@ -15,6 +15,8 @@ PETAdvice combines React/TypeScript and FastAPI for dog/cat symptom urgency and 
 - Same-origin container deployment with Caddy, a non-root API/worker, local font assets and PWA shell. Checks need an online API; reminders and answer editing are future product work.
 
 For Vercel, start with the [release guide](docs/vercel-release.md).
+The current protected account preview and cloud configuration are recorded in the
+[Vercel/Supabase setup notes](docs/operations/vercel-supabase-setup.md).
 
 Read the [implementation review](docs/modernization-review.md), [operations runbook](docs/operations/runbook.md) and [unpublished privacy-policy draft](docs/privacy-policy-draft.md).
 
@@ -44,7 +46,7 @@ The application checks the Alembic schema at startup and refuses pending migrati
 
 ## Deployment and privacy
 
-Use `compose.yaml` and the [runbook](docs/operations/runbook.md) for local containers, PostgreSQL import, encrypted backups/restores, retention and rollback. The old ephemeral backend-only Render manifest has been retired. The selected release path is Vercel + Neon PostgreSQL + Upstash Redis/QStash + Resend. Configuration, signed scheduled jobs and static build preparation are included; provider accounts and a cloud deployment are pending. See the [Vercel release guide](docs/vercel-release.md).
+Use `compose.yaml` and the [runbook](docs/operations/runbook.md) for local containers, PostgreSQL import, encrypted backups/restores, retention and rollback. The old ephemeral backend-only Render manifest has been retired. The private preview uses Vercel + Supabase PostgreSQL + Upstash Redis/QStash, with accounts enabled and email verification/recovery disabled only in the protected Preview environment. A full public release still needs email delivery and the remaining operator/privacy setup. See the [Vercel release guide](docs/vercel-release.md) and [current setup notes](docs/operations/vercel-supabase-setup.md).
 
 Production requires stable keys, exact HTTPS origins/hosts, SMTP/TLS or Resend HTTPS delivery, a restricted database role, operator/contact and a published policy URL. Verification is mandatory in production. Browser tokens use one-hour HttpOnly/SameSite cookies; mutations validate trusted origins. Tokens are checked against stored sessions, so logout/password reset revoke access. API clients may use Bearer tokens with the same revocation rules.
 

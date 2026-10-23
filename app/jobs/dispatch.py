@@ -14,7 +14,7 @@ def trigger_mail():
                'Upstash-Retry-Delay': 'min(600000, 60000 * pow(2, retried))'}
     if settings.vercel_automation_bypass_secret:
         headers['Upstash-Forward-x-vercel-protection-bypass'] = settings.vercel_automation_bypass_secret
-        headers['Upstash-Redact-Fields'] = 'headers'
+        headers['Upstash-Redact-Fields'] = 'header[x-vercel-protection-bypass]'
     try:
         response = httpx.post(settings.qstash_url.rstrip('/') + '/v2/publish/' + settings.job_callback_url,
             headers=headers,
