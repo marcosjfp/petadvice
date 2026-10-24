@@ -18,7 +18,7 @@ async def lifespan(app):
         settings = get_settings()
         if not settings.production or settings.deployment_mode != 'scheduled':
             raise RuntimeError('Vercel deployments require APP_ENV=production and DEPLOYMENT_MODE=scheduled')
-        if settings.email_disabled and os.environ.get('VERCEL_ENV') != 'preview':
+        if (settings.guest_only_preview or settings.accounts_without_email_preview) and os.environ.get('VERCEL_ENV') != 'preview':
             raise RuntimeError('Email-disabled modes require a protected preview deployment')
     # Mounted applications do not automatically receive parent lifespan events.
     async with api.router.lifespan_context(api):
@@ -31,12 +31,12 @@ app.mount('/api', api)
 
 @app.api_route('/{path:path}', methods=['GET', 'HEAD'], include_in_schema=False)
 def frontend(path: str, request: Request):
-    # Vercel serves existing public files from the CDN. This also permits local
-    # smoke testing of the release entrypoint and navigation fallback.
+    # Include public/** in the function bundle as well as any CDN copy: Vercel's
+    # Python builder otherwise excludes public files from runtime SPA fallback.
     target = (PUBLIC / path).resolve()
     if target.is_relative_to(PUBLIC.resolve()) and target.is_file():
         return FileResponse(target)
-    if path.startswith('api') or Path(path).suffix or 'text/html' not in request.headers.get('accept', ''):
+    if path.startswith('api') or Path(path).suffix or (path and 'text/html' not in request.headers.get('accept', '')):
         raise HTTPException(404, 'Not found')
     if not (PUBLIC / 'index.html').is_file():
         raise HTTPException(503, 'Frontend has not been built')

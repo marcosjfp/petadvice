@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     app_env: Literal['development', 'test', 'production'] = 'development'
     guest_only_preview: bool = False
     accounts_without_email_preview: bool = False
+    accounts_without_email_beta: bool = False
     direct_database_url: str = ''
     deployment_mode: Literal['worker', 'scheduled'] = 'worker'
     database_url: str = 'sqlite:///./petadvice.db'
@@ -56,7 +57,7 @@ class Settings(BaseSettings):
 
     @property
     def email_disabled(self) -> bool:
-        return self.guest_only_preview or self.accounts_without_email_preview
+        return self.guest_only_preview or self.accounts_without_email_preview or self.accounts_without_email_beta
 
     @property
     def origins(self) -> list[str]:
@@ -69,10 +70,12 @@ class Settings(BaseSettings):
     def validate_production(self) -> None:
         if not self.production:
             return
-        if self.guest_only_preview and self.accounts_without_email_preview:
-            raise RuntimeError('Choose either guest-only or account preview mode')
-        if self.email_disabled and (os.getenv('VERCEL') != '1' or os.getenv('VERCEL_ENV') != 'preview'):
+        if sum((self.guest_only_preview, self.accounts_without_email_preview, self.accounts_without_email_beta)) > 1:
+            raise RuntimeError('Choose one guest preview, account preview or account beta mode')
+        if (self.guest_only_preview or self.accounts_without_email_preview) and (os.getenv('VERCEL') != '1' or os.getenv('VERCEL_ENV') != 'preview'):
             raise RuntimeError('Email-disabled modes are restricted to Vercel preview deployments')
+        if self.accounts_without_email_beta and (os.getenv('VERCEL') != '1' or os.getenv('VERCEL_ENV') != 'production'):
+            raise RuntimeError('Account beta mode requires an explicit Vercel production deployment')
         if 'jwt_secret_key' not in self.model_fields_set or len(self.jwt_secret_key) < 32 or self.jwt_secret_key == 'dev-only-insecure-secret-change-me':
             raise RuntimeError('Production requires a stable random JWT_SECRET_KEY of at least 32 characters')
         if not self.database_url.startswith(('postgresql://', 'postgresql+psycopg://', 'postgres://')):

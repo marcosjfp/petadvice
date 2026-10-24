@@ -39,13 +39,14 @@ test('guest-only preview offers checks and education without account entry point
   expect(screen.queryByRole('button', { name: /Create an account/ })).not.toBeInTheDocument()
 })
 
-test('private account preview allows login while hiding unavailable recovery', async () => {
+test.each([['false', 'Private account preview'], ['true', 'Tester beta']])('account test mode %s allows login while hiding unavailable recovery', async (publicBeta, label) => {
   const { ApiError } = await import('./api')
   vi.stubEnv('VITE_ACCOUNTS_WITHOUT_EMAIL_PREVIEW', 'true')
+  vi.stubEnv('VITE_PUBLIC_TEST_BETA', publicBeta)
   vi.mocked(api.getMe).mockRejectedValue(new ApiError('Not authenticated', 401))
   const user = userEvent.setup()
   render(<App />)
-  expect(await screen.findByText('Private account preview')).toBeVisible()
+  expect(await screen.findByText(label)).toBeVisible()
   await user.click(screen.getByRole('button', { name: 'Log in' }))
   expect(screen.getByRole('button', { name: 'Log in' })).toBeVisible()
   expect(screen.queryByRole('button', { name: 'Forgot your password?' })).not.toBeInTheDocument()

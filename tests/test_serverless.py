@@ -115,6 +115,8 @@ def test_release_entrypoint_mounts_api_without_caching_or_spa_shadowing(client, 
     monkeypatch.setattr(server, 'PUBLIC', tmp_path)
     with TestClient(server.app) as release:
         assert release.get('/api/health').json() == {'status': 'ok'}
+        assert release.get('/').text == '<html>Release frontend</html>'
+        assert release.head('/').status_code == 200
         assert release.get('/api/auth/me').status_code == 401
         assert release.get('/api/auth/me').headers['cache-control'] == 'no-store'
         assert release.get('/api/unknown', headers={'Accept': 'text/html'}).status_code == 404

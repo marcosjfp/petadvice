@@ -1,13 +1,13 @@
 # PETAdvice Vercel release
 
-Prepared 2026-10-10. Enhancements 1–4 are implemented: public Learn/Care, rule-based result explanations, printable/downloadable reports, and private pet history. The clinical content/question files and escalation decisions are preserved. No reviewer attribution was added. A protected Vercel/Supabase account preview was configured on 2026-10-23; see the [current setup notes](operations/vercel-supabase-setup.md). The full-release requirements below still apply before a public launch.
+Prepared 2026-10-10. Enhancements 1–4 are implemented: public Learn/Care, rule-based result explanations, printable/downloadable reports, and private pet history. The clinical content/question files and escalation decisions are preserved. No reviewer attribution was added. A Vercel/Supabase tester beta at https://petadvice.vercel.app was authorized on 2026-10-23; see the [current setup notes](operations/vercel-supabase-setup.md). The full-release requirements below still apply before use beyond the explicitly enabled test beta.
 
 ## Architecture
 
 | Service | Purpose | Application configuration |
 | --- | --- | --- |
 | Vercel | Vite static frontend and FastAPI function on one HTTPS origin | Root project, FastAPI framework, `server.py` |
-| Neon PostgreSQL | Profiles, checks, sessions, encrypted email outbox | Restricted role; pooled TLS `DATABASE_URL` |
+| Supabase PostgreSQL | Profiles, checks, sessions, encrypted email outbox | Restricted role; pooled TLS `DATABASE_URL` |
 | Upstash Redis | Shared request protection | TCP/TLS `rediss://` URL, not a REST endpoint |
 | Resend | Verification and recovery email | HTTPS API key and verified sending domain |
 | Upstash QStash | Immediate email wakeups, retries and scheduled reconciliation/retention | Token plus current/next signing keys |
@@ -18,7 +18,7 @@ The shared API gets `no-store` headers, and the service worker never caches API 
 
 ## 1. Create isolated provider resources
 
-Create a Vercel project from a private repository with **repository root** as Root Directory and **FastAPI** as Framework Preset. Use `python scripts/build_vercel.py` as Build Command, leaving Output Directory at the framework default. Do not select the `web` directory: it would omit the backend. Choose function/database/Redis regions close to one another. The Vercel project can use a free `vercel.app` address initially.
+Create a Vercel project from a private repository with **repository root** as Root Directory and **FastAPI** as Framework Preset. Use `python scripts/build_vercel.py` as Build Command, leaving Output Directory at the framework default. Keep `functions.server.py.includeFiles = "public/**"`: the Python builder otherwise excludes generated public files needed by runtime frontend serving and SPA fallback. The upload ignore rule `/public` must stay anchored so `web/public` source assets are included. Do not select the `web` directory: it would omit the backend. Choose function/database/Redis regions close to one another. The Vercel project can use a free `vercel.app` address initially.
 
 Create separate preview and production databases, Redis databases, Resend keys and QStash credentials/accounts where practical. Do not point temporary branch previews at production. Use a fixed preview alias for exact origins, hostnames and the signed callback destination; unconfigured ephemeral URLs will intentionally fail host/origin checks. Protect previews. QStash requires a reachable endpoint: configure [Vercel's automation bypass secret](https://vercel.com/docs/deployment-protection/methods-to-bypass-deployment-protection/protection-bypass-automation) if protection is enabled (`VERCEL_AUTOMATION_BYPASS_SECRET`); triggers and schedule setup forward it in a private, redacted header. Do not put bypass secrets in the callback URL, browser code, or Git. Verify that ordinary preview access remains protected.
 
@@ -34,7 +34,7 @@ Generate a stable random `JWT_SECRET_KEY` and an independent Fernet `MAIL_ENCRYP
 
 Set `APP_ENV=production`, `DEPLOYMENT_MODE=scheduled`, `MAIL_BACKEND=resend`, `RESEND_API_KEY`, `SMTP_FROM`, the pooled `DATABASE_URL`, Redis URI and all QStash credentials. `QSTASH_URL` must match the region of the QStash account. Set `PUBLIC_WEB_URL` to the exact clean HTTPS origin, `CORS_ORIGINS` to exact allowed HTTPS origins, and `TRUSTED_HOSTS` to their hostname(s), with no wildcards. Callback signatures are checked against `${PUBLIC_WEB_URL}/api/jobs/run`.
 
-Operator name, privacy email, published privacy-policy URL/version and backup/log retention remain undecided. Complete the existing [privacy draft](privacy-policy-draft.md) with the actual hosting/providers and retention practices before public release; production startup refuses missing operator/contact/policy configuration. A URL must point to a real published policy. Do not mark placeholder text as a completed policy.
+Operator name, privacy email, published privacy-policy URL/version and backup/log retention remain undecided. Complete the existing [privacy draft](privacy-policy-draft.md) with the actual hosting/providers and retention practices before public release; normal production startup refuses missing operator/contact/policy configuration. The separately enabled `ACCOUNTS_WITHOUT_EMAIL_BETA` tester exception disables email, uses a visible test-data notice, and requires the Vercel production target; it does not complete the full-release requirements. A URL must point to a real published policy. Do not mark placeholder text as a completed policy.
 
 ## 3. Prepare the database before directing traffic
 

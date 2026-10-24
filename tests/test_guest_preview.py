@@ -63,8 +63,9 @@ def test_guest_preview_keeps_signed_retention_but_rejects_email_jobs(client, sch
     assert client.get('/ready').status_code == 200
 
 
-def test_account_preview_supports_hashed_passwords_without_email_or_recovery(client, monkeypatch):
-    monkeypatch.setattr(get_settings(), 'accounts_without_email_preview', True)
+@pytest.mark.parametrize('mode', ['accounts_without_email_preview', 'accounts_without_email_beta'])
+def test_account_preview_supports_hashed_passwords_without_email_or_recovery(client, monkeypatch, mode):
+    monkeypatch.setattr(get_settings(), mode, True)
     headers = signup(client, 'private-preview@example.com')
     assert client.get('/auth/me', headers=headers).json()['email_verification_required'] is False
     assert client.post('/pets', headers=headers, json={'name': 'Preview cat', 'species': 'cat'}).status_code == 200
@@ -80,3 +81,20 @@ def test_account_preview_supports_hashed_passwords_without_email_or_recovery(cli
     assert client.post('/auth/logout', headers=headers).status_code == 200
     assert client.get('/auth/me', headers=headers).status_code == 401
     assert client.post('/auth/login', json={'email': 'private-preview@example.com', 'password': 'a-long-test-passphrase'}).status_code == 200
+
+
+def test_account_beta_requires_explicit_production_target_and_retains_security(monkeypatch):
+    settings = production_settings(accounts_without_email_beta=True)
+    settings.mail_backend = 'file'
+    for name in ['smtp_host', 'smtp_from', 'mail_encryption_key', 'privacy_operator', 'privacy_email', 'privacy_policy_url']:
+        setattr(settings, name, '')
+    monkeypatch.setenv('VERCEL', '1')
+    monkeypatch.setenv('VERCEL_ENV', 'preview')
+    with pytest.raises(RuntimeError, match='explicit Vercel production'):
+        settings.validate_production()
+    monkeypatch.setenv('VERCEL_ENV', 'production')
+    settings.validate_production()
+    assert settings.email_disabled and not settings.email_verification_required
+    settings.rate_limit_storage_uri = 'memory://'
+    with pytest.raises(RuntimeError, match='shared Redis'):
+        settings.validate_production()

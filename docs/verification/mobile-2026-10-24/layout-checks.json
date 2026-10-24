@@ -1,0 +1,128 @@
+[
+  {
+    "size": {
+      "width": 320,
+      "height": 568
+    },
+    "banner": "relative",
+    "contentWidth": 305,
+    "fields": [
+      {
+        "contained": true,
+        "font": "16px"
+      },
+      {
+        "contained": true,
+        "font": "16px"
+      }
+    ],
+    "overflow": false,
+    "scrollWidth": 305,
+    "width": 320
+  },
+  {
+    "size": {
+      "width": 375,
+      "height": 667
+    },
+    "banner": "relative",
+    "contentWidth": 360,
+    "fields": [
+      {
+        "contained": true,
+        "font": "16px"
+      },
+      {
+        "contained": true,
+        "font": "16px"
+      }
+    ],
+    "overflow": false,
+    "scrollWidth": 360,
+    "width": 375
+  },
+  {
+    "size": {
+      "width": 393,
+      "height": 852
+    },
+    "banner": "relative",
+    "contentWidth": 378,
+    "fields": [
+      {
+        "contained": true,
+        "font": "16px"
+      },
+      {
+        "contained": true,
+        "font": "16px"
+      }
+    ],
+    "overflow": false,
+    "scrollWidth": 378,
+    "width": 393
+  },
+  {
+    "size": {
+      "width": 430,
+      "height": 932
+    },
+    "banner": "relative",
+    "contentWidth": 415,
+    "fields": [
+      {
+        "contained": true,
+        "font": "16px"
+      },
+      {
+        "contained": true,
+        "font": "16px"
+      }
+    ],
+    "overflow": false,
+    "scrollWidth": 415,
+    "width": 430
+  },
+  {
+    "size": {
+      "width": 852,
+      "height": 393
+    },
+    "banner": "relative",
+    "contentWidth": 837,
+    "fields": [
+      {
+        "contained": true,
+        "font": "16px"
+      },
+      {
+        "contained": true,
+        "font": "16px"
+      }
+    ],
+    "overflow": false,
+    "scrollWidth": 837,
+    "width": 852
+  },
+  {
+    "size": {
+      "width": 1280,
+      "height": 800
+    },
+    "banner": "fixed",
+    "contentWidth": 1265,
+    "fields": [
+      {
+        "contained": true,
+        "font": "16px"
+      },
+      {
+        "contained": true,
+        "font": "16px"
+      }
+    ],
+    "overflow": false,
+    "scrollWidth": 1265,
+    "width": 1280
+  }
+]

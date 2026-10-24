@@ -19,7 +19,7 @@ GENERIC_LINK_RESPONSE = {'message': 'If this address belongs to an eligible acco
 
 def require_email_enabled():
     if get_settings().email_disabled:
-        raise HTTPException(403, 'Email verification and password recovery are unavailable in this private preview')
+        raise HTTPException(403, 'Email verification and password recovery are unavailable in this test version')
 
 
 @router.post('/signup', response_model=TokenResponse, dependencies=[Depends(limit_requests('signup', '10/hour'))])

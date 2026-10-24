@@ -99,3 +99,81 @@ summary { cursor: pointer; min-height: 44px; padding: 12px 0; font-weight: 700; 
   .check-report a { color: #111; text-decoration: none; }
   .check-report .fine-print { font-size: 10pt; }
 }
+
+/* Keep content above the decorative circle, including the beta notice. */
+.shell > aside:not(.emergency) { position: relative; z-index: 1; }
+.shell::before { pointer-events: none; }
+.shell {
+  min-height: 100svh;
+  padding-top: max(34px, env(safe-area-inset-top));
+  padding-left: max(7vw, env(safe-area-inset-left));
+  padding-right: max(7vw, env(safe-area-inset-right));
+}
+.profile-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.auth-form { grid-template-columns: minmax(0, 1fr); }
+.profile-form > *, .form-field, .panel, .question, .result { min-width: 0; }
+.profile-form input:not([type=checkbox]), .profile-form select,
+.security-password input, .search-label input, .guest-species select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 48px;
+  font-size: 16px;
+}
+input[type=date] { display: block; min-inline-size: 0; }
+input[type=date]::-webkit-date-and-time-value { min-height: 1.5em; text-align: left; }
+.security-password input { border: 1px solid var(--line); border-radius: 7px; padding: 13px; color: var(--ink); background: #fff; }
+.pet-switcher-copy { min-width: 0; }
+.pet-switcher-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.emergency { bottom: calc(22px + env(safe-area-inset-bottom)); }
+.emergency > div { min-width: 0; }
+
+/* A phone's keyboard and Safari toolbars must never compete with a fixed banner. */
+@media (max-width: 650px), (max-width: 950px) and (max-height: 500px) {
+  .shell {
+    padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right))
+      calc(24px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  }
+  .welcome { padding: 32px 0 20px; }
+  .welcome h1 { font-size: clamp(36px, 10vw, 52px); line-height: 1.08; }
+  .intro { padding: 32px 0 24px; }
+  .intro h1 { font-size: clamp(36px, 10vw, 52px); line-height: 1.08; }
+  .panel, .question, .result { width: 100%; padding: 24px 18px; }
+  .panel > h1, .panel > h2, .question > h1, .question > h2, .result h1 {
+    font-size: clamp(28px, 8vw, 35px);
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+  }
+  .profile-form { grid-template-columns: minmax(0, 1fr); margin-top: 24px; }
+  .profile-form label { font-size: 14px; }
+  .profile-form .primary { width: 100%; }
+  .check { align-items: flex-start; line-height: 1.5; }
+  .check input { flex: 0 0 20px; width: 20px; height: 20px; margin: 2px 0 0; }
+  .header-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pet-switcher { grid-column: 1 / -1; width: 100%; }
+  button { max-width: 100%; overflow-wrap: anywhere; }
+  .panel p, .privacy-notice, .care-list article > div { overflow-wrap: anywhere; }
+  .report-context, .report-notice { padding: 14px; }
+  .report-action { padding-left: 14px; }
+  .check-history li { padding: 16px; }
+  .emergency {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    max-width: none;
+    margin: 32px 0 0;
+    align-items: flex-start;
+    padding: 16px;
+  }
+}
+@media (max-width: 420px) {
+  .intro-actions, .public-links { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .public-links .secondary { margin-top: 0; }
+  .report-controls > button, .guest-controls > button { width: 100%; margin-right: 0; }
+}
+@media print {
+  .shell { padding: 0; min-height: 0; }
+  .emergency { display: none; }
+}

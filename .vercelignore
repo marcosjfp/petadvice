@@ -18,7 +18,7 @@
 **/*.pab
 **/node_modules
 web/dist
-public
+/public
 tests
 docs
 coverage
