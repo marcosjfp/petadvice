@@ -150,15 +150,16 @@ function Shell({ children, onBack }: { children: React.ReactNode; onBack?: () =>
 }
 
 function PublicLanding({ onQuickCheck, onLogin, onBrowse }: { onQuickCheck: () => void; onLogin?: () => void; onBrowse: (view: 'library' | 'care') => void }) {
-  return <main className="shell"><header><img className="main-logo" src={fullLogo} alt="PETAdvice dog and cat logo" />{onLogin && <button className="start-fresh" onClick={onLogin}>Log in</button>}</header>
-    {!onLogin && <aside className="panel"><strong>Private guest preview</strong><p>Try symptom checks, Learn and Care. Accounts and email are unavailable in this preview. Use synthetic test information only.</p></aside>}
-    {import.meta.env.VITE_ACCOUNTS_WITHOUT_EMAIL_PREVIEW === 'true' && <aside className="panel"><strong>{import.meta.env.VITE_PUBLIC_TEST_BETA === 'true' ? 'Tester beta' : 'Private account preview'}</strong><p>Accounts are available for testing. Email verification and password recovery are unavailable. Use a test email, fictional pet details and a password you do not use elsewhere.</p></aside>}
+  return <main className="shell landing"><header><img className="main-logo" src={fullLogo} alt="PETAdvice dog and cat logo" />{onLogin && <button className="start-fresh login-button" onClick={onLogin}>Log in</button>}</header>
     <section className="intro"><p className="eyebrow">Friendly guidance for everyday pet worries</p><h1>A clearer next step for your pet.</h1><p className="intro-lead">When something feels different, PETAdvice helps you work out what to look for, how urgently to act, and what to discuss with your vet.</p>
       <div className="intro-actions"><button className="primary" onClick={onQuickCheck}>Start a quick check <span aria-hidden="true">→</span></button>{onLogin && <button className="secondary" onClick={onLogin}>Save my pet profiles</button>}</div>
       <div className="public-links"><button className="secondary" onClick={() => onBrowse('library')}>Browse Learn</button><button className="secondary" onClick={() => onBrowse('care')}>Browse Care</button></div>
       <div className="intro-points"><article><span>01</span><div><h2>Make sense of symptoms</h2><p>Find straightforward information about common concerns.</p></div></article><article><span>02</span><div><h2>Know how urgent it is</h2><p>Answer focused questions to help decide when to contact a vet.</p></div></article><article><span>03</span><div><h2>Keep care on track</h2><p>{onLogin ? 'Save pet profiles and browse care information for their life stage.' : 'Browse preventive care information for dogs and cats.'}</p></div></article></div>
       <p className="intro-boundary">General educational guidance, not a diagnosis. This beta's content is awaiting veterinary review. No account is needed for a quick check.</p>
-    </section><Emergency />
+    </section>
+    {!onLogin && <aside className="beta-notice"><strong>Private guest preview</strong><p>Try symptom checks, Learn and Care. Accounts and email are unavailable in this preview. Use synthetic test information only.</p></aside>}
+    {import.meta.env.VITE_ACCOUNTS_WITHOUT_EMAIL_PREVIEW === 'true' && <aside className="beta-notice"><strong>{import.meta.env.VITE_PUBLIC_TEST_BETA === 'true' ? 'Tester beta' : 'Private account preview'}</strong><p>Accounts are available for testing. Email verification and password recovery are unavailable. Use a test email, fictional pet details and a password you do not use elsewhere.</p></aside>}
+    <Emergency />
   </main>
 }
 

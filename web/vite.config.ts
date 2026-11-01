@@ -18,6 +18,12 @@ export default defineConfig({
     workbox: {
       globPatterns: ['**/*.{js,css,html,ico,woff2}'],
       navigateFallbackDenylist: [/^\/api\//],
+      // There is no update prompt in the UI, so a waiting worker would keep serving an
+      // old build until every tab closes (iOS Safari rarely closes tabs). Activate new
+      // builds immediately; the open page keeps running and the next load is fresh.
+      skipWaiting: true,
+      clientsClaim: true,
+      cleanupOutdatedCaches: true,
       // Private responses and medical checks must never use an offline API cache.
       runtimeCaching: [],
     },
