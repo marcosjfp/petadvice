@@ -5,7 +5,7 @@ import CheckResult from './CheckResult'
 import CheckHistory from './CheckHistory'
 import { downloadJson } from './download'
 import { errorMessage, useRequest } from './useRequest'
-import { formatDate, languages, readable, serverText, useI18n, type Language } from './i18n'
+import { formatDate, languages, readable, serverText, useI18n } from './i18n'
 import { lifeStageLabel } from './checkReport'
 import fullLogo from './assets/brand/Logo_new.png'
 import nameLogo from './assets/brand/Logo_Just_Name.png'
@@ -18,9 +18,9 @@ function ErrorNotice({ message }: { message: string }) {
   return message ? <p className="error" role="alert">{message}</p> : null
 }
 
-function LanguageSelect() {
+function LanguageSwitch() {
   const { language, t, setLanguage } = useI18n()
-  return <label className="language-select"><select aria-label={t.language} value={language} onChange={(event) => setLanguage(event.target.value as Language)}>{languages.map((item) => <option key={item.code} value={item.code} lang={item.code}>{item.label}</option>)}</select></label>
+  return <div className="language-switch" role="group" aria-label={t.language}>{languages.map((item) => <button key={item.code} type="button" lang={item.code} aria-label={item.label} title={item.label} aria-pressed={language === item.code} onClick={() => setLanguage(item.code)}>{item.code.toUpperCase()}</button>)}</div>
 }
 
 function App() {
@@ -137,9 +137,8 @@ function App() {
   </Shell>
 
   return <main className="shell">
-    <header><img className="name-logo" src={nameLogo} alt="PETAdvice" /><div className="header-actions">
+    <header><img className="name-logo" src={nameLogo} alt="PETAdvice" /><LanguageSwitch /><div className="header-actions">
       {pet && <label className="pet-switcher"><img className="pets-logo" src={petsLogo} alt="" /><span className="pet-switcher-copy"><strong>{pet.name}</strong><small>{pet.life_stage ? lifeStageLabel(t, pet.life_stage) : t.app.ageUnknown}</small></span><select aria-label={t.app.changePet} value={pet.id} onChange={(event) => setSelectedPetId(event.target.value)}>{pets.map((item) => <option value={item.id} key={item.id}>{item.name} ({t.speciesLower[item.species]})</option>)}</select><span className="switcher-chevron" aria-hidden="true">⌄</span></label>}
-      <LanguageSelect />
       <button className="start-fresh" onClick={() => { setShowPetForm(true); setView('triage') }}>{t.app.newPet}</button>
       <button className="start-fresh" disabled={busy} onClick={() => void run(async () => { await api.logout(); resetAccount() })}>{t.common.logOut}</button>
     </div></header>
@@ -156,13 +155,13 @@ function App() {
 
 function Shell({ children, onBack }: { children: React.ReactNode; onBack?: () => void }) {
   const { t } = useI18n()
-  return <main className="shell"><header><img className="name-logo" src={nameLogo} alt="PETAdvice" /><div className="header-actions"><LanguageSelect />{onBack && <button className="cancel-fresh" onClick={onBack}>{t.common.back}</button>}</div></header>{children}</main>
+  return <main className="shell"><header><img className="name-logo" src={nameLogo} alt="PETAdvice" /><LanguageSwitch />{onBack && <button className="cancel-fresh" onClick={onBack}>{t.common.back}</button>}</header>{children}</main>
 }
 
 function PublicLanding({ onQuickCheck, onLogin, onBrowse }: { onQuickCheck: () => void; onLogin?: () => void; onBrowse: (view: 'library' | 'care') => void }) {
   const { t } = useI18n()
   const l = t.landing
-  return <main className="shell landing"><header><img className="main-logo" src={fullLogo} alt={l.logoAlt} /><div className="header-actions"><LanguageSelect />{onLogin && <button className="start-fresh login-button" onClick={onLogin}>{l.login}</button>}</div></header>
+  return <main className="shell landing"><header><img className="main-logo" src={fullLogo} alt={l.logoAlt} /><LanguageSwitch />{onLogin && <button className="start-fresh login-button" onClick={onLogin}>{l.login}</button>}</header>
     <section className="intro"><p className="eyebrow">{l.eyebrow}</p><h1>{l.title}</h1><p className="intro-lead">{l.lead}</p>
       <div className="intro-actions"><button className="primary" onClick={onQuickCheck}>{l.start} <span aria-hidden="true">→</span></button>{onLogin && <button className="secondary" onClick={onLogin}>{l.save}</button>}</div>
       <div className="public-links"><button className="secondary" onClick={() => onBrowse('library')}>{l.browseLearn}</button><button className="secondary" onClick={() => onBrowse('care')}>{l.browseCare}</button></div>
