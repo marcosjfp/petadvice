@@ -19,6 +19,7 @@ The beta runs on Vercel, Supabase PostgreSQL and Upstash Redis/QStash. Deploymen
 - Argon2id password hashes, HttpOnly/SameSite cookies, revocable sessions and logout across devices. Normal HTTPS production deployments use Secure cookies.
 - Email verification and single-use password recovery for fully configured deployments; these features are disabled in the live tester beta.
 - Public Learn and Care pages for dogs and cats, including symptom search and life-stage information.
+- English, Portuguese (Portugal) and Spanish (Spain). The interface language is chosen from the header selector or the browser language. Clinical content translations live in `app/content/translations/`; triage answers are always stored as the canonical English option, so urgency rules are identical in every language. A check's report is saved in the language used when its guidance was first shown.
 - Multiple pet profiles and private, paginated check history.
 - Results with recorded answers, explanations of existing urgency rules, sources and preserved report context.
 - Printable/PDF and downloadable HTML summaries. Saved checks retain the guidance recorded at the time instead of recalculating it from current content.

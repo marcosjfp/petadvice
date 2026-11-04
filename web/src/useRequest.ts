@@ -1,7 +1,8 @@
 import { useCallback, useRef, useState } from 'react'
+import { translations } from './i18n'
 
 export function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Something went wrong. Please try again.'
+  return error instanceof Error ? error.message : translations().errors.generic
 }
 
 // The ref blocks a second submission even before React paints disabled controls.

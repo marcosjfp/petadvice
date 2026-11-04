@@ -4,10 +4,16 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
-from app.models.schema import ConditionEntry, PreventiveCareItem, TriageQuestion, UrgencyLevel
+from app.i18n import DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES
+from app.models.schema import ConditionEntry, PreventiveCareItem, RedFlag, TriageQuestion, UrgencyLevel
 
 CONTENT_DIR = Path(__file__).parent
 QUESTIONS_FILE = CONTENT_DIR / "triage_questions.json"
+TRANSLATIONS_DIR = CONTENT_DIR / "translations"
+ALL_LIFE_STAGES = "all"
+_CONDITION_TEXT = ("name", "home_care_guidance", "prevention_tips")
+_CONDITION_LISTS = ("possible_causes", "recommended_examinations")
+_PREVENTIVE_TEXT = ("title", "description", "recurrence")
 
 
 class ContentLibrary:
@@ -16,6 +22,7 @@ class ContentLibrary:
         self.preventive_items: list[PreventiveCareItem] = []
         self.questions: list[TriageQuestion] = []
         self.version: str | None = None
+        self.translations: dict[str, dict] = {}
 
     def load(self) -> None:
         self.conditions, self.preventive_items = [], []
@@ -45,13 +52,17 @@ class ContentLibrary:
             invalid_home_care = [item.id for item in conditions if item.urgency_default != UrgencyLevel.monitor_home and item.home_care_guidance]
             if invalid_home_care:
                 raise ValueError(f"home_care_guidance is only allowed for monitor_home entries: {invalid_home_care}")
+            translation_files = sorted(TRANSLATIONS_DIR.glob("*.json"))
+            translations = {path.stem: json.loads(path.read_text()) for path in translation_files}
+            self._validate_translations(translations, conditions, preventive_items, questions)
         except (OSError, KeyError, json.JSONDecodeError, ValidationError, ValueError) as error:
             raise RuntimeError(f"Content library failed schema validation: {error}") from error
         self.conditions = conditions
         self.preventive_items = preventive_items
         self.questions = questions
+        self.translations = translations
         digest = hashlib.sha256()
-        for path in [*batch_files, QUESTIONS_FILE]:
+        for path in [*batch_files, QUESTIONS_FILE, *translation_files]:
             if path.exists():
                 digest.update(path.name.encode())
                 digest.update(path.read_bytes())
@@ -93,6 +104,74 @@ class ContentLibrary:
             if sum(question.is_entry_point for question in group) != 1:
                 raise ValueError(f"Symptom needs exactly one entry question: {symptom}")
 
+    @staticmethod
+    def _validate_translations(translations: dict[str, dict], conditions: list[ConditionEntry], preventive_items: list[PreventiveCareItem], questions: list[TriageQuestion]) -> None:
+        """Translations may be incomplete (English is the fallback) but must match the source shape."""
+        by_kind = {
+            "conditions": {item.id: item for item in conditions},
+            "preventive_care": {item.id: item for item in preventive_items},
+            "questions": {item.id: item for item in questions},
+        }
+        for language, data in translations.items():
+            if language not in SUPPORTED_LANGUAGES or language == DEFAULT_LANGUAGE:
+                raise ValueError(f"Unsupported translation language: {language}")
+            unknown_sections = set(data) - set(by_kind)
+            if unknown_sections:
+                raise ValueError(f"Unknown translation sections in {language}: {sorted(unknown_sections)}")
+            for kind, entries in data.items():
+                for item_id, fields in entries.items():
+                    source = by_kind[kind].get(item_id)
+                    if source is None:
+                        raise ValueError(f"Translation {language} references unknown {kind} id: {item_id}")
+                    list_fields = {"red_flags": [flag.description for flag in source.red_flags]} if kind == "conditions" else {}
+                    if kind == "conditions":
+                        list_fields |= {name: getattr(source, name) for name in _CONDITION_LISTS}
+                    if kind == "questions":
+                        list_fields["options"] = source.options
+                    for name, value in fields.items():
+                        if name in list_fields:
+                            if not isinstance(value, list) or len(value) != len(list_fields[name]):
+                                raise ValueError(f"Translation {language} {item_id}.{name} must have {len(list_fields[name])} items")
+                        elif not hasattr(source, name) or not isinstance(value, str):
+                            raise ValueError(f"Translation {language} {item_id} has an invalid field: {name}")
+
+    def _translation(self, language: str, kind: str, item_id: str) -> dict:
+        return self.translations.get(language, {}).get(kind, {}).get(item_id, {})
+
+    def localize_condition(self, condition: ConditionEntry, language: str) -> ConditionEntry:
+        fields = self._translation(language, "conditions", condition.id)
+        if not fields:
+            return condition
+        update = {name: fields[name] for name in (*_CONDITION_TEXT, *_CONDITION_LISTS) if name in fields and getattr(condition, name) is not None}
+        if "red_flags" in fields:
+            update["red_flags"] = [RedFlag(description=text, escalates_to=flag.escalates_to) for flag, text in zip(condition.red_flags, fields["red_flags"])]
+        return condition.model_copy(update=update)
+
+    def localize_flag(self, condition: ConditionEntry, flag: RedFlag, language: str) -> str:
+        texts = self._translation(language, "conditions", condition.id).get("red_flags")
+        return texts[condition.red_flags.index(flag)] if texts else flag.description
+
+    def localize_preventive(self, item: PreventiveCareItem, language: str) -> PreventiveCareItem:
+        fields = self._translation(language, "preventive_care", item.id)
+        update = {name: fields[name] for name in _PREVENTIVE_TEXT if name in fields and getattr(item, name) is not None}
+        return item.model_copy(update=update) if update else item
+
+    def question_prompt(self, question: TriageQuestion, language: str) -> str:
+        return self._translation(language, "questions", question.id).get("prompt", question.prompt)
+
+    def option_label(self, question: TriageQuestion, answer: str, language: str) -> str:
+        labels = self._translation(language, "questions", question.id).get("options")
+        return labels[question.options.index(answer)] if labels and answer in question.options else answer
+
+    def present_question(self, question: TriageQuestion | None, language: str) -> dict | None:
+        """Answers are submitted as the canonical option; option_labels are for display only."""
+        if question is None:
+            return None
+        return question.model_dump() | {
+            "prompt": self.question_prompt(question, language),
+            "option_labels": [self.option_label(question, option, language) for option in question.options],
+        }
+
     def conditions_for_symptom(self, symptom_tag: str) -> list[ConditionEntry]:
         return [condition for condition in self.conditions if symptom_tag in condition.symptom_tags]
 
@@ -105,7 +184,7 @@ class ContentLibrary:
     def questions_for_symptom(self, symptom_tag: str) -> list[TriageQuestion]:
         return [question for question in self.questions if question.symptom_tag == symptom_tag]
 
-    def filter_conditions(self, species=None, category=None, life_stage=None, symptom_tag=None):
+    def filter_conditions(self, species=None, category=None, life_stage=None, symptom_tag=None, language=DEFAULT_LANGUAGE):
         results = self.conditions
         if species:
             results = [item for item in results if item.species.value in (species, "both")]
@@ -115,15 +194,15 @@ class ContentLibrary:
             results = [item for item in results if life_stage in item.applicable_life_stages]
         if symptom_tag:
             results = [item for item in results if symptom_tag in item.symptom_tags]
-        return results
+        return [self.localize_condition(item, language) for item in results]
 
-    def filter_preventive(self, species=None, life_stage=None):
+    def filter_preventive(self, species=None, life_stage=None, language=DEFAULT_LANGUAGE):
         results = self.preventive_items
         if species:
             results = [item for item in results if item.species.value in (species, "both")]
         if life_stage:
-            results = [item for item in results if item.life_stage == life_stage]
-        return results
+            results = [item for item in results if item.life_stage in (life_stage, ALL_LIFE_STAGES)]
+        return [self.localize_preventive(item, language) for item in results]
 
 
 content_library = ContentLibrary()

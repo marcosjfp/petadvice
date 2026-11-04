@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { api, ApiError, urgencyLabels, type Condition, type Owner, type Privacy, type Pet, type Question, type Species, type TriageResult, type PreventiveCareItem } from './api'
+import { api, ApiError, type Condition, type Owner, type Privacy, type Pet, type Question, type Species, type TriageResult, type PreventiveCareItem } from './api'
 import AccountLink from './AccountLink'
 import CheckResult from './CheckResult'
 import CheckHistory from './CheckHistory'
 import { downloadJson } from './download'
 import { errorMessage, useRequest } from './useRequest'
+import { formatDate, languages, readable, serverText, useI18n, type Language } from './i18n'
+import { lifeStageLabel } from './checkReport'
 import fullLogo from './assets/brand/Logo_new.png'
 import nameLogo from './assets/brand/Logo_Just_Name.png'
 import petsLogo from './assets/brand/Logo_Just_Pets.png'
@@ -16,7 +18,13 @@ function ErrorNotice({ message }: { message: string }) {
   return message ? <p className="error" role="alert">{message}</p> : null
 }
 
+function LanguageSelect() {
+  const { language, t, setLanguage } = useI18n()
+  return <label className="language-select"><select aria-label={t.language} value={language} onChange={(event) => setLanguage(event.target.value as Language)}>{languages.map((item) => <option key={item.code} value={item.code} lang={item.code}>{item.label}</option>)}</select></label>
+}
+
 function App() {
+  const { t } = useI18n()
   const guestOnlyPreview = import.meta.env.VITE_GUEST_ONLY_PREVIEW === 'true'
   const [accountLink, setAccountLink] = useState(() => {
     if (guestOnlyPreview) return null
@@ -101,8 +109,8 @@ function App() {
 
   if (accountLink) return <Shell><AccountLink {...accountLink} onDone={() => { setAccountLink(null); setShowAuth(true); retryLoad() }} /><Emergency /></Shell>
 
-  if (auth === 'checking' || (auth === 'signed-in' && !petsLoaded)) return <Shell><p role="status">Loading your account…</p><Emergency /></Shell>
-  if (auth === 'error' || loadError) return <Shell><h1>We could not load your account.</h1><ErrorNotice message={loadError || 'Check your connection and try again.'} /><button className="primary" onClick={retryLoad}>Try again</button><Emergency /></Shell>
+  if (auth === 'checking' || (auth === 'signed-in' && !petsLoaded)) return <Shell><p role="status">{t.app.loadingAccount}</p><Emergency /></Shell>
+  if (auth === 'error' || loadError) return <Shell><h1>{t.app.loadErrorTitle}</h1><ErrorNotice message={loadError || t.app.loadErrorDetail} /><button className="primary" onClick={retryLoad}>{t.common.tryAgain}</button><Emergency /></Shell>
   if (auth === 'guest') {
     if (showAuth) return <AuthPanel onBack={() => setShowAuth(false)} onAuthenticated={() => { setShowAuth(false); setShowQuickCheck(false); retryLoad() }} />
     if (showQuickCheck) return <Shell onBack={() => setShowQuickCheck(false)}><Triage pet={null} onLogin={guestOnlyPreview ? undefined : () => setShowAuth(true)} /><Emergency /></Shell>
@@ -113,28 +121,29 @@ function App() {
   if (owner?.email_verification_required && !owner.email_verified_at) return <Shell><VerificationNotice email={owner.email} onLogout={resetAccount} /><Account onDeleted={resetAccount} /><Emergency /></Shell>
 
   if ((!pet || showPetForm) && view !== 'account') return <Shell onBack={pet ? () => setShowPetForm(false) : undefined}>
-    <section className="welcome"><p className="eyebrow">{pet ? 'Add another companion' : 'Set up your first pet'}</p>
-      <h1>Tell us about your pet.</h1><p className="lead">A few details help keep guidance relevant. Leave anything you do not know as unknown.</p>
+    <section className="welcome"><p className="eyebrow">{pet ? t.petForm.eyebrowAnother : t.petForm.eyebrowFirst}</p>
+      <h1>{t.petForm.title}</h1><p className="lead">{t.petForm.lead}</p>
       <form className="profile-form" onSubmit={createPet} aria-busy={busy}>
-        <label>Pet name<input name="name" required maxLength={100} placeholder="e.g. Miso" /></label>
-        <label>Species<select name="species"><option value="dog">Dog</option><option value="cat">Cat</option></select></label>
-        <label>Date of birth (optional)<input name="date_of_birth" type="date" max={today} /></label>
-        <label>Sex<select name="sex"><option value="">Unknown</option><option value="female">Female</option><option value="male">Male</option></select></label>
-        <label>Spayed or neutered?<select name="neutered"><option value="">Unknown</option><option value="yes">Yes</option><option value="no">No</option></select></label>
-        <label>Dog breed size (optional)<select name="breed_size"><option value="">Unknown / cat</option><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option><option value="giant">Giant</option></select></label>
-        <button className="primary" disabled={busy}>{busy ? 'Saving…' : 'Create pet profile'}</button>
+        <label>{t.petForm.name}<input name="name" required maxLength={100} placeholder={t.petForm.namePlaceholder} /></label>
+        <label>{t.petForm.species}<select name="species"><option value="dog">{t.species.dog}</option><option value="cat">{t.species.cat}</option></select></label>
+        <label>{t.petForm.dateOfBirth}<input name="date_of_birth" type="date" max={today} /></label>
+        <label>{t.petForm.sex}<select name="sex"><option value="">{t.common.unknown}</option><option value="female">{t.petForm.female}</option><option value="male">{t.petForm.male}</option></select></label>
+        <label>{t.petForm.neutered}<select name="neutered"><option value="">{t.common.unknown}</option><option value="yes">{t.common.yes}</option><option value="no">{t.common.no}</option></select></label>
+        <label>{t.petForm.breedSize}<select name="breed_size"><option value="">{t.petForm.unknownOrCat}</option><option value="small">{t.petForm.small}</option><option value="medium">{t.petForm.medium}</option><option value="large">{t.petForm.large}</option><option value="giant">{t.petForm.giant}</option></select></label>
+        <button className="primary" disabled={busy}>{busy ? t.petForm.saving : t.petForm.create}</button>
       </form><ErrorNotice message={error} />
-      {!pet && <button className="secondary" onClick={() => setView('account')}>Account and privacy</button>}
+      {!pet && <button className="secondary" onClick={() => setView('account')}>{t.petForm.accountPrivacy}</button>}
     </section><Emergency />
   </Shell>
 
   return <main className="shell">
     <header><img className="name-logo" src={nameLogo} alt="PETAdvice" /><div className="header-actions">
-      {pet && <label className="pet-switcher"><img className="pets-logo" src={petsLogo} alt="" /><span className="pet-switcher-copy"><strong>{pet.name}</strong><small>{pet.life_stage?.replaceAll('_', ' ') ?? 'Age unknown'}</small></span><select aria-label="Change active pet" value={pet.id} onChange={(event) => setSelectedPetId(event.target.value)}>{pets.map((item) => <option value={item.id} key={item.id}>{item.name} ({item.species})</option>)}</select><span className="switcher-chevron" aria-hidden="true">⌄</span></label>}
-      <button className="start-fresh" onClick={() => { setShowPetForm(true); setView('triage') }}>New pet</button>
-      <button className="start-fresh" disabled={busy} onClick={() => void run(async () => { await api.logout(); resetAccount() })}>Log out</button>
+      {pet && <label className="pet-switcher"><img className="pets-logo" src={petsLogo} alt="" /><span className="pet-switcher-copy"><strong>{pet.name}</strong><small>{pet.life_stage ? lifeStageLabel(t, pet.life_stage) : t.app.ageUnknown}</small></span><select aria-label={t.app.changePet} value={pet.id} onChange={(event) => setSelectedPetId(event.target.value)}>{pets.map((item) => <option value={item.id} key={item.id}>{item.name} ({t.speciesLower[item.species]})</option>)}</select><span className="switcher-chevron" aria-hidden="true">⌄</span></label>}
+      <LanguageSelect />
+      <button className="start-fresh" onClick={() => { setShowPetForm(true); setView('triage') }}>{t.app.newPet}</button>
+      <button className="start-fresh" disabled={busy} onClick={() => void run(async () => { await api.logout(); resetAccount() })}>{t.common.logOut}</button>
     </div></header>
-    <nav className="tabs" aria-label="Main navigation">{(['triage', 'library', 'care', 'history', 'account'] as View[]).map((item) => <button aria-current={view === item ? 'page' : undefined} className={view === item ? 'active' : ''} onClick={() => setView(item)} key={item}>{({ triage: 'Check symptoms', library: 'Learn', care: 'Care plan', history: 'Check history', account: 'Account' })[item]}</button>)}</nav>
+    <nav className="tabs" aria-label={t.app.mainNavigation}>{(['triage', 'library', 'care', 'history', 'account'] as View[]).map((item) => <button aria-current={view === item ? 'page' : undefined} className={view === item ? 'active' : ''} onClick={() => setView(item)} key={item}>{t.app.tabs[item]}</button>)}</nav>
     <ErrorNotice message={error} />
     {view === 'triage' && pet && <Triage key={pet.id} pet={pet} />}
     {view === 'library' && pet && <Library key={pet.species} species={pet.species} />}
@@ -146,19 +155,22 @@ function App() {
 }
 
 function Shell({ children, onBack }: { children: React.ReactNode; onBack?: () => void }) {
-  return <main className="shell"><header><img className="name-logo" src={nameLogo} alt="PETAdvice" />{onBack && <button className="cancel-fresh" onClick={onBack}>Back</button>}</header>{children}</main>
+  const { t } = useI18n()
+  return <main className="shell"><header><img className="name-logo" src={nameLogo} alt="PETAdvice" /><div className="header-actions"><LanguageSelect />{onBack && <button className="cancel-fresh" onClick={onBack}>{t.common.back}</button>}</div></header>{children}</main>
 }
 
 function PublicLanding({ onQuickCheck, onLogin, onBrowse }: { onQuickCheck: () => void; onLogin?: () => void; onBrowse: (view: 'library' | 'care') => void }) {
-  return <main className="shell landing"><header><img className="main-logo" src={fullLogo} alt="PETAdvice dog and cat logo" />{onLogin && <button className="start-fresh login-button" onClick={onLogin}>Log in</button>}</header>
-    <section className="intro"><p className="eyebrow">Friendly guidance for everyday pet worries</p><h1>A clearer next step for your pet.</h1><p className="intro-lead">When something feels different, PETAdvice helps you work out what to look for, how urgently to act, and what to discuss with your vet.</p>
-      <div className="intro-actions"><button className="primary" onClick={onQuickCheck}>Start a quick check <span aria-hidden="true">→</span></button>{onLogin && <button className="secondary" onClick={onLogin}>Save my pet profiles</button>}</div>
-      <div className="public-links"><button className="secondary" onClick={() => onBrowse('library')}>Browse Learn</button><button className="secondary" onClick={() => onBrowse('care')}>Browse Care</button></div>
-      <div className="intro-points"><article><span>01</span><div><h2>Make sense of symptoms</h2><p>Find straightforward information about common concerns.</p></div></article><article><span>02</span><div><h2>Know how urgent it is</h2><p>Answer focused questions to help decide when to contact a vet.</p></div></article><article><span>03</span><div><h2>Keep care on track</h2><p>{onLogin ? 'Save pet profiles and browse care information for their life stage.' : 'Browse preventive care information for dogs and cats.'}</p></div></article></div>
-      <p className="intro-boundary">General educational guidance, not a diagnosis. This beta's content is awaiting veterinary review. No account is needed for a quick check.</p>
+  const { t } = useI18n()
+  const l = t.landing
+  return <main className="shell landing"><header><img className="main-logo" src={fullLogo} alt={l.logoAlt} /><div className="header-actions"><LanguageSelect />{onLogin && <button className="start-fresh login-button" onClick={onLogin}>{l.login}</button>}</div></header>
+    <section className="intro"><p className="eyebrow">{l.eyebrow}</p><h1>{l.title}</h1><p className="intro-lead">{l.lead}</p>
+      <div className="intro-actions"><button className="primary" onClick={onQuickCheck}>{l.start} <span aria-hidden="true">→</span></button>{onLogin && <button className="secondary" onClick={onLogin}>{l.save}</button>}</div>
+      <div className="public-links"><button className="secondary" onClick={() => onBrowse('library')}>{l.browseLearn}</button><button className="secondary" onClick={() => onBrowse('care')}>{l.browseCare}</button></div>
+      <div className="intro-points"><article><span>01</span><div><h2>{l.point1Title}</h2><p>{l.point1Body}</p></div></article><article><span>02</span><div><h2>{l.point2Title}</h2><p>{l.point2Body}</p></div></article><article><span>03</span><div><h2>{l.point3Title}</h2><p>{onLogin ? l.point3Account : l.point3Guest}</p></div></article></div>
+      <p className="intro-boundary">{l.boundary}</p>
     </section>
-    {!onLogin && <aside className="beta-notice"><strong>Private guest preview</strong><p>Try symptom checks, Learn and Care. Accounts and email are unavailable in this preview. Use synthetic test information only.</p></aside>}
-    {import.meta.env.VITE_ACCOUNTS_WITHOUT_EMAIL_PREVIEW === 'true' && <aside className="beta-notice"><strong>{import.meta.env.VITE_PUBLIC_TEST_BETA === 'true' ? 'Tester beta' : 'Private account preview'}</strong><p>Accounts are available for testing. Email verification and password recovery are unavailable. Use a test email, fictional pet details and a password you do not use elsewhere.</p></aside>}
+    {!onLogin && <aside className="beta-notice"><strong>{l.guestPreviewTitle}</strong><p>{l.guestPreviewBody}</p></aside>}
+    {import.meta.env.VITE_ACCOUNTS_WITHOUT_EMAIL_PREVIEW === 'true' && <aside className="beta-notice"><strong>{import.meta.env.VITE_PUBLIC_TEST_BETA === 'true' ? l.testerBeta : l.accountPreview}</strong><p>{l.accountPreviewBody}</p></aside>}
     <Emergency />
   </main>
 }
@@ -166,8 +178,9 @@ function PublicLanding({ onQuickCheck, onLogin, onBrowse }: { onQuickCheck: () =
 function PublicEducation({ initialView, onBack }: { initialView: 'library' | 'care'; onBack: () => void }) {
   const [view, setView] = useState(initialView)
   const [species, setSpecies] = useState<Species>('dog')
-  return <Shell onBack={onBack}><nav className="tabs" aria-label="Public learning navigation">{(['library', 'care'] as const).map((item) => <button key={item} aria-current={view === item ? 'page' : undefined} className={view === item ? 'active' : ''} onClick={() => setView(item)}>{item === 'library' ? 'Learn' : 'Care'}</button>)}</nav>
-    <label className="guest-species">Browse information for<select value={species} onChange={(event) => setSpecies(event.target.value as Species)}><option value="dog">Dogs</option><option value="cat">Cats</option></select></label>
+  const { t } = useI18n()
+  return <Shell onBack={onBack}><nav className="tabs" aria-label={t.publicEducation.navigation}>{(['library', 'care'] as const).map((item) => <button key={item} aria-current={view === item ? 'page' : undefined} className={view === item ? 'active' : ''} onClick={() => setView(item)}>{item === 'library' ? t.publicEducation.learn : t.publicEducation.care}</button>)}</nav>
+    <label className="guest-species">{t.publicEducation.browseFor}<select value={species} onChange={(event) => setSpecies(event.target.value as Species)}><option value="dog">{t.speciesPlural.dog}</option><option value="cat">{t.speciesPlural.cat}</option></select></label>
     {view === 'library' ? <Library key={species} species={species} /> : <Care key={species} species={species} />}<Emergency />
   </Shell>
 }
@@ -175,15 +188,19 @@ function PublicEducation({ initialView, onBack }: { initialView: 'library' | 'ca
 function PrivacyNotice() {
   const guestOnlyPreview = import.meta.env.VITE_GUEST_ONLY_PREVIEW === 'true'
   const [notice, setNotice] = useState<Privacy | null>(null)
+  const { t } = useI18n()
+  const p = t.privacy
   useEffect(() => { let active = true; api.privacy().then((data) => { if (active) setNotice(data) }).catch(() => {}); return () => { active = false } }, [])
-  if (guestOnlyPreview) return <details className="privacy-notice"><summary>How your data is used</summary><p>This private preview stores guest symptom checks. Accounts and email are disabled; use synthetic test information only.</p><p>{notice ? `Guest access expires after ${notice.guest_retention_hours} hours. Scheduled cleanup removes expired checks.` : 'Guest access is temporary; the retention notice could not be loaded.'} You can download or delete your check while it is open. Closing or refreshing the page loses access.</p><p>The privacy policy is still a draft. This preview is for private testing.</p></details>
-  return <details className="privacy-notice"><summary>How your data is used</summary><p>The app stores your email, a password hash, pet profiles, symptom checks and security records. You can download account data or delete your account and its profiles and checks from the app database.</p><p>{notice ? `Guest checks expire after ${notice.guest_retention_hours} hours and are removed by scheduled cleanup. You can also download or delete a guest check while it is open.` : 'Guest checks have a limited retention period; the current notice could not be loaded.'} Closing the page loses access to that guest check.</p><p>Account data is kept until you delete the account. Backups follow the deployment operator’s separate retention schedule.</p>{notice?.policy_url && /^https:\/\//.test(notice.policy_url) ? <p><a href={notice.policy_url} target="_blank" rel="noopener noreferrer">Read the privacy policy</a> · {notice.operator}{notice.contact && <> · <a href={`mailto:${notice.contact}`}>{notice.contact}</a></>}</p> : <p>This test beta uses Vercel hosting, Supabase database storage and Upstash for request limits and scheduled cleanup. The full privacy policy and operator contact are not yet published. Use a test email and fictional pet details only.</p>}<p>Do not enter personal or sensitive details in pet names.</p></details>
+  if (guestOnlyPreview) return <details className="privacy-notice"><summary>{p.summary}</summary><p>{p.guestStores}</p><p>{notice ? p.guestRetention(notice.guest_retention_hours) : p.guestRetentionUnknown} {p.guestControls}</p><p>{p.guestDraft}</p></details>
+  return <details className="privacy-notice"><summary>{p.summary}</summary><p>{p.accountStores}</p><p>{notice ? p.accountRetention(notice.guest_retention_hours) : p.accountRetentionUnknown} {p.closingLoses}</p><p>{p.accountKept}</p>{notice?.policy_url && /^https:\/\//.test(notice.policy_url) ? <p><a href={notice.policy_url} target="_blank" rel="noopener noreferrer">{p.readPolicy}</a> · {notice.operator}{notice.contact && <> · <a href={`mailto:${notice.contact}`}>{notice.contact}</a></>}</p> : <p>{p.betaHosting}</p>}<p>{p.noSensitive}</p></details>
 }
 
 function VerificationNotice({ email, onLogout }: { email: string; onLogout: () => void }) {
   const { busy, error, run } = useRequest()
   const [status, setStatus] = useState('')
-  return <section className="panel"><h1>Check your email.</h1><p>Verify {email} before saving pet profiles. Open the link in your verification email, then return here.</p><button className="primary" disabled={busy} onClick={() => void run(async () => { setStatus((await api.resendVerification(email)).message) })}>Resend verification email</button><button className="secondary" onClick={() => window.location.reload()}>I have verified my email</button><button className="secondary" disabled={busy} onClick={() => void run(async () => { await api.logout(); onLogout() })}>Log out</button><p role="status">{status}</p><ErrorNotice message={error} /></section>
+  const { t } = useI18n()
+  const v = t.verification
+  return <section className="panel"><h1>{v.title}</h1><p>{v.body(email)}</p><button className="primary" disabled={busy} onClick={() => void run(async () => { setStatus(serverText((await api.resendVerification(email)).message)) })}>{v.resend}</button><button className="secondary" onClick={() => window.location.reload()}>{v.verified}</button><button className="secondary" disabled={busy} onClick={() => void run(async () => { await api.logout(); onLogout() })}>{t.common.logOut}</button><p role="status">{status}</p><ErrorNotice message={error} /></section>
 }
 
 function AuthPanel({ onBack, onAuthenticated }: { onBack: () => void; onAuthenticated: () => void }) {
@@ -194,31 +211,32 @@ function AuthPanel({ onBack, onAuthenticated }: { onBack: () => void; onAuthenti
   const [privacyAccepted, setPrivacyAccepted] = useState(false)
   const [status, setStatus] = useState('')
   const { busy, error, run, setError } = useRequest()
+  const { t } = useI18n()
+  const a = t.auth
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     void run(async () => {
-      if (mode === 'forgot') { setStatus((await api.forgotPassword(email)).message); return }
+      if (mode === 'forgot') { setStatus(serverText((await api.forgotPassword(email)).message)); return }
       if (mode === 'login') await api.login(email, password)
       else await api.signup(email, password, privacyAccepted)
       onAuthenticated()
     })
   }
-  return <Shell onBack={onBack}><section className="welcome auth-panel"><p className="eyebrow">Private guidance for your pets</p><h1>{mode === 'login' ? 'Welcome back.' : mode === 'forgot' ? 'Recover your account.' : 'Create your account.'}</h1><p className="lead">{mode === 'forgot' ? 'Enter your email to request a password reset link.' : 'Your pet profiles and checks stay tied to your account.'}</p>
-    {withoutEmail && <p role="note">Email verification and password recovery are unavailable in this test version. Keep your test password; the app cannot email a reset link.</p>}
+  return <Shell onBack={onBack}><section className="welcome auth-panel"><p className="eyebrow">{a.eyebrow}</p><h1>{mode === 'login' ? a.welcomeBack : mode === 'forgot' ? a.recover : a.create}</h1><p className="lead">{mode === 'forgot' ? a.leadForgot : a.lead}</p>
+    {withoutEmail && <p role="note">{a.noEmailNote}</p>}
     <form className="profile-form auth-form" onSubmit={submit} aria-busy={busy}>
-      <label>Email<input name="email" type="email" autoComplete="username" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} /></label>
-      {mode !== 'forgot' && <label>Password<input name="password" type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} required minLength={mode === 'signup' ? 15 : 1} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} />{mode === 'signup' && <small>Use 15–128 characters. A passphrase works well.</small>}</label>}
-      {mode === 'signup' && <><PrivacyNotice /><label className="check"><input type="checkbox" required checked={privacyAccepted} onChange={(event) => setPrivacyAccepted(event.target.checked)} /> I have read the beta data-use notice.</label></>}
-      <button className="primary" disabled={busy}>{busy ? 'Please wait…' : mode === 'login' ? 'Log in' : mode === 'forgot' ? 'Send reset link' : 'Create account'}</button>
-    </form><p role="status">{status}</p><ErrorNotice message={error} /><button className="secondary" disabled={busy} onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); setPassword(''); setStatus('') }}>{mode === 'login' ? 'Create an account' : 'Back to log in'}</button>{mode === 'login' && !withoutEmail && <button className="secondary" onClick={() => { setMode('forgot'); setError(''); setPassword(''); setStatus('') }}>Forgot your password?</button>}
+      <label>{a.email}<input name="email" type="email" autoComplete="username" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} /></label>
+      {mode !== 'forgot' && <label>{a.password}<input name="password" type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} required minLength={mode === 'signup' ? 15 : 1} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} />{mode === 'signup' && <small>{a.passwordHint}</small>}</label>}
+      {mode === 'signup' && <><PrivacyNotice /><label className="check"><input type="checkbox" required checked={privacyAccepted} onChange={(event) => setPrivacyAccepted(event.target.checked)} /> {a.acceptNotice}</label></>}
+      <button className="primary" disabled={busy}>{busy ? t.common.pleaseWait : mode === 'login' ? a.submitLogin : mode === 'forgot' ? a.submitForgot : a.submitCreate}</button>
+    </form><p role="status">{status}</p><ErrorNotice message={error} /><button className="secondary" disabled={busy} onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); setPassword(''); setStatus('') }}>{mode === 'login' ? a.createAccount : a.backToLogin}</button>{mode === 'login' && !withoutEmail && <button className="secondary" onClick={() => { setMode('forgot'); setError(''); setPassword(''); setStatus('') }}>{a.forgot}</button>}
   </section><Emergency /></Shell>
 }
 
-const symptoms = [
-  { value: 'straining_to_urinate', label: 'Straining to urinate' }, { value: 'vomiting', label: 'Vomiting' },
-  { value: 'diarrhea', label: 'Diarrhea' }, { value: 'limping', label: 'Limping after exercise', dogOnly: true },
-  { value: 'reverse_sneezing', label: 'Reverse sneezing', dogOnly: true }, { value: 'scratching', label: 'Scratching or fleas' },
-  { value: 'increased_thirst', label: 'Drinking more than usual' }, { value: 'vaginal_discharge', label: 'Unexpected discharge' },
+const symptoms: { value: string; only?: Species }[] = [
+  { value: 'straining_to_urinate' }, { value: 'vomiting' }, { value: 'diarrhea' }, { value: 'limping', only: 'dog' },
+  { value: 'reverse_sneezing', only: 'dog' }, { value: 'scratching' }, { value: 'scooting' }, { value: 'nervous_or_stressed', only: 'cat' },
+  { value: 'increased_thirst' }, { value: 'vaginal_discharge' },
 ]
 
 function Triage({ pet, onLogin }: { pet: Pet | null; onLogin?: () => void }) {
@@ -231,6 +249,8 @@ function Triage({ pet, onLogin }: { pet: Pet | null; onLogin?: () => void }) {
   const [complete, setComplete] = useState(false)
   const [result, setResult] = useState<TriageResult | null>(null)
   const { busy, error, run, setError } = useRequest()
+  const { t } = useI18n()
+  const tr = t.triage
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => { if (question || complete) heading.current?.focus() }, [question, complete, result])
   const activeSpecies = pet?.species ?? species
@@ -258,17 +278,17 @@ function Triage({ pet, onLogin }: { pet: Pet | null; onLogin?: () => void }) {
   function restart() { setResult(null); setSession(''); setGuestToken(null); setExpiresAt(null); setQuestion(null); setComplete(false); setError('') }
   const guestControls = guestToken ? <GuestControls session={session} token={guestToken} expiresAt={expiresAt} disabled={busy} onDeleted={restart} /> : null
   if (result) return <CheckResult result={result} petName={pet?.name}>
-    {onLogin && <button className="primary" onClick={onLogin}>Create an account for future pet profiles</button>}
-    <button className="secondary" onClick={restart}>Start another check</button>
+    {onLogin && <button className="primary" onClick={onLogin}>{tr.createAccountCta}</button>}
+    <button className="secondary" onClick={restart}>{tr.startAnother}</button>
     {guestControls}
   </CheckResult>
-  if (complete) return <section className="panel"><h1 ref={heading} tabIndex={-1}>Your questions are complete.</h1><p role="status">{busy ? 'Loading guidance…' : 'Guidance could not be loaded yet.'}</p><ErrorNotice message={error} /><button className="primary" disabled={busy} onClick={() => void run(async () => { setResult(await api.result(session, guestToken)) })}>Try loading guidance again</button>{guestControls}</section>
-  if (question) return <section className="question" aria-busy={busy}><div className="progress">Check for {pet?.name ?? `your ${species}`} <span>Adaptive questions</span></div><h1 ref={heading} tabIndex={-1}>{question.prompt}</h1><div className="options">{question.options.map((option) => <button disabled={busy} className="option" onClick={() => answer(option)} key={option}>{option}<span aria-hidden="true">→</span></button>)}</div><p role="status">{busy ? 'Saving your answer…' : ''}</p><ErrorNotice message={error} /><button className="secondary" disabled={busy} onClick={restart}>Restart this check</button>{guestControls}</section>
-  return <section className="panel" aria-busy={busy}><p className="eyebrow">A calmer next step</p><h1>What have you noticed?</h1><p className="muted">{pet ? `Checking symptoms for ${pet.name}. ` : ''}Choose the closest match. This check gives urgency guidance, not a diagnosis.</p>
-    {!pet && <label className="guest-species">Who is this check for?<select disabled={busy} value={species} onChange={(event) => { setSpecies(event.target.value as Species); setSymptom(''); setError('') }}><option value="dog">Dog</option><option value="cat">Cat</option></select></label>}
-    <div className="symptoms">{symptoms.filter((item) => !item.dogOnly || activeSpecies === 'dog').map((item) => <button disabled={busy} aria-pressed={symptom === item.value} className={symptom === item.value ? 'selected' : ''} onClick={() => setSymptom(item.value)} key={item.value}>{item.label}<span aria-hidden="true">＋</span></button>)}</div>
-    <button className="primary wide" disabled={!symptom || busy} onClick={begin}>{busy ? 'Starting your check…' : 'Continue'}</button><ErrorNotice message={error} />
-    <p className="fine-print">Cannot find the symptom? Contact your veterinary practice. Breathing trouble or collapse needs emergency care immediately.</p>
+  if (complete) return <section className="panel"><h1 ref={heading} tabIndex={-1}>{tr.complete}</h1><p role="status">{busy ? tr.loadingGuidance : tr.guidanceNotLoaded}</p><ErrorNotice message={error} /><button className="primary" disabled={busy} onClick={() => void run(async () => { setResult(await api.result(session, guestToken)) })}>{tr.retryGuidance}</button>{guestControls}</section>
+  if (question) return <section className="question" aria-busy={busy}><div className="progress">{tr.checkFor(pet?.name ?? tr.yourSpecies(t.speciesLower[species]))} <span>{tr.adaptive}</span></div><h1 ref={heading} tabIndex={-1}>{question.prompt}</h1><div className="options">{question.options.map((option, index) => <button disabled={busy} className="option" onClick={() => answer(option)} key={option}>{question.option_labels?.[index] ?? option}<span aria-hidden="true">→</span></button>)}</div><p role="status">{busy ? tr.savingAnswer : ''}</p><ErrorNotice message={error} /><button className="secondary" disabled={busy} onClick={restart}>{tr.restart}</button>{guestControls}</section>
+  return <section className="panel" aria-busy={busy}><p className="eyebrow">{tr.eyebrow}</p><h1>{tr.title}</h1><p className="muted">{pet ? tr.checkingFor(pet.name) : ''}{tr.choose}</p>
+    {!pet && <label className="guest-species">{tr.whoFor}<select disabled={busy} value={species} onChange={(event) => { setSpecies(event.target.value as Species); setSymptom(''); setError('') }}><option value="dog">{t.species.dog}</option><option value="cat">{t.species.cat}</option></select></label>}
+    <div className="symptoms">{symptoms.filter((item) => !item.only || item.only === activeSpecies).map((item) => <button disabled={busy} aria-pressed={symptom === item.value} className={symptom === item.value ? 'selected' : ''} onClick={() => setSymptom(item.value)} key={item.value}>{t.symptoms[item.value]}<span aria-hidden="true">＋</span></button>)}</div>
+    <button className="primary wide" disabled={!symptom || busy} onClick={begin}>{busy ? tr.starting : tr.continue}</button><ErrorNotice message={error} />
+    <p className="fine-print">{tr.finePrint}</p>
     {!pet && <PrivacyNotice />}
   </section>
 }
@@ -276,12 +296,15 @@ function Triage({ pet, onLogin }: { pet: Pet | null; onLogin?: () => void }) {
 function GuestControls({ session, token, expiresAt, disabled, onDeleted }: { session: string; token: string; expiresAt: string | null; disabled: boolean; onDeleted: () => void }) {
   const { busy, error, run } = useRequest()
   const [status, setStatus] = useState('')
-  return <div className="guest-controls"><p className="fine-print">{expiresAt ? `This guest check expires ${new Date(expiresAt).toLocaleString()}. ` : ''}Closing this page loses access. Download a copy to keep it.</p><button className="secondary" disabled={disabled || busy} onClick={() => void run(async () => { downloadJson(await api.exportCheck(session, token), 'petadvice-guest-check.json'); setStatus('Your guest check has been downloaded.') })}>Download this guest check</button><button className="secondary" disabled={disabled || busy} onClick={() => void run(async () => { await api.deleteGuestCheck(session, token); onDeleted() })}>Delete this guest check</button><p role="status">{status}</p><ErrorNotice message={error} /></div>
+  const { t } = useI18n()
+  const g = t.guest
+  return <div className="guest-controls"><p className="fine-print">{expiresAt ? g.expires(formatDate(expiresAt)) : ''}{g.closingLoses}</p><button className="secondary" disabled={disabled || busy} onClick={() => void run(async () => { downloadJson(await api.exportCheck(session, token), 'petadvice-guest-check.json'); setStatus(g.downloaded) })}>{g.download}</button><button className="secondary" disabled={disabled || busy} onClick={() => void run(async () => { await api.deleteGuestCheck(session, token); onDeleted() })}>{g.delete}</button><p role="status">{status}</p><ErrorNotice message={error} /></div>
 }
 
 function Sources({ sources }: { sources: string[] }) {
+  const { t } = useI18n()
   const links = sources.filter((source) => /^https?:\/\//.test(source))
-  return links.length ? <details className="sources"><summary>Sources</summary><ul>{links.map((source) => <li key={source}><a href={source} target="_blank" rel="noopener noreferrer">{new URL(source).hostname} (opens a new tab)</a></li>)}</ul></details> : null
+  return links.length ? <details className="sources"><summary>{t.common.sources}</summary><ul>{links.map((source) => <li key={source}><a href={source} target="_blank" rel="noopener noreferrer">{t.common.opensNewTab(new URL(source).hostname)}</a></li>)}</ul></details> : null
 }
 
 function Library({ species }: { species: Species }) {
@@ -289,22 +312,25 @@ function Library({ species }: { species: Species }) {
   const [query, setQuery] = useState('')
   const [error, setError] = useState('')
   const [retry, setRetry] = useState(0)
+  const { language, t } = useI18n()
+  const lib = t.library
   useEffect(() => {
     let cancelled = false
-    api.listConditions(species).then((data) => { if (!cancelled) setItems(data) })
+    api.listConditions(species).then((data) => { if (!cancelled) { setItems(data); setError('') } })
       .catch((failure) => { if (!cancelled) setError(errorMessage(failure)) })
     return () => { cancelled = true }
-  }, [species, retry])
-  const filtered = items?.filter((item) => `${item.name} ${item.category.replaceAll('_', ' ')} ${(item.symptom_tags ?? []).join(' ').replaceAll('_', ' ')}`.toLowerCase().includes(query.toLowerCase())) ?? []
-  return <section className="panel"><p className="eyebrow">Reference library</p><h1>Plain-language starting points</h1><p className="muted">Information for conversations with your vet. Beta content awaits veterinary review.</p>
-    <label className="search-label">Search the library<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by symptom, name or category" /></label>
-    {!items && !error && <p role="status">Loading the library…</p>}<ErrorNotice message={error} />
-    {error && <button className="secondary" onClick={() => { setError(''); setRetry((value) => value + 1) }}>Try again</button>}
-    {items && <p role="status">{filtered.length} {filtered.length === 1 ? 'entry' : 'entries'}</p>}
-    {items && filtered.length === 0 && <p>No entries match your search. Try another word or contact your vet for concerns outside this library.</p>}
-    <div className="entries">{filtered.map((item) => <details className="condition-entry" key={item.id}><summary aria-label={`Read about ${item.name}. ${urgencyLabels[item.urgency_default]}`}><span className="tag">{item.category.replaceAll('_', ' ')}</span><strong>{item.name}</strong><span className={`urgency-label ${item.urgency_default}`}>{urgencyLabels[item.urgency_default]}</span></summary>
-      {item.home_care_guidance && <p>{item.home_care_guidance}</p>}{item.red_flags.length > 0 && <><h3>Signs that need prompt attention</h3><ul>{item.red_flags.map((flag) => <li key={flag.description}>{flag.description} — {urgencyLabels[flag.escalates_to]}</li>)}</ul></>}
-      {item.prevention_tips && <p>{item.prevention_tips}</p>}<p className="fine-print">{item.vet_reviewed_by && item.last_reviewed_date ? `Reviewed by ${item.vet_reviewed_by} on ${item.last_reviewed_date}.` : 'Awaiting veterinary review.'}</p><Sources sources={item.sources} />
+  }, [species, retry, language])
+  const category = (value: string) => t.category[value] ?? readable(value)
+  const filtered = items?.filter((item) => `${item.name} ${category(item.category)} ${(item.symptom_tags ?? []).map((tag) => `${t.symptoms[tag] ?? ''} ${readable(tag)}`).join(' ')}`.toLocaleLowerCase(language).includes(query.toLocaleLowerCase(language))) ?? []
+  return <section className="panel"><p className="eyebrow">{lib.eyebrow}</p><h1>{lib.title}</h1><p className="muted">{lib.muted}</p>
+    <label className="search-label">{lib.search}<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={lib.searchPlaceholder} /></label>
+    {!items && !error && <p role="status">{lib.loading}</p>}<ErrorNotice message={error} />
+    {error && <button className="secondary" onClick={() => { setError(''); setRetry((value) => value + 1) }}>{t.common.tryAgain}</button>}
+    {items && <p role="status">{lib.entries(filtered.length)}</p>}
+    {items && filtered.length === 0 && <p>{lib.noMatch}</p>}
+    <div className="entries">{filtered.map((item) => <details className="condition-entry" key={item.id}><summary aria-label={lib.readAbout(item.name, t.urgency[item.urgency_default])}><span className="tag">{category(item.category)}</span><strong>{item.name}</strong><span className={`urgency-label ${item.urgency_default}`}>{t.urgency[item.urgency_default]}</span></summary>
+      {item.home_care_guidance && <p>{item.home_care_guidance}</p>}{item.red_flags.length > 0 && <><h3>{lib.promptSigns}</h3><ul>{item.red_flags.map((flag) => <li key={flag.description}>{flag.description} — {t.urgency[flag.escalates_to]}</li>)}</ul></>}
+      {item.prevention_tips && <p>{item.prevention_tips}</p>}<p className="fine-print">{item.vet_reviewed_by && item.last_reviewed_date ? lib.reviewed(item.vet_reviewed_by, item.last_reviewed_date) : lib.awaiting}</p><Sources sources={item.sources} />
     </details>)}</div>
   </section>
 }
@@ -313,16 +339,18 @@ function Care({ pet, species = pet?.species ?? 'dog' }: { pet?: Pet; species?: S
   const [items, setItems] = useState<PreventiveCareItem[] | null>(null)
   const [error, setError] = useState('')
   const [retry, setRetry] = useState(0)
+  const { language, t } = useI18n()
+  const c = t.care
   useEffect(() => {
     let cancelled = false
-    api.listPreventive(species, pet?.life_stage ?? null).then((data) => { if (!cancelled) setItems(data) })
+    api.listPreventive(species, pet?.life_stage ?? null).then((data) => { if (!cancelled) { setItems(data); setError('') } })
       .catch((failure) => { if (!cancelled) setError(errorMessage(failure)) })
     return () => { cancelled = true }
-  }, [species, pet?.life_stage, retry])
-  return <section className="panel"><p className="eyebrow">Preventive care</p><h1>Small check-ins, less worry.</h1><p className="muted">{pet?.life_stage ? `Based on ${pet.name}'s ${pet.life_stage.replaceAll('_', ' ')} life stage.` : pet ? `Showing all available ${species} care information because ${pet.name}'s age is unknown. Ask your vet which items apply.` : `Showing all available ${species} care information. Ask your vet which items apply to your pet's age and circumstances.`} This is information, with no scheduled reminders yet.</p>
-    {!items && !error && <p role="status">Loading care information…</p>}<ErrorNotice message={error} />{error && <button className="secondary" onClick={() => { setError(''); setRetry((value) => value + 1) }}>Try again</button>}
-    {items?.length === 0 && <p>No care items are published for this life stage yet. Ask your vet about routine check-ups, vaccinations, parasite prevention and dental care.</p>}
-    <div className="care-list">{items?.map((item) => <article key={item.id}><div><h3>{item.title}</h3><p>{item.description}</p>{item.recurrence && <p className="recurrence">Timing: {item.recurrence}</p>}<Sources sources={item.sources} /></div></article>)}</div>
+  }, [species, pet?.life_stage, retry, language])
+  return <section className="panel"><p className="eyebrow">{c.eyebrow}</p><h1>{c.title}</h1><p className="muted">{pet?.life_stage ? c.basedOn(pet.name, lifeStageLabel(t, pet.life_stage)) : pet ? c.unknownAge(species, pet.name) : c.all(species)} {c.noReminders}</p>
+    {!items && !error && <p role="status">{c.loading}</p>}<ErrorNotice message={error} />{error && <button className="secondary" onClick={() => { setError(''); setRetry((value) => value + 1) }}>{t.common.tryAgain}</button>}
+    {items?.length === 0 && <p>{c.empty}</p>}
+    <div className="care-list">{items?.map((item) => <article key={item.id}><div><h3>{item.title}</h3><p>{item.description}</p>{item.recurrence && <p className="recurrence">{c.timing(item.recurrence)}</p>}<Sources sources={item.sources} /></div></article>)}</div>
   </section>
 }
 
@@ -331,23 +359,26 @@ function Account({ onDeleted }: { onDeleted: () => void }) {
   const [password, setPassword] = useState('')
   const { busy, error, run } = useRequest()
   const [status, setStatus] = useState('')
+  const { t } = useI18n()
+  const a = t.account
   function exportData() {
     void run(async () => {
       await api.reauthenticate(password)
       downloadJson(await api.exportMyData(), 'petadvice-data.json')
       setPassword('')
-      setStatus('Your data export has been downloaded.')
+      setStatus(a.downloaded)
     })
   }
-  return <section className="panel"><p className="eyebrow">Account and privacy</p><h1>Your data, your choice.</h1><PrivacyNotice /><label className="security-password">Confirm your password for account controls<input type="password" autoComplete="current-password" maxLength={128} value={password} onChange={(e) => setPassword(e.target.value)} /></label><button className="secondary" disabled={busy || !password} onClick={exportData}>Download my data</button><button className="secondary" disabled={busy || !password} onClick={() => void run(async () => { await api.reauthenticate(password); await api.logoutAll(); onDeleted() })}>Log out all devices</button><p role="status">{status}</p><ErrorNotice message={error} />
-    <div className="delete-account"><h3>Delete account</h3><p>This permanently removes your account, pet profiles and associated checks from the app database.</p>
-      {!confirmDelete ? <button className="secondary" disabled={busy} onClick={() => setConfirmDelete(true)}>Delete my account…</button> : <><p role="alert">This cannot be undone. Download your data first if you want a copy.</p><button className="danger" disabled={busy || !password} onClick={() => void run(async () => { await api.reauthenticate(password); await api.deleteMyAccount(); onDeleted() })}>Permanently delete my account</button><button className="secondary" disabled={busy} onClick={() => setConfirmDelete(false)}>Cancel</button></>}
+  return <section className="panel"><p className="eyebrow">{a.eyebrow}</p><h1>{a.title}</h1><PrivacyNotice /><label className="security-password">{a.confirmPassword}<input type="password" autoComplete="current-password" maxLength={128} value={password} onChange={(e) => setPassword(e.target.value)} /></label><button className="secondary" disabled={busy || !password} onClick={exportData}>{a.download}</button><button className="secondary" disabled={busy || !password} onClick={() => void run(async () => { await api.reauthenticate(password); await api.logoutAll(); onDeleted() })}>{a.logoutAll}</button><p role="status">{status}</p><ErrorNotice message={error} />
+    <div className="delete-account"><h3>{a.deleteTitle}</h3><p>{a.deleteBody}</p>
+      {!confirmDelete ? <button className="secondary" disabled={busy} onClick={() => setConfirmDelete(true)}>{a.deleteStart}</button> : <><p role="alert">{a.deleteWarning}</p><button className="danger" disabled={busy || !password} onClick={() => void run(async () => { await api.reauthenticate(password); await api.deleteMyAccount(); onDeleted() })}>{a.deleteConfirm}</button><button className="secondary" disabled={busy} onClick={() => setConfirmDelete(false)}>{t.common.cancel}</button></>}
     </div>
   </section>
 }
 
 function Emergency() {
-  return <aside className="emergency" aria-label="Emergency warning"><span className="pulse" aria-hidden="true">!</span><div><strong>Go straight to a vet</strong><span>Breathing trouble, collapse, seizures, uncontrolled bleeding, or straining with no urine.</span></div></aside>
+  const { t } = useI18n()
+  return <aside className="emergency" aria-label={t.emergency.label}><span className="pulse" aria-hidden="true">!</span><div><strong>{t.emergency.title}</strong><span>{t.emergency.body}</span></div></aside>
 }
 
 export default App

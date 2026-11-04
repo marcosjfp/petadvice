@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, expect, test, vi } from 'vitest'
 import { api } from './api'
 import App from './App'
+import { setLanguage } from './i18n'
 
 vi.mock('./api', async (importOriginal) => {
   const original = await importOriginal<typeof import('./api')>()
@@ -18,6 +19,7 @@ const pets = [
   { id: 'cat', name: 'Miso', species: 'cat' as const, life_stage: null },
 ]
 beforeEach(() => {
+  setLanguage('en')
   vi.unstubAllEnvs()
   vi.resetAllMocks()
   vi.mocked(api.history).mockResolvedValue({ checks: [], next_cursor: null })
@@ -218,4 +220,45 @@ test('history opens the recorded result and clears it when the active pet change
   expect(await screen.findByText('No checks saved for Miso yet. Complete a symptom check to see it here.')).toBeInTheDocument()
   expect(screen.queryByText('Original guidance.')).not.toBeInTheDocument()
   print.mockRestore()
+})
+
+test('switching language translates the interface, refetches content and is remembered', async () => {
+  const user = userEvent.setup()
+  vi.mocked(api.listPreventive).mockResolvedValue([])
+  render(<App />)
+  await user.click(await screen.findByRole('button', { name: 'Care plan' }))
+  await waitFor(() => expect(api.listPreventive).toHaveBeenCalledTimes(1))
+  await user.selectOptions(screen.getByRole('combobox', { name: 'Language' }), 'pt')
+  expect(await screen.findByRole('heading', { name: 'Pequenas verificações, menos preocupação.' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Verificar sintomas' })).toBeInTheDocument()
+  expect(document.documentElement.lang).toBe('pt')
+  expect(localStorage.getItem('petadvice_language')).toBe('pt')
+  await waitFor(() => expect(api.listPreventive).toHaveBeenCalledTimes(2))
+  await user.selectOptions(screen.getByRole('combobox', { name: 'Idioma' }), 'es')
+  expect(await screen.findByRole('button', { name: 'Revisar síntomas' })).toBeInTheDocument()
+})
+
+test('translated answer labels are shown while the canonical answer is submitted', async () => {
+  setLanguage('es')
+  const user = userEvent.setup()
+  vi.mocked(api.startTriage).mockResolvedValue({ session_id: 'session', flow_complete: false, next_question: { id: 'q1', prompt: '¿Cuántas veces ha vomitado tu mascota?', options: ['Once', '2-3 times'], option_labels: ['Una vez', '2 o 3 veces'] } })
+  vi.mocked(api.answer).mockResolvedValue({ next_question: null, flow_complete: true })
+  vi.mocked(api.result).mockResolvedValue({ resulting_urgency: 'monitor_home', resulting_guidance: 'Vigila de cerca a tu mascota.', matched_condition_ids: [], possible_causes: [], recommended_examinations: [], symptom: 'vomiting', language: 'es' })
+  render(<App />)
+  await user.click(await screen.findByRole('button', { name: 'Vómitos' }))
+  await user.click(screen.getByRole('button', { name: 'Continuar' }))
+  await user.click(await screen.findByRole('button', { name: 'Una vez' }))
+  expect(api.answer).toHaveBeenCalledWith('session', 'q1', 'Once', null)
+  expect(await screen.findByRole('heading', { name: 'Vigilar en casa' })).toBeInTheDocument()
+  expect(screen.getByText('Síntoma:').closest('p')).toHaveTextContent('Síntoma: Vómitos')
+})
+
+test('new parasite and stress symptoms follow the pet species', async () => {
+  const user = userEvent.setup()
+  render(<App />)
+  expect(await screen.findByRole('button', { name: 'Scooting or worms in stool' })).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Nervous or stressed' })).not.toBeInTheDocument()
+  await user.selectOptions(screen.getByRole('combobox', { name: 'Change active pet' }), 'cat')
+  expect(await screen.findByRole('button', { name: 'Nervous or stressed' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Scooting or worms in stool' })).toBeInTheDocument()
 })

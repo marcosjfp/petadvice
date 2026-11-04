@@ -1,3 +1,5 @@
+import { getLanguage, serverText, translations } from './i18n'
+
 const API_BASE = (import.meta.env.VITE_API_BASE_URL ?? '/api').replace(/\/$/, '')
 
 export class ApiError extends Error {
@@ -12,6 +14,7 @@ export class ApiError extends Error {
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers = new Headers(options.headers)
   if (options.body) headers.set('Content-Type', 'application/json')
+  headers.set('Accept-Language', getLanguage())
   const controller = new AbortController()
   const timeout = window.setTimeout(() => controller.abort(), 15_000)
   try {
@@ -21,9 +24,9 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     if (!response.ok) {
       const body = await response.json().catch(() => null)
       const detail = body?.detail
-      const message = typeof detail === 'string' ? detail
+      const message = typeof detail === 'string' ? serverText(detail)
         : Array.isArray(detail) ? detail.map((item: { msg: string }) => item.msg.replace(/^Value error, /, '')).join('. ')
-        : 'The request could not be completed. Please try again.'
+        : translations().errors.requestFailed
       if (response.status === 401 && path !== '/auth/login' && path !== '/auth/me') {
         window.dispatchEvent(new Event('petadvice:session-expired'))
       }
@@ -33,8 +36,8 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   } catch (error) {
     if (error instanceof ApiError) throw error
     throw new Error(controller.signal.aborted
-      ? 'The request timed out. Check your connection and try again.'
-      : 'Could not connect. Check your connection and try again.')
+      ? translations().errors.timeout
+      : translations().errors.network)
   } finally {
     window.clearTimeout(timeout)
   }
@@ -42,10 +45,6 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
 export type Species = 'dog' | 'cat'
 export type Urgency = 'monitor_home' | 'vet_soon' | 'vet_24h' | 'emergency_now'
-export const urgencyLabels: Record<Urgency, string> = {
-  monitor_home: 'Monitor at home', vet_soon: 'Book a vet appointment',
-  vet_24h: 'Contact a vet within 24 hours', emergency_now: 'Emergency veterinary care now',
-}
 export type Pet = { id: string; name: string; species: Species; life_stage?: string | null }
 export type PetCreate = { name: string; species: Species; date_of_birth: string | null; sex: string | null; neutered: boolean | null; breed_size: string | null; environment_factors: string[] }
 export type Condition = {
@@ -56,10 +55,10 @@ export type Condition = {
   symptom_tags?: string[];
 }
 export type PreventiveCareItem = { id: string; title: string; description: string; recurrence: string | null; sources: string[] }
-export type Question = { id: string; prompt: string; options: string[] }
+export type Question = { id: string; prompt: string; options: string[]; option_labels?: string[] }
 export type TriageResult = {
   resulting_urgency: Urgency; resulting_guidance: string; matched_condition_ids: string[]; possible_causes: string[]; recommended_examinations: string[];
-  session_id?: string; symptom?: string; started_at?: string | null; recorded_at?: string | null; historical?: boolean; content_version?: string | null;
+  session_id?: string; symptom?: string; started_at?: string | null; recorded_at?: string | null; historical?: boolean; content_version?: string | null; language?: string | null;
   pet?: { name: string; species: Species; date_of_birth: string | null; life_stage: string | null; sex: string | null; neutered: boolean | null; breed_size: string | null } | null;
   reasons?: { kind: string; detail: string; urgency: Urgency }[];
   answers?: { question_id: string; prompt: string; answer: string }[]; sources?: string[];

@@ -1,0 +1,268 @@
+{
+  "conditions": {
+    "dog-cat-repro-001": {
+      "name": "Piómetra (infeção do útero)",
+      "red_flags": [
+        "Qualquer um dos sintomas acima entre cerca de 2 e 8 semanas depois de um cio",
+        "Piómetra fechada (sem corrimento visível) com letargia, vómitos ou abdómen distendido"
+      ],
+      "prevention_tips": "A esterilização remove o útero por completo e elimina totalmente este risco."
+    },
+    "dog-cat-repro-002": {
+      "name": "Tumores mamários",
+      "red_flags": ["Massa que cresce rapidamente ou está ulcerada"],
+      "prevention_tips": "Fale com o seu veterinário sobre a idade ideal para a esterilização e os fatores de risco individuais, em vez de seguir uma idade fixa."
+    },
+    "dog-repro-003": {
+      "name": "Tumor testicular e risco de criptorquidia",
+      "red_flags": ["Dor ou inchaço súbito e intenso no escroto"],
+      "prevention_tips": "Fale com o seu veterinário sobre testículos retidos e castração."
+    },
+    "dog-repro-004": {
+      "name": "Doença da próstata",
+      "red_flags": ["Febre com dor abdominal"],
+      "prevention_tips": "Fale com o seu veterinário sobre alterações urinárias ou reprodutivas num macho não castrado."
+    },
+    "cat-urinary-001": {
+      "name": "Esforço para urinar / obstrução da uretra",
+      "red_flags": [
+        "Esforço para urinar com pouca ou nenhuma urina num gato macho castrado",
+        "Letargia, vómitos ou colapso além do esforço para urinar"
+      ],
+      "prevention_tips": "Várias caixas de areia limpas, comida húmida, um peso saudável e menos stress entre gatos podem reduzir o risco de recorrência."
+    },
+    "dog-repro-005": {
+      "name": "Incontinência urinária responsiva a estrogénios",
+      "red_flags": ["Sangue na urina, esforço para urinar, febre ou dor além da perda de urina"],
+      "prevention_tips": "Não pode ser totalmente prevenida e é uma consequência reconhecida da esterilização em algumas cadelas."
+    },
+    "dog-gi-001": {
+      "name": "Vómito agudo, episódio isolado",
+      "red_flags": [
+        "Vómitos repetidos, três ou mais vezes em poucas horas",
+        "Sangue no vómito",
+        "Abdómen inchado ou distendido com tentativas de vomitar sem resultado",
+        "Acesso conhecido ou suspeito a tóxicos, a um objeto estranho ou a chocolate",
+        "Vómitos com letargia, sem beber, ou a recusar comida para além de uma refeição"
+      ],
+      "home_care_guidance": "Para um único episódio de vómito num cão adulto que, de resto, está bem: retire a comida durante algumas horas (não a água) e depois ofereça pequenas quantidades frequentes de uma dieta leve, como frango cozido com arroz branco. Volte à comida habitual de forma gradual ao longo de alguns dias, quando o apetite e as fezes estiverem normais.",
+      "prevention_tips": "Guarde o lixo e a comida humana em segurança e introduza alimentos novos de forma gradual, ao longo de 7 a 10 dias, e não de uma só vez.",
+      "possible_causes": [
+        "Indiscrição alimentar: comer restos, uma mudança súbita de comida ou guloseimas ricas e gordas",
+        "Gastrite ligeira",
+        "Enjoo de viagem",
+        "Parasitas intestinais",
+        "Menos frequentemente: obstrução, pancreatite ou ingestão de tóxicos (é precisamente isto que os sinais de alerta acima procuram)"
+      ],
+      "recommended_examinations": [
+        "Exame físico e palpação abdominal",
+        "Análises ao sangue, se os vómitos persistirem ou o animal parecer doente, para avaliar os órgãos e excluir outras causas",
+        "Raio-X ou ecografia abdominal, se houver suspeita de objeto estranho ou obstrução",
+        "Análise às fezes, se os parasitas forem uma possibilidade"
+      ]
+    },
+    "cat-gi-001": {
+      "name": "Bolas de pelo ocasionais",
+      "red_flags": [
+        "Bolas de pelo mais de uma ou duas vezes por mês",
+        "Tentativas repetidas de vomitar sem expelir a bola de pelo",
+        "Vómito de bolas de pelo com perda de apetite, letargia, diarreia ou prisão de ventre",
+        "Sangue no vómito, ou uma bola de pelo invulgarmente grande, espumosa ou com cor alterada",
+        "Abdómen inchado ou duro, ou incapacidade de manter a comida ou a água no estômago"
+      ],
+      "home_care_guidance": "Uma bola de pelo ocasional (cerca de uma vez por mês ou menos) num gato que come, bebe e se comporta normalmente geralmente não é motivo de preocupação. Escovar regularmente reduz a quantidade de pelo solto que o gato engole ao lavar-se.",
+      "prevention_tips": "Escove o seu gato regularmente, sobretudo raças de pelo comprido, e pergunte ao veterinário sobre uma dieta para bolas de pelo ou um suplemento de fibra, se forem frequentes."
+    },
+    "dog-cat-gi-002": {
+      "name": "Diarreia aguda ligeira, sem outros sinais",
+      "red_flags": [
+        "Cachorro ou gatinho, animal sénior ou animal com uma doença crónica conhecida",
+        "Sangue nas fezes, ou fezes pretas e com aspeto de alcatrão",
+        "Vómitos além da diarreia",
+        "Letargia, recusa de comida ou água, ou sinais de desidratação como gengivas secas ou olhos encovados",
+        "Dor abdominal, inchaço ou febre",
+        "Diarreia que dura mais de 24 a 48 horas apesar dos cuidados em casa"
+      ],
+      "home_care_guidance": "Para um episódio ligeiro e isolado num animal adulto que, de resto, está bem: retire a comida durante 12 a 24 horas (com água fresca sempre disponível) e depois reintroduza uma dieta leve, como frango cozido ou carne picada magra com arroz branco, em refeições pequenas e frequentes. Esta dieta não é equilibrada a longo prazo: volte gradualmente à comida habitual ao longo de alguns dias, quando as fezes ficarem mais firmes.",
+      "prevention_tips": "Introduza alimentos novos de forma gradual ao longo de 7 a 10 dias, evite restos de comida gordurosos e mantenha a desparasitação em dia."
+    },
+    "dog-resp-001": {
+      "name": "Episódio de espirro invertido",
+      "red_flags": [
+        "O episódio dura mais de 1 a 2 minutos, ou não resolve por completo",
+        "Episódios cada vez mais frequentes ou intensos",
+        "Corrimento nasal ou com sangue",
+        "Colapso, gengivas ou língua azuladas ou acinzentadas, ou dificuldade em respirar mesmo fora do episódio"
+      ],
+      "home_care_guidance": "O espirro invertido (uma inspiração rápida e repetida, como um ronco ou buzinar) parece alarmante, mas costuma ser um reflexo breve e inofensivo causado por irritação da garganta ou do palato mole. Mantenha a calma: o pânico tende a prolongá-lo. Massajar suavemente a garganta ou tapar brevemente as narinas para estimular a deglutição pode ajudar a terminar o episódio mais cedo. Normalmente passa em bem menos de um minuto, sem efeitos duradouros.",
+      "prevention_tips": "Reduza a exposição a pó, perfumes fortes e outros irritantes no ar. É mais comum em raças pequenas e braquicéfalas devido à anatomia das vias respiratórias e, para além disso, não é geralmente evitável."
+    },
+    "dog-derm-001": {
+      "name": "Hot spot inicial e ligeiro (dermatite húmida aguda)",
+      "red_flags": [
+        "A zona dói ao toque, ou o cão não deixa que a examine",
+        "Aumenta de tamanho ou profundidade apesar dos cuidados em casa",
+        "Corrimento, pus, mau cheiro ou hemorragia persistente",
+        "Sem melhoria 1 a 2 dias depois de começar os cuidados em casa",
+        "Febre ou letargia além da lesão de pele"
+      ],
+      "home_care_guidance": "Se a zona for pequena, não dolorosa e detetada cedo: corte com cuidado o pelo à volta (com máquina, não com tesoura) para o ar chegar à pele, limpe suavemente com um antisséptico diluído próprio para animais (nunca água oxigenada nem álcool, que danificam os tecidos) e, se necessário, evite que o cão se lamba com um colar isabelino. Deixe a zona descoberta: precisa de se manter seca, sem pensos. Nunca use pomadas para pessoas, porque alguns ingredientes comuns, como o óxido de zinco, são tóxicos para cães.",
+      "prevention_tips": "Mantenha a prevenção de pulgas e parasitas em dia (uma picada de pulga é um desencadeador frequente) e resolva rapidamente nós no pelo ou humidade retida em pelagens densas."
+    },
+    "dog-cat-wound-001": {
+      "name": "Pequeno corte ou arranhão",
+      "red_flags": [
+        "Qualquer mordedura, mesmo pequena, tem um risco elevado de infeção, seja qual for o tamanho",
+        "A hemorragia não para após cerca de 10 a 15 minutos de pressão firme e contínua",
+        "A ferida é profunda, tem mais de cerca de 1 cm ou deixa ver gordura, músculo ou osso",
+        "Ferida perto de uma articulação ou na cara",
+        "Aparecem sinais de infeção: vermelhidão, inchaço, pus, cheiro, calor, ou o animal parece doente",
+        "Hemorragia abundante ou descontrolada, gengivas pálidas ou fraqueza"
+      ],
+      "home_care_guidance": "Para um arranhão ou corte pequeno e superficial com pouca hemorragia: faça uma pressão suave e constante com um pano limpo até a hemorragia parar e depois lave com água limpa (evite antissépticos fortes e pomadas para pessoas). Impeça o animal de lamber a ferida (um colar isabelino ajuda) e verifique-a todos os dias, durante os dias seguintes, à procura de sinais de infeção.",
+      "prevention_tips": "Passeios ao ar livre com supervisão e unhas aparadas reduzem o risco de lesões; em casas com vários animais, separe-os durante brincadeiras agitadas ou às refeições para reduzir mordeduras em lutas."
+    },
+    "dog-cat-parasite-001": {
+      "name": "Infestação ligeira de pulgas",
+      "red_flags": [
+        "Cachorro, gatinho, sénior ou animal pequeno ou frágil com gengivas pálidas, fraqueza ou letargia (possível anemia causada pelas pulgas)",
+        "Perda de pelo generalizada, pele ferida ou sinais de uma reação alérgica importante (dermatite alérgica à picada da pulga)",
+        "Exposição acidental de um gato a um produto antipulgas para cães ou a um spray doméstico com permetrina"
+      ],
+      "home_care_guidance": "Penteie o seu animal com um pente fino para pulgas e use, no mesmo dia, um tratamento antipulgas recomendado pelo veterinário e adequado à espécie em todos os gatos, cães (e coelhos) da casa. A maior parte de um problema de pulgas está na sua casa e não no animal: lave as camas do animal e a sua roupa de cama a 60 °C ou mais e seque na máquina a alta temperatura, aspire bem tapetes, alcatifas e móveis e, depois de cada utilização, esvazie o aspirador ou feche e deite fora o saco fora de casa para as pulgas não escaparem. Veja a secção Cuidados para um plano completo contra pulgas em casa.",
+      "prevention_tips": "A prevenção antipulgas durante todo o ano, recomendada pelo veterinário, é muito mais eficaz do que tratar só quando surgem. IMPORTANTE: nunca use um produto antipulgas para cães num gato. Muitos contêm permetrina, que é altamente tóxica (potencialmente mortal) para gatos."
+    },
+    "dog-musculo-001": {
+      "name": "Coxeio ligeiro depois do exercício",
+      "red_flags": [
+        "Cachorro a coxear",
+        "Não apoia qualquer peso na perna",
+        "Chora, gane ou mostra dor clara quando lhe tocam na perna",
+        "Inchaço visível, calor, uma ferida aberta, ou a perna parece torta ou fora do sítio",
+        "Surgiu depois de uma queda, de um atropelamento ou de outro traumatismo importante",
+        "Sem melhoria após 24 a 48 horas de repouso, ou o coxeio repete-se",
+        "Letargia, não come ou parece doente além do coxeio"
+      ],
+      "home_care_guidance": "Se o seu cão ainda apoia algum peso, não mostra dor quando toca suavemente na perna e, de resto, come e se comporta normalmente: o tratamento é repouso. Limite os passeios a saídas curtas, lentas e com trela, só para fazer as necessidades, evite escadas e saltos e não o deixe correr nem brincar durante 24 a 48 horas. A maioria das distensões ligeiras melhora visivelmente nesse período.",
+      "prevention_tips": "Faça um aquecimento antes de exercício intenso e evite aumentos súbitos de atividade, sobretudo em cães sem boa forma física."
+    },
+    "dog-cat-parasite-002": {
+      "name": "Parasitas intestinais (vermes)",
+      "red_flags": [
+        "Cachorro ou gatinho com a barriga inchada, fraqueza ou crescimento fraco",
+        "Gengivas pálidas, fraqueza, ou diarreia preta, com aspeto de alcatrão ou com sangue (possível perda de sangue por ancilostomas)",
+        "Vómitos repetidos, ou vomitar vermes",
+        "Arrastar o rabo no chão com uma zona inchada, vermelha, a sangrar ou com mau cheiro junto ao ânus (possível abcesso das glândulas anais)"
+      ],
+      "prevention_tips": "Siga um plano de desparasitação recomendado pelo veterinário: cachorros e gatinhos são geralmente desparasitados a cada 2 semanas no início e depois todos os meses até cerca dos 6 meses; os adultos, com regularidade conforme o risco. Apanhe as fezes rapidamente, mantenha o controlo de pulgas em dia (as pulgas transmitem a ténia) e evite dar carne crua ou deixar o animal caçar ou comer restos.",
+      "possible_causes": [
+        "Lombrigas (ascarídeos): frequentes em cachorros e gatinhos, muitas vezes transmitidas pela mãe; parecem esparguete nas fezes ou no vómito",
+        "Ténia: pequenos segmentos parecidos com grãos de arroz à volta do rabo, nas fezes ou na cama; transmite-se ao engolir pulgas",
+        "Ancilostomas e tricurídeos: geralmente não se veem, mas podem causar diarreia, perda de peso e anemia",
+        "Giárdia e outros parasitas microscópicos que causam diarreia recorrente",
+        "Arrastar o rabo no chão também é muitas vezes causado por glândulas anais cheias ou infetadas, alergias ou irritação da pele, e não só por vermes"
+      ],
+      "recommended_examinations": [
+        "Análise às fezes: leve uma amostra fresca à consulta",
+        "Exame físico, incluindo as glândulas anais se o animal arrasta o rabo",
+        "Controlo do peso e da condição corporal, sobretudo em animais jovens",
+        "Análise ao sangue para anemia, se as gengivas estiverem pálidas ou o animal estiver fraco"
+      ]
+    },
+    "cat-behav-001": {
+      "name": "Stress ou ansiedade em gatos",
+      "red_flags": [
+        "Não come há mais de 24 horas: os gatos podem desenvolver rapidamente problemas graves de fígado (lipidose hepática)",
+        "Esforço na caixa de areia com pouca ou nenhuma urina, sobretudo num gato macho",
+        "Urina fora da caixa de areia, urina muitas vezes em pequenas quantidades, ou sangue na urina",
+        "Zonas sem pelo ou pele ferida por se lamber em excesso",
+        "Uma mudança súbita de comportamento com sinais de dor, esconder-se sem se mexer, ou deixar de se lavar"
+      ],
+      "home_care_guidance": "Mantenha rotinas previsíveis e dê ao seu gato esconderijos seguros, locais altos e zonas separadas para comida, água, caixa de areia e descanso (uma caixa de areia por gato, mais uma). As feromonas faciais felinas sintéticas, vendidas em difusores de tomada, sprays, toalhitas e coleiras, imitam as marcas de cheiro que os gatos deixam onde se sentem seguros e tranquilos. Ligue um difusor na divisão onde o gato passa mais tempo, não atrás de móveis nem debaixo de prateleiras, e deixe-o sempre ligado; pode demorar de alguns dias a uma semana a fazer efeito e as recargas duram normalmente cerca de um mês. Para situações curtas de stress, como viagens ou idas ao veterinário, borrife a transportadora ou a cama cerca de 15 minutos antes, para o álcool evaporar. Nunca borrife diretamente o gato nem a transportadora com o gato lá dentro. Se usar uma coleira de feromonas, escolha uma com fecho de segurança (que se solta). As feromonas ajudam muitos gatos, mas não todos, e funcionam melhor em conjunto com mudanças em casa.",
+      "prevention_tips": "Introduza mudanças aos poucos, deixe a transportadora à vista com uma manta conhecida e guloseimas para que se torne um local seguro, e pergunte ao veterinário sobre feromonas ou outras opções antes de situações de stress previsíveis, como mudanças de casa, um novo animal ou fogo de artifício.",
+      "possible_causes": [
+        "Mudanças em casa: mudança de casa, novas pessoas ou animais, obras ou móveis mudados de sítio",
+        "Conflito com outro gato da casa, ou gatos vistos pela janela",
+        "Viagens, idas ao veterinário, barulhos fortes ou fogo de artifício",
+        "Dor ou doença: vale a pena uma consulta quando o comportamento muda sem razão evidente"
+      ],
+      "recommended_examinations": [
+        "Exame físico para excluir dor ou doença por trás da mudança de comportamento",
+        "Análise à urina, se o gato urina fora da caixa de areia"
+      ]
+    }
+  },
+  "preventive_care": {
+    "prevent-001": {
+      "title": "Recalcular a alimentação depois da esterilização ou castração",
+      "description": "Reavalie as necessidades calóricas e a condição corporal depois da castração e continue a controlar o peso regularmente.",
+      "recurrence": "um novo cálculo e depois a cada 6 meses"
+    },
+    "prevent-002": {
+      "title": "Falar sobre a idade de castração em cachorros de raça grande",
+      "description": "Em cães que deverão ultrapassar cerca de 20 kg, fale com o seu veterinário sobre a idade adequada para a raça, em vez de seguir uma idade fixa.",
+      "recurrence": "uma conversa antes dos 6 meses"
+    },
+    "prevent-003": {
+      "title": "Confirmar que ambos os testículos desceram até aos 6 meses",
+      "description": "Peça ao veterinário que verifique a descida dos testículos numa consulta de rotina do cachorro e fale sobre os próximos passos se algum não tiver descido.",
+      "recurrence": "uma verificação por volta dos 6 meses"
+    },
+    "prevent-004": {
+      "title": "Falar sobre a idade de esterilização antes do primeiro cio",
+      "description": "Fale com o seu veterinário sobre a idade adequada, sobretudo em cadelas de raça grande, em que os riscos e benefícios podem ser diferentes.",
+      "recurrence": "uma conversa antes do primeiro cio"
+    },
+    "prevent-005": {
+      "title": "Tratar uma infestação de pulgas em casa",
+      "description": "A maior parte de uma população de pulgas (ovos, larvas e casulos) vive na sua casa e não no animal. Trate todos os animais da casa no mesmo dia com um produto recomendado pelo veterinário. Lave as camas e mantas dos animais e a sua roupa de cama a alta temperatura (60 °C ou mais) e seque na máquina a temperatura elevada. Aspire bem alcatifas, tapetes, sofás, rodapés e bancos do carro e, depois de cada utilização, esvazie o depósito ou feche e deite fora o saco do aspirador fora de casa para as pulgas não escaparem. Limpe pavimentos e superfícies com água quente e detergente ou com uma máquina a vapor. Se usar um spray antipulgas para a casa, escolha um recomendado pelo veterinário, siga o rótulo e mantenha os animais afastados até secar. Nunca use produtos com permetrina perto de gatos. Persista: podem continuar a nascer pulgas dos casulos durante várias semanas.",
+      "recurrence": "aspirar a cada um ou dois dias e lavar as camas todas as semanas até não ver pulgas durante várias semanas"
+    },
+    "prevent-006": {
+      "title": "Usar feromonas para aliviar situações de stress",
+      "description": "As feromonas faciais felinas sintéticas (difusores, sprays, toalhitas e coleiras) podem ajudar os gatos a sentirem-se seguros. Ligue um difusor na divisão que o gato mais usa e deixe-o sempre ligado. Antes de viagens, idas ao veterinário, visitas ou fogo de artifício, borrife a transportadora ou a cama cerca de 15 minutos antes de o gato entrar, para o álcool evaporar. Nunca borrife diretamente o gato. Deixe a transportadora à vista em casa, com uma manta conhecida, para que não fique associada só a viagens stressantes.",
+      "recurrence": "recarga do difusor cerca de uma vez por mês; spray 15 minutos antes de cada situação de stress"
+    },
+    "prevent-007": {
+      "title": "Cortar as unhas e ter arranhadores",
+      "description": "Corte as unhas do seu gato com regularidade para evitar desconforto, unhas presas e lesões. Pressione suavemente a almofada da pata para expor cada unha e corte apenas a ponta afiada e transparente, bem longe da zona rosada (o sabugo), que sangra e dói se for cortada. Tenha um arranhador firme, alto o suficiente para o gato se esticar por completo, e também arranhadores horizontais: arranhar ajuda naturalmente a soltar as camadas exteriores da unha. Verifique com frequência as unhas dos gatos mais velhos, porque podem engrossar e crescer para dentro das almofadas. Peça ao veterinário que lhe mostre como fazer, se tiver dúvidas.",
+      "recurrence": "a cada 2 a 4 semanas"
+    },
+    "prevent-008": {
+      "title": "Manter as unhas com um comprimento saudável",
+      "description": "Passeios regulares em superfícies duras, como o passeio, ajudam a desgastar as unhas, mas normalmente não substituem o corte, e os esporões (as unhas do lado de dentro da pata) nunca tocam no chão. Se ouvir as unhas a bater no chão, precisam de ser cortadas. Use um corta-unhas próprio para cães ou uma lima elétrica e corte apenas a pontinha, evitando o sabugo: a zona sensível e rosada dentro da unha que sangra se for cortada. Em unhas escuras, corte fatias muito finas e pare quando aparecer um ponto escuro no centro da superfície cortada. Tenha à mão pó hemostático ou amido de milho para o caso de uma unha sangrar e recompense o seu cão para manter o corte tranquilo. Peça ao veterinário ou ao tosquiador que lhe mostre como fazer, se tiver dúvidas.",
+      "recurrence": "verificar a cada 2 semanas; cortar a cada 3 a 4 semanas ou quando as unhas batem no chão"
+    },
+    "prevent-009": {
+      "title": "Proteger a família dos parasitas internos",
+      "description": "Alguns vermes dos animais, como as lombrigas e os ancilostomas, podem infetar pessoas. As crianças pequenas, os idosos, as grávidas e as pessoas com o sistema imunitário enfraquecido correm mais risco. Mantenha um plano regular de desparasitação e controlo de pulgas recomendado pelo veterinário. Apanhe rapidamente as fezes do cão, sobretudo onde as crianças brincam, e limpe a caixa de areia todos os dias; as grávidas devem usar luvas ou evitar limpar a caixa de areia por causa da toxoplasmose. Lave as mãos depois de mexer em animais, terra ou fezes e sempre antes de comer. Tape as caixas de areia de brincar quando não estão a ser usadas e mantenha as crianças longe dos sítios onde os animais fazem as necessidades.",
+      "recurrence": "desparasitação conforme indicação do veterinário, muitas vezes pelo menos a cada 3 meses em animais adultos"
+    },
+    "prevent-010": {
+      "title": "Reconhecer sinais de parasitas internos e externos",
+      "description": "Parasitas internos: diarreia, perda de peso apesar de bom apetite, pelo baço, vómitos e arrastar o rabo no chão ou no tapete. Cachorros e gatinhos podem ter a barriga inchada, e é possível ver mesmo os vermes nas fezes ou na diarreia: as lombrigas parecem esparguete e os segmentos de ténia parecem grãos de arroz à volta do rabo. Parasitas externos: coçar, lamber ou morder em excesso, pele vermelha ou irritada, crostas e perda de pelo. Procure pulgas ou a sujidade preta das pulgas (fica vermelha em papel branco húmido), carraças agarradas à pele, e cera escura nos ouvidos ou abanar da cabeça por ácaros dos ouvidos. Se notar estes sinais, pergunte ao veterinário sobre uma análise às fezes e o tratamento adequado.",
+      "recurrence": "verificar pelo, pele e ouvidos todas as semanas e depois de passeios em erva alta"
+    }
+  },
+  "questions": {
+    "q-vomit-001": {"prompt": "Quantas vezes vomitou o seu animal?", "options": ["Uma vez", "2 a 3 vezes", "Mais de 3 vezes em poucas horas"]},
+    "q-vomit-002": {"prompt": "Há sangue no vómito, ou o abdómen está inchado com tentativas de vomitar sem resultado (tenta vomitar mas não sai nada)?", "options": ["Não, nenhum dos dois", "Sim"]},
+    "q-vomit-003": {"prompt": "Teve acesso, conhecido ou possível, a algo tóxico, a um objeto estranho ou a chocolate?", "options": ["Não", "Sim, acesso possível ou conhecido"]},
+    "q-vomit-004": {"prompt": "Como estão a energia e o apetite do seu animal? Há letargia, ou recusa comida e água?", "options": ["Energia e apetite normais", "Letargia, não come ou não bebe"]},
+    "q-urinate-001": {"prompt": "Quanta urina sai quando faz esforço?", "options": ["Quantidade normal", "Pouca", "Nenhuma"]},
+    "q-urinate-002": {"prompt": "Há vómitos, letargia ou colapso além disto?", "options": ["Não", "Sim"]},
+    "q-diarrhea-001": {"prompt": "Há sangue nas fezes, ou estão pretas e com aspeto de alcatrão?", "options": ["Não", "Sim, sangue ou fezes pretas"]},
+    "q-diarrhea-002": {"prompt": "O seu animal também está a vomitar, com letargia ou a recusar comida e água?", "options": ["Não, de resto está normal", "Sim"]},
+    "q-limping-001": {"prompt": "O seu cão apoia algum peso na perna?", "options": ["Sim, apoia algum peso", "Não apoia peso nenhum"]},
+    "q-limping-002": {"prompt": "Isto aconteceu depois de uma queda, um atropelamento ou outro traumatismo importante?", "options": ["Não", "Sim"]},
+    "q-limping-003": {"prompt": "Há inchaço visível, calor, uma ferida, ou dor quando toca na perna?", "options": ["Não", "Sim"]},
+    "q-reverse-sneezing-001": {"prompt": "Quanto tempo durou o episódio e passou por completo?", "options": ["Menos de um minuto, voltou ao normal", "Mais de um minuto, ou não passou por completo"]},
+    "q-scratching-001": {"prompt": "Há gengivas pálidas, fraqueza ou letargia além da comichão?", "options": ["Não", "Sim"]},
+    "q-scooting-001": {"prompt": "O seu animal é um cachorro ou gatinho com a barriga inchada, ou mostra fraqueza ou gengivas pálidas?", "options": ["Não", "Sim"]},
+    "q-scooting-002": {"prompt": "Há diarreia com sangue ou preta com aspeto de alcatrão, ou vómitos repetidos?", "options": ["Não", "Sim"]},
+    "q-scooting-003": {"prompt": "A pele junto ao rabo está inchada, vermelha, a sangrar ou com mau cheiro?", "options": ["Não", "Sim"]},
+    "q-stress-001": {"prompt": "O seu gato faz esforço na caixa de areia, urina fora dela, ou há sangue na urina?", "options": ["Não", "Urina fora da caixa ou sangue na urina", "Esforço com pouca ou nenhuma urina"]},
+    "q-stress-002": {"prompt": "O seu gato não comeu nada há mais de 24 horas?", "options": ["Não", "Sim"]},
+    "q-stress-003": {"prompt": "A mudança começou de repente, com sinais de dor, esconder-se sem se mexer, ou deixar de se lavar?", "options": ["Não", "Sim"]}
+  }
+}

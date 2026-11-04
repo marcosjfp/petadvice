@@ -4,6 +4,7 @@ from sqlalchemy import update
 from sqlmodel import Session
 
 from app.content.loader import content_library
+from app.i18n import DEFAULT_LANGUAGE, message
 from app.models.schema import ConditionEntry, NeuterStatus, Pet, RedFlag, ReportPet, RecordedAnswer, ResultReason, TriageAnswerRequest, TriageQuestion, TriageResult, TriageSession, UrgencyLevel
 from app.services.life_stage_calculator import calculate_life_stage
 from app.services.auth import as_utc, utcnow
@@ -94,7 +95,8 @@ def answer_question(db: Session, session_id: str, req: TriageAnswerRequest) -> t
     return session, next_question, next_question is None
 
 
-def compute_result(db: Session, session_id: str) -> TriageResult:
+def compute_result(db: Session, session_id: str, language: str = DEFAULT_LANGUAGE) -> TriageResult:
+    """The first result is stored in the requesting language and kept as recorded."""
     session = db.get(TriageSession, session_id)
     if session is None:
         raise UnknownSessionError(session_id)
@@ -113,9 +115,9 @@ def compute_result(db: Session, session_id: str) -> TriageResult:
             session_id=session.id, resulting_urgency=session.resulting_urgency,
             resulting_guidance=session.resulting_guidance,
             matched_condition_ids=[item for item in session.condition_entries_matched_raw.split(',') if item],
-            answers=[RecordedAnswer(question_id=key, prompt=f'Question ID: {key}', answer=value) for key, value in json.loads(session.answers_json).items()],
+            answers=[RecordedAnswer(question_id=key, prompt=message(language, 'question_id', id=key), answer=value) for key, value in json.loads(session.answers_json).items()],
             started_at=as_utc(session.started_at), symptom=session.symptom_entry_point,
-            recorded_at=utcnow(), historical=True,
+            recorded_at=utcnow(), historical=True, language=language,
         ))
 
     matched = content_library.conditions_for_symptom(session.symptom_entry_point)
@@ -123,16 +125,17 @@ def compute_result(db: Session, session_id: str) -> TriageResult:
     # Never substitute entries for another species or known incompatible scope.
     # A check without applicable content cannot justify home-care reassurance.
     urgency = max((condition.urgency_default for condition in candidates), key=lambda item: item.rank, default=UrgencyLevel.vet_24h)
-    reasons = [ResultReason(kind='symptom_guidance', detail=f'The existing symptom guidance for {condition.name} sets this minimum action level. This is not a diagnosis of that condition.', urgency=condition.urgency_default) for condition in candidates]
+    localized = {condition.id: content_library.localize_condition(condition, language) for condition in candidates}
+    reasons = [ResultReason(kind='symptom_guidance', detail=message(language, 'reason.symptom_guidance', name=localized[condition.id].name), urgency=condition.urgency_default) for condition in candidates]
     if not candidates:
-        reasons.append(ResultReason(kind='limited_content', detail='No condition guidance matches the available pet context. The check uses the existing cautious fallback.', urgency=urgency))
+        reasons.append(ResultReason(kind='limited_content', detail=message(language, 'reason.limited_content'), urgency=urgency))
     if session.resulting_urgency and session.resulting_urgency.rank > urgency.rank:
         urgency = session.resulting_urgency
     life_stage = calculate_life_stage(pet)
     for condition in candidates:
         escalation = condition.life_stage_escalation.get(life_stage) if life_stage else None
         if escalation:
-            reasons.append(ResultReason(kind='life_stage', detail=f'The existing guidance for {condition.name} includes a higher action level for the {life_stage.replace("_", " ")} life stage.', urgency=escalation))
+            reasons.append(ResultReason(kind='life_stage', detail=message(language, 'reason.life_stage', name=localized[condition.id].name, life_stage=message(language, f'life_stage.{life_stage}')), urgency=escalation))
         if escalation and escalation.rank > urgency.rank:
             urgency = escalation
     answers = json.loads(session.answers_json)
@@ -141,7 +144,7 @@ def compute_result(db: Session, session_id: str) -> TriageResult:
         answer = answers.get(question.id)
         if answer in question.escalate_if:
             escalation = question.escalate_if[answer]
-            reasons.append(ResultReason(kind='answer', detail=f'{question.prompt} Your answer: {answer}. The existing question rule sets this action level.', urgency=escalation))
+            reasons.append(ResultReason(kind='answer', detail=message(language, 'reason.answer', prompt=content_library.question_prompt(question, language), answer=content_library.option_label(question, answer, language)), urgency=escalation))
             if escalation.rank > urgency.rank:
                 urgency = escalation
 
@@ -153,24 +156,24 @@ def compute_result(db: Session, session_id: str) -> TriageResult:
                 for answer in answers.values()
             ):
                 triggered_flags.append(flag)
-                reasons.append(ResultReason(kind='red_flag', detail=f'An answer matched this existing warning rule: {flag.description}', urgency=flag.escalates_to))
+                reasons.append(ResultReason(kind='red_flag', detail=message(language, 'reason.red_flag', flag=content_library.localize_flag(condition, flag, language)), urgency=flag.escalates_to))
                 if flag.escalates_to.rank > urgency.rank:
                     urgency = flag.escalates_to
 
-    guidance = _build_guidance(urgency, candidates)
+    guidance = _build_guidance(urgency, [localized[item.id] for item in candidates], language)
     result = TriageResult(
         session_id=session.id,
         resulting_urgency=urgency,
         resulting_guidance=guidance,
         matched_condition_ids=[item.id for item in candidates],
-        possible_causes=sorted({cause for condition in candidates for cause in condition.possible_causes}),
-        recommended_examinations=sorted({exam for condition in candidates for exam in condition.recommended_examinations}),
+        possible_causes=sorted({cause for condition in localized.values() for cause in condition.possible_causes}),
+        recommended_examinations=sorted({exam for condition in localized.values() for exam in condition.recommended_examinations}),
         reasons=[reason for reason in reasons if reason.urgency == urgency],
-        answers=[RecordedAnswer(question_id=key, prompt=content_library.question_by_id(key).prompt if content_library.question_by_id(key) else f'Question ID: {key}', answer=value) for key, value in answers.items()],
+        answers=[_recorded_answer(key, value, language) for key, value in answers.items()],
         pet=ReportPet(name=pet.name, species=pet.species, date_of_birth=pet.date_of_birth, life_stage=life_stage, sex=pet.sex, neutered=pet.neutered, breed_size=pet.breed_size),
         started_at=as_utc(session.started_at), recorded_at=utcnow(), symptom=session.symptom_entry_point,
         sources=sorted({source for condition in candidates for source in condition.sources}),
-        content_version=content_library.version,
+        content_version=content_library.version, language=language,
     )
     return _save_snapshot(db, session, result)
 
@@ -187,12 +190,16 @@ def _save_snapshot(db: Session, session: TriageSession, result: TriageResult) ->
     return TriageResult.model_validate(session.result_snapshot)
 
 
-def _build_guidance(urgency: UrgencyLevel, candidates: list[ConditionEntry]) -> str:
+def _recorded_answer(question_id: str, answer: str, language: str) -> RecordedAnswer:
+    question = content_library.question_by_id(question_id)
+    if question is None:
+        return RecordedAnswer(question_id=question_id, prompt=message(language, 'question_id', id=question_id), answer=answer)
+    return RecordedAnswer(question_id=question_id, prompt=content_library.question_prompt(question, language), answer=content_library.option_label(question, answer, language))
+
+
+def _build_guidance(urgency: UrgencyLevel, candidates: list[ConditionEntry], language: str) -> str:
     if urgency == UrgencyLevel.monitor_home:
         texts = [item.home_care_guidance for item in candidates if item.home_care_guidance]
-        return " ".join(texts) if texts else "Monitor your pet closely and contact a vet if things change or do not improve."
-    if urgency == UrgencyLevel.vet_soon:
-        return "Arrange a veterinary appointment within the next few days."
-    if urgency == UrgencyLevel.vet_24h:
-        return "Please arrange a veterinary appointment within 24 hours."
-    return "This needs emergency veterinary attention now. Contact an emergency clinic immediately."
+        if texts:
+            return " ".join(texts)
+    return message(language, f'guidance.{urgency.value}')

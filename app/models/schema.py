@@ -305,6 +305,7 @@ class TriageResult(BaseModel):
     symptom: str = ""
     sources: list[str] = PydanticField(default_factory=list)
     content_version: Optional[str] = None
+    language: Optional[str] = None
     historical: bool = False
 
 

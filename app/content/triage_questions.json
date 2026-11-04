@@ -108,5 +108,55 @@
     "escalate_if": {"Yes": "vet_soon"},
     "is_entry_point": true,
     "next_question_by_answer": {}
+  },
+  {
+    "id": "q-scooting-001",
+    "prompt": "Is your pet a puppy or kitten with a swollen belly, or showing weakness or pale gums?",
+    "symptom_tag": "scooting",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "vet_24h"},
+    "is_entry_point": true,
+    "next_question_by_answer": {"No": "q-scooting-002", "Yes": "q-scooting-002"}
+  },
+  {
+    "id": "q-scooting-002",
+    "prompt": "Is there bloody or black, tarry diarrhoea, or repeated vomiting?",
+    "symptom_tag": "scooting",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "vet_24h"},
+    "next_question_by_answer": {"No": "q-scooting-003", "Yes": "q-scooting-003"}
+  },
+  {
+    "id": "q-scooting-003",
+    "prompt": "Is the skin beside the bottom swollen, red, bleeding or foul-smelling?",
+    "symptom_tag": "scooting",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "vet_24h"},
+    "next_question_by_answer": {}
+  },
+  {
+    "id": "q-stress-001",
+    "prompt": "Is your cat straining in the litter box, peeing outside it, or is there blood in the urine?",
+    "symptom_tag": "nervous_or_stressed",
+    "options": ["No", "Peeing outside the box or blood in the urine", "Straining with little or no urine"],
+    "escalate_if": {"Peeing outside the box or blood in the urine": "vet_24h", "Straining with little or no urine": "emergency_now"},
+    "is_entry_point": true,
+    "next_question_by_answer": {"No": "q-stress-002", "Peeing outside the box or blood in the urine": "q-stress-002"}
+  },
+  {
+    "id": "q-stress-002",
+    "prompt": "Has your cat eaten nothing for more than 24 hours?",
+    "symptom_tag": "nervous_or_stressed",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "vet_24h"},
+    "next_question_by_answer": {"No": "q-stress-003", "Yes": "q-stress-003"}
+  },
+  {
+    "id": "q-stress-003",
+    "prompt": "Did the change start suddenly, with signs of pain, hiding and not moving, or no longer grooming?",
+    "symptom_tag": "nervous_or_stressed",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "vet_soon"},
+    "next_question_by_answer": {}
   }
 ]

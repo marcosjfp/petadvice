@@ -6,6 +6,7 @@ from sqlmodel import Session, select
 
 from app.content.loader import content_library
 from app.db import get_session
+from app.i18n import request_language
 from app.models.schema import GuestAccess, Owner, Pet, TriageAnswerRequest, TriageSession, TriageStartRequest
 from app.services import triage_engine
 from app.services.auth import as_utc, get_current_owner, get_optional_owner, utcnow, verify_auth_origin
@@ -63,6 +64,7 @@ def check_history(pet_id: str, before: str | None = None, owner: Owner = Depends
 @router.post("/start", dependencies=[Depends(limit_requests('triage-start', '30/minute'))])
 def start_triage(
     payload: TriageStartRequest,
+    request: Request,
     current_owner: Owner | None = Depends(get_optional_owner),
     db: Session = Depends(get_session),
 ):
@@ -89,7 +91,7 @@ def start_triage(
         expires_at = utcnow() + timedelta(hours=get_settings().guest_retention_hours)
         db.add(GuestAccess(session_id=session.id, token_hash=token_hash(guest_token), expires_at=expires_at))
         db.commit()
-    return {"session_id": session.id, "next_question": first_question, "flow_complete": first_question is None, 'guest_token': guest_token, 'expires_at': expires_at}
+    return {"session_id": session.id, "next_question": content_library.present_question(first_question, request_language(request)), "flow_complete": first_question is None, 'guest_token': guest_token, 'expires_at': expires_at}
 
 
 @router.post("/{session_id}/answer", dependencies=[Depends(limit_requests('triage-answer', '120/minute'))])
@@ -107,7 +109,7 @@ def answer_triage(
         raise HTTPException(status_code=404, detail="Triage session not found")
     except triage_engine.InvalidAnswerError:
         raise HTTPException(status_code=422, detail="Answer is not valid for this question")
-    return {"next_question": next_question, "flow_complete": flow_complete}
+    return {"next_question": content_library.present_question(next_question, request_language(request)), "flow_complete": flow_complete}
 
 
 @router.get("/{session_id}/result")
@@ -119,7 +121,7 @@ def get_triage_result(
 ):
     _verify_session_ownership(db, session_id, current_owner, request)
     try:
-        return triage_engine.compute_result(db, session_id)
+        return triage_engine.compute_result(db, session_id, request_language(request))
     except triage_engine.UnknownSessionError:
         raise HTTPException(status_code=404, detail="Triage session not found")
     except triage_engine.IncompleteSessionError:
