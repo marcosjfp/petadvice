@@ -181,7 +181,8 @@
       "sources": [
         "https://www.webvet.com/symptom-checker/cat/wounds-and-bleeding/",
         "https://www.pumpkin.care/post/dog-wound-care"
-      ]
+      ],
+      "related_care": ["prevent-007", "prevent-008"]
     },
     {
       "id": "dog-cat-parasite-001",
@@ -200,14 +201,15 @@
         {"description": "Widespread hair loss, broken skin, or signs of a significant allergic reaction (flea allergy dermatitis)", "escalates_to": "vet_soon"},
         {"description": "Accidental exposure of a cat to a dog flea product or household flea spray containing permethrin", "escalates_to": "emergency_now"}
       ],
-      "home_care_guidance": "Comb your pet with a fine-toothed flea comb, and use a vet-recommended, species-appropriate flea treatment on every cat, dog (and rabbit) in the household on the same day. Most of a flea problem lives in your home, not on your pet, so wash pet bedding and your bed linen at 60°C+ and tumble-dry on high heat, vacuum carpets and furniture thoroughly, and after each use empty the vacuum or seal and discard the bag outside so fleas cannot escape. See the Care section for a full home flea plan.",
+      "home_care_guidance": "Comb your pet with a fine-toothed flea comb, and use a vet-recommended, species-appropriate flea treatment on every cat, dog (and rabbit) in the household on the same day. Most of a flea problem lives in your home, not on your pet, so wash pet bedding and your bed linen at 60°C+ and tumble-dry on high heat, vacuum carpets and furniture thoroughly, and after each use empty the vacuum or seal and discard the bag outside so fleas cannot escape.",
       "prevention_tips": "Year-round vet-recommended flea prevention is far more effective than reactive treatment. CRITICAL: never use a dog flea product on a cat — many contain permethrin, which is highly toxic (potentially fatal) to cats.",
       "vet_reviewed_by": null,
       "last_reviewed_date": null,
       "sources": [
         "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/fleas-on-cats",
         "https://www.pdsa.org.uk/media/5834/phh_dog_c_fleas-on-dogs.pdf"
-      ]
+      ],
+      "related_care": ["prevent-005", "prevent-010"]
     },
     {
       "id": "dog-musculo-001",

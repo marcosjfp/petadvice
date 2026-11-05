@@ -52,16 +52,17 @@ export type Condition = {
   home_care_guidance: string | null; prevention_tips: string | null;
   red_flags: { description: string; escalates_to: Urgency }[];
   sources: string[]; vet_reviewed_by: string | null; last_reviewed_date: string | null;
-  symptom_tags?: string[];
+  symptom_tags?: string[]; related_care_items?: CareGuide[];
 }
-export type PreventiveCareItem = { id: string; title: string; description: string; recurrence: string | null; sources: string[] }
+export type CareGuide = { id: string; title: string; description: string; recurrence: string | null }
+export type PreventiveCareItem = CareGuide & { sources: string[]; related_symptoms?: string[] }
 export type Question = { id: string; prompt: string; options: string[]; option_labels?: string[] }
 export type TriageResult = {
   resulting_urgency: Urgency; resulting_guidance: string; matched_condition_ids: string[]; possible_causes: string[]; recommended_examinations: string[];
   session_id?: string; symptom?: string; started_at?: string | null; recorded_at?: string | null; historical?: boolean; content_version?: string | null; language?: string | null;
   pet?: { name: string; species: Species; date_of_birth: string | null; life_stage: string | null; sex: string | null; neutered: boolean | null; breed_size: string | null } | null;
   reasons?: { kind: string; detail: string; urgency: Urgency }[];
-  answers?: { question_id: string; prompt: string; answer: string }[]; sources?: string[];
+  answers?: { question_id: string; prompt: string; answer: string }[]; sources?: string[]; related_care?: CareGuide[];
 }
 export type CheckHistory = { checks: { session_id: string; started_at: string; symptom: string; complete: boolean; urgency: Urgency | null }[]; next_cursor: string | null }
 export type TriageStart = { session_id: string; next_question: Question | null; flow_complete: boolean; guest_token?: string | null; expires_at?: string | null }

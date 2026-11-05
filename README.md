@@ -35,7 +35,7 @@ The phone layout includes larger form controls, constrained date/select fields, 
 
 The layout was checked at iPhone 15 portrait/landscape dimensions, smaller phone widths and desktop sizes using Chrome. Physical iPhone/Safari keyboard, date-picker and safe-area behavior still needs device verification. See the [mobile verification report and screenshots](docs/verification/mobile-2026-10-24/README.md).
 
-An existing PWA installation can retain an older interface after a deployment. Refresh PETAdvice; if it still looks old, close its tabs or saved app and reopen it. Account data does not need to be deleted.
+After a deployment, a page that has just opened switches to the new version automatically. If someone is already using the page (for example mid-check), it keeps running and shows a "new version is ready" notice with a Refresh button instead, so an update never discards a check in progress. Open tabs check for updates when they become visible again and every 30 minutes. Browsers still running a build from before this behaviour shipped need one more refresh. Account data never needs to be deleted.
 
 ## Local development
 

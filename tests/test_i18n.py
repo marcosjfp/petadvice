@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from app.content.loader import TRANSLATIONS_DIR, ContentLibrary, content_library
 from app.i18n import normalize_language
 from app.main import app
-from app.models.schema import Pet, Sex, Species, TriageAnswerRequest, UrgencyLevel
+from app.models.schema import Sex, Species, TriageAnswerRequest, UrgencyLevel
 from app.services import triage_engine
 from tests.test_backend import complete_remaining_questions, db, make_pet  # noqa: F401
 
@@ -117,3 +117,36 @@ def test_stressed_cat_check(db, first_answer, expected):
     assert result.resulting_urgency == expected
     if expected == UrgencyLevel.monitor_home:
         assert "pheromones" in result.resulting_guidance
+
+
+def test_new_content_has_follow_ups():
+    for condition_id in ("dog-cat-parasite-001", "dog-cat-parasite-002", "cat-behav-001"):
+        assert content_library.condition_by_id(condition_id).related_care
+    for item_id in ("prevent-005", "prevent-006", "prevent-009", "prevent-010"):
+        assert content_library.preventive_by_id(item_id).related_symptoms
+    flea = content_library.condition_by_id("dog-cat-parasite-001").home_care_guidance
+    assert "Care section" not in flea
+
+
+def test_broken_follow_up_link_is_rejected():
+    library = ContentLibrary()
+    library.load()
+    library.conditions[0].related_care.append("prevent-missing")
+    with pytest.raises(ValueError, match="unknown care items"):
+        ContentLibrary._validate_links(library.conditions, library.preventive_items, library.questions)
+    library.preventive_items[0].related_symptoms.append("not-a-check")
+    library.conditions[0].related_care.pop()
+    with pytest.raises(ValueError, match="without a check"):
+        ContentLibrary._validate_links(library.conditions, library.preventive_items, library.questions)
+
+
+def test_result_and_learn_include_related_care_for_the_pet_species(db):
+    pet = make_pet(db, species=Species.dog)
+    session, _ = triage_engine.start_session(db, pet, "scratching")
+    complete_remaining_questions(db, session.id)
+    result = triage_engine.compute_result(db, session.id, "pt")
+    assert [item.id for item in result.related_care] == ["prevent-005", "prevent-010"]
+    assert result.related_care[0].title == "Tratar uma infestação de pulgas em casa"
+    client = TestClient(app)
+    wound = next(item for item in client.get("/conditions", params={"species": "dog"}).json() if item["id"] == "dog-cat-wound-001")
+    assert [item["id"] for item in wound["related_care_items"]] == ["prevent-008"]  # the cat nail guide is filtered out

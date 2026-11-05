@@ -196,6 +196,7 @@ class ConditionEntry(BaseModel):
     vet_reviewed_by: Optional[str] = None
     last_reviewed_date: Optional[date] = None
     sources: list[str] = PydanticField(default_factory=list)
+    related_care: list[str] = PydanticField(default_factory=list)
 
 
 class TriageQuestion(BaseModel):
@@ -217,6 +218,7 @@ class PreventiveCareItem(BaseModel):
     recurrence: Optional[str] = None
     trigger_age_days: Optional[int] = None
     sources: list[str] = PydanticField(default_factory=list)
+    related_symptoms: list[str] = PydanticField(default_factory=list)
 
 
 class PetCreate(BaseModel):
@@ -290,6 +292,13 @@ class ReportPet(BaseModel):
     breed_size: Optional[BreedSize] = None
 
 
+class RelatedCare(BaseModel):
+    id: str
+    title: str
+    description: str
+    recurrence: Optional[str] = None
+
+
 class TriageResult(BaseModel):
     session_id: str
     resulting_urgency: UrgencyLevel
@@ -304,6 +313,7 @@ class TriageResult(BaseModel):
     recorded_at: Optional[datetime] = None
     symptom: str = ""
     sources: list[str] = PydanticField(default_factory=list)
+    related_care: list[RelatedCare] = PydanticField(default_factory=list)
     content_version: Optional[str] = None
     language: Optional[str] = None
     historical: bool = False

@@ -5,7 +5,7 @@ from sqlmodel import Session
 
 from app.content.loader import content_library
 from app.i18n import DEFAULT_LANGUAGE, message
-from app.models.schema import ConditionEntry, NeuterStatus, Pet, RedFlag, ReportPet, RecordedAnswer, ResultReason, TriageAnswerRequest, TriageQuestion, TriageResult, TriageSession, UrgencyLevel
+from app.models.schema import ConditionEntry, NeuterStatus, Pet, RedFlag, RelatedCare, ReportPet, RecordedAnswer, ResultReason, TriageAnswerRequest, TriageQuestion, TriageResult, TriageSession, UrgencyLevel
 from app.services.life_stage_calculator import calculate_life_stage
 from app.services.auth import as_utc, utcnow
 
@@ -173,6 +173,7 @@ def compute_result(db: Session, session_id: str, language: str = DEFAULT_LANGUAG
         pet=ReportPet(name=pet.name, species=pet.species, date_of_birth=pet.date_of_birth, life_stage=life_stage, sex=pet.sex, neutered=pet.neutered, breed_size=pet.breed_size),
         started_at=as_utc(session.started_at), recorded_at=utcnow(), symptom=session.symptom_entry_point,
         sources=sorted({source for condition in candidates for source in condition.sources}),
+        related_care=_related_care(candidates, pet.species.value, language),
         content_version=content_library.version, language=language,
     )
     return _save_snapshot(db, session, result)
@@ -188,6 +189,15 @@ def _save_snapshot(db: Session, session: TriageSession, result: TriageResult) ->
     db.commit()
     db.refresh(session)
     return TriageResult.model_validate(session.result_snapshot)
+
+
+def _related_care(candidates: list[ConditionEntry], species: str, language: str) -> list[RelatedCare]:
+    # Copied into the snapshot so a saved report shows the guides it was given.
+    seen: dict[str, RelatedCare] = {}
+    for condition in candidates:
+        for item in content_library.related_care(condition, species, language):
+            seen.setdefault(item.id, RelatedCare(id=item.id, title=item.title, description=item.description, recurrence=item.recurrence))
+    return list(seen.values())
 
 
 def _recorded_answer(question_id: str, answer: str, language: str) -> RecordedAnswer:

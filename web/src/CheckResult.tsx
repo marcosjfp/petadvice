@@ -3,6 +3,7 @@ import { type TriageResult } from './api'
 import { downloadFile } from './download'
 import { petContextLine, petDisplayName, reportDate, reportHtml, symptomLabel } from './checkReport'
 import { useI18n } from './i18n'
+import { CareGuides } from './CareGuides'
 
 export default function CheckResult({ result, petName, saved = false, children }: { result: TriageResult; petName?: string; saved?: boolean; children?: React.ReactNode }) {
   const { t } = useI18n()
@@ -15,7 +16,7 @@ export default function CheckResult({ result, petName, saved = false, children }
       <h1 ref={heading} tabIndex={-1}>{t.urgency[result.resulting_urgency]}</h1>
       {saved && <p className="report-notice">{r.savedNotice}</p>}
       {result.historical && <p className="report-notice">{r.historicalNotice}</p>}
-      <div className="report-action"><h2>{r.nextStep}</h2><p className="result-copy">{result.resulting_guidance}</p></div>
+      <div className="report-action"><h2>{r.nextStep}</h2><p className="result-copy">{result.resulting_guidance}</p><CareGuides items={result.related_care} heading={r.careGuides} level="h3" /></div>
       <div className="report-context"><p><strong>{r.symptom}</strong> {symptomLabel(t, result.symptom)}<br /><strong>{r.started}</strong> {reportDate(result.started_at)}{result.recorded_at && <><br /><strong>{r.preserved}</strong> {reportDate(result.recorded_at)}</>}</p>
         {result.pet && <p><strong>{r.petContext}</strong> {petContextLine(t, result.pet)}</p>}
       </div>

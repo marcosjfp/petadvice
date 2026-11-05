@@ -38,7 +38,8 @@
       "sources": [
         "https://www.esccap.org/uploads/docs/ag51r456_0778_ESCCAP_GL1__English_2026_v23.pdf",
         "https://aaha.org/globalassets/02-guidelines/canine-life-stage-2019/roundworm_hookworm_cdc_brochure.pdf"
-      ]
+      ],
+      "related_care": ["prevent-009", "prevent-010"]
     },
     {
       "id": "cat-behav-001",
@@ -77,7 +78,8 @@
         "https://us.feliway.com/products/feliway-classic-spray-60ml",
         "https://www.drugs.com/vet/feliway-diffuser.html",
         "https://www.vet.cornell.edu/sites/default/files/Destructive%20Behavior%202021%20Accessible.pdf"
-      ]
+      ],
+      "related_care": ["prevent-006"]
     }
   ],
   "preventive_care_items": [
@@ -93,7 +95,8 @@
         "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/fleas-on-cats",
         "https://www.medicalnewstoday.com/articles/how-to-get-rid-of-fleas",
         "https://mypetandi.elanco.com/au/parasites/fleas/six-steps-get-rid-fleas-your-home-fast"
-      ]
+      ],
+      "related_symptoms": ["scratching"]
     },
     {
       "id": "prevent-006",
@@ -106,7 +109,8 @@
       "sources": [
         "https://us.feliway.com/products/feliway-classic-spray-60ml",
         "https://www.drugs.com/vet/feliway-diffuser.html"
-      ]
+      ],
+      "related_symptoms": ["nervous_or_stressed"]
     },
     {
       "id": "prevent-007",
@@ -146,7 +150,8 @@
         "https://aaha.org/globalassets/02-guidelines/canine-life-stage-2019/roundworm_hookworm_cdc_brochure.pdf",
         "https://stacks.cdc.gov/view/cdc/13560/cdc_13560_DS1.pdf",
         "https://www.esccap.org/uploads/docs/ag51r456_0778_ESCCAP_GL1__English_2026_v23.pdf"
-      ]
+      ],
+      "related_symptoms": ["scooting"]
     },
     {
       "id": "prevent-010",
@@ -159,7 +164,8 @@
       "sources": [
         "https://www.esccap.org/uploads/docs/ag51r456_0778_ESCCAP_GL1__English_2026_v23.pdf",
         "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/fleas-on-cats"
-      ]
+      ],
+      "related_symptoms": ["scooting", "scratching"]
     }
   ]
 }

@@ -47,6 +47,7 @@ class ContentLibrary:
             if QUESTIONS_FILE.exists():
                 questions = [TriageQuestion.model_validate(item) for item in json.loads(QUESTIONS_FILE.read_text())]
             self._validate_questions(questions)
+            self._validate_links(conditions, preventive_items, questions)
             if len({item.id for item in preventive_items}) != len(preventive_items):
                 raise ValueError("Duplicate preventive care id across batches")
             invalid_home_care = [item.id for item in conditions if item.urgency_default != UrgencyLevel.monitor_home and item.home_care_guidance]
@@ -103,6 +104,26 @@ class ContentLibrary:
             group = [question for question in questions if question.symptom_tag == symptom]
             if sum(question.is_entry_point for question in group) != 1:
                 raise ValueError(f"Symptom needs exactly one entry question: {symptom}")
+
+    @staticmethod
+    def _validate_links(conditions: list[ConditionEntry], preventive_items: list[PreventiveCareItem], questions: list[TriageQuestion]) -> None:
+        care_ids = {item.id for item in preventive_items}
+        checkable = {question.symptom_tag for question in questions} | {tag for condition in conditions for tag in condition.symptom_tags}
+        for condition in conditions:
+            missing = set(condition.related_care) - care_ids
+            if missing:
+                raise ValueError(f"{condition.id} links to unknown care items: {sorted(missing)}")
+        for item in preventive_items:
+            missing = set(item.related_symptoms) - checkable
+            if missing:
+                raise ValueError(f"{item.id} links to symptoms without a check: {sorted(missing)}")
+
+    def related_care(self, condition: ConditionEntry, species: str | None, language: str) -> list[PreventiveCareItem]:
+        items = [self.preventive_by_id(item_id) for item_id in condition.related_care]
+        return [self.localize_preventive(item, language) for item in items if item and (species is None or item.species.value in (species, "both"))]
+
+    def preventive_by_id(self, item_id: str) -> PreventiveCareItem | None:
+        return next((item for item in self.preventive_items if item.id == item_id), None)
 
     @staticmethod
     def _validate_translations(translations: dict[str, dict], conditions: list[ConditionEntry], preventive_items: list[PreventiveCareItem], questions: list[TriageQuestion]) -> None:

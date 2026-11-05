@@ -99,7 +99,8 @@
 			"prevention_tips": "Multiple clean litter trays, wet food, a lean body condition, and reducing multi-cat stress can lower recurrence risk.",
 			"vet_reviewed_by": null,
 			"last_reviewed_date": null,
-			"sources": ["https://www.hillspet.com/cat-care/healthcare/male-cat-urinary-blockage", "https://vethelpdirect.com/?p=7623"]
+			"sources": ["https://www.hillspet.com/cat-care/healthcare/male-cat-urinary-blockage", "https://vethelpdirect.com/?p=7623"],
+			"related_care": ["prevent-006"]
 		},
 		{
 			"id": "dog-repro-005",

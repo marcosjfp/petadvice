@@ -12,6 +12,7 @@ const en = {
   common: {
     back: 'Back', tryAgain: 'Try again', logOut: 'Log out', cancel: 'Cancel', pleaseWait: 'Please wait…', yes: 'Yes', no: 'No', unknown: 'Unknown',
     sources: 'Sources', opensNewTab: (host: string) => `${host} (opens a new tab)`, notRecorded: 'Not recorded',
+    startCheck: (symptom: string) => `Start a check: ${symptom}`,
   },
   species: { dog: 'Dog', cat: 'Cat' } as Record<string, string>,
   speciesLower: { dog: 'dog', cat: 'cat', both: 'dog or cat' } as Record<string, string>,
@@ -98,7 +99,7 @@ const en = {
     entries: (count: number) => `${count} ${count === 1 ? 'entry' : 'entries'}`,
     noMatch: 'No entries match your search. Try another word or contact your vet for concerns outside this library.',
     readAbout: (name: string, urgency: string) => `Read about ${name}. ${urgency}`, promptSigns: 'Signs that need prompt attention',
-    reviewed: (by: string, date: string) => `Reviewed by ${by} on ${date}.`, awaiting: 'Awaiting veterinary review.',
+    reviewed: (by: string, date: string) => `Reviewed by ${by} on ${date}.`, awaiting: 'Awaiting veterinary review.', careGuides: 'Related care guides',
   },
   care: {
     eyebrow: 'Preventive care', title: 'Small check-ins, less worry.',
@@ -122,7 +123,7 @@ const en = {
     symptom: 'Symptom:', started: 'Started:', preserved: 'Report preserved:', petContext: 'Pet context recorded:',
     ageUnknown: 'age unknown', sexLabel: 'sex', neuteredLabel: 'neutered', breedSizeSuffix: 'breed size', born: 'born',
     howDecided: 'How this was decided', answers: 'Your recorded answers', noAnswers: 'No questionnaire answers were recorded.',
-    causes: 'Possible causes to discuss with your vet', exams: 'Your vet may want to check', sources: 'Sources recorded with this check',
+    careGuides: 'Care guides for this situation', causes: 'Possible causes to discuss with your vet', exams: 'Your vet may want to check', sources: 'Sources recorded with this check',
     contentVersion: (version: string) => `Content version: ${version}`, contentVersionMissing: 'Not recorded for this older check',
     print: 'Print / save PDF', downloadSummary: 'Download summary', summaryStays: 'The downloaded summary stays on your device. Share it only with someone you choose.',
     explanationGap: 'The original rule explanations were not recorded for this check.',
@@ -144,6 +145,7 @@ const en = {
     generic: 'Something went wrong. Please try again.', requestFailed: 'The request could not be completed. Please try again.',
     timeout: 'The request timed out. Check your connection and try again.', network: 'Could not connect. Check your connection and try again.',
   },
+  update: { ready: 'A new version of PETAdvice is ready.', refresh: 'Refresh', dismiss: 'Dismiss' },
   server: {} as Record<string, string>,
 }
 
@@ -154,6 +156,7 @@ const pt: Messages = {
   common: {
     back: 'Voltar', tryAgain: 'Tentar novamente', logOut: 'Terminar sessão', cancel: 'Cancelar', pleaseWait: 'Aguarde…', yes: 'Sim', no: 'Não', unknown: 'Desconhecido',
     sources: 'Fontes', opensNewTab: (host) => `${host} (abre num novo separador)`, notRecorded: 'Não registado',
+    startCheck: (symptom) => `Fazer uma verificação: ${symptom}`,
   },
   species: { dog: 'Cão', cat: 'Gato' },
   speciesLower: { dog: 'cão', cat: 'gato', both: 'cão ou gato' },
@@ -240,7 +243,7 @@ const pt: Messages = {
     entries: (count) => `${count} ${count === 1 ? 'entrada' : 'entradas'}`,
     noMatch: 'Nenhuma entrada corresponde à pesquisa. Experimente outra palavra ou contacte o seu veterinário para questões fora desta biblioteca.',
     readAbout: (name, urgency) => `Ler sobre ${name}. ${urgency}`, promptSigns: 'Sinais que precisam de atenção rápida',
-    reviewed: (by, date) => `Revisto por ${by} em ${date}.`, awaiting: 'Aguarda revisão veterinária.',
+    reviewed: (by, date) => `Revisto por ${by} em ${date}.`, awaiting: 'Aguarda revisão veterinária.', careGuides: 'Guias de cuidados relacionados',
   },
   care: {
     eyebrow: 'Cuidados preventivos', title: 'Pequenas verificações, menos preocupação.',
@@ -264,7 +267,7 @@ const pt: Messages = {
     symptom: 'Sintoma:', started: 'Início:', preserved: 'Relatório guardado:', petContext: 'Contexto do animal registado:',
     ageUnknown: 'idade desconhecida', sexLabel: 'sexo', neuteredLabel: 'castrado', breedSizeSuffix: 'porte da raça', born: 'nascido a',
     howDecided: 'Como foi decidido', answers: 'As suas respostas registadas', noAnswers: 'Não foram registadas respostas ao questionário.',
-    causes: 'Causas possíveis para falar com o veterinário', exams: 'O veterinário pode querer verificar', sources: 'Fontes registadas com esta verificação',
+    careGuides: 'Guias de cuidados para esta situação', causes: 'Causas possíveis para falar com o veterinário', exams: 'O veterinário pode querer verificar', sources: 'Fontes registadas com esta verificação',
     contentVersion: (version) => `Versão do conteúdo: ${version}`, contentVersionMissing: 'Não registada nesta verificação mais antiga',
     print: 'Imprimir / guardar PDF', downloadSummary: 'Descarregar resumo', summaryStays: 'O resumo descarregado fica no seu dispositivo. Partilhe-o apenas com quem escolher.',
     explanationGap: 'As explicações originais das regras não foram registadas nesta verificação.',
@@ -286,6 +289,7 @@ const pt: Messages = {
     generic: 'Algo correu mal. Tente novamente.', requestFailed: 'Não foi possível concluir o pedido. Tente novamente.',
     timeout: 'O pedido demorou demasiado. Verifique a ligação e tente novamente.', network: 'Não foi possível ligar. Verifique a ligação e tente novamente.',
   },
+  update: { ready: 'Está disponível uma nova versão do PETAdvice.', refresh: 'Atualizar', dismiss: 'Fechar' },
   server: {
     'Incorrect email or password': 'Email ou palavra-passe incorretos',
     'An account with this email already exists': 'Já existe uma conta com este email',
@@ -319,6 +323,7 @@ const es: Messages = {
   common: {
     back: 'Volver', tryAgain: 'Reintentar', logOut: 'Cerrar sesión', cancel: 'Cancelar', pleaseWait: 'Espera…', yes: 'Sí', no: 'No', unknown: 'Desconocido',
     sources: 'Fuentes', opensNewTab: (host) => `${host} (se abre en una pestaña nueva)`, notRecorded: 'No registrado',
+    startCheck: (symptom) => `Hacer una revisión: ${symptom}`,
   },
   species: { dog: 'Perro', cat: 'Gato' },
   speciesLower: { dog: 'perro', cat: 'gato', both: 'perro o gato' },
@@ -405,7 +410,7 @@ const es: Messages = {
     entries: (count) => `${count} ${count === 1 ? 'entrada' : 'entradas'}`,
     noMatch: 'Ninguna entrada coincide con tu búsqueda. Prueba con otra palabra o consulta a tu veterinario si tu duda no está en esta biblioteca.',
     readAbout: (name, urgency) => `Leer sobre ${name}. ${urgency}`, promptSigns: 'Signos que requieren atención rápida',
-    reviewed: (by, date) => `Revisado por ${by} el ${date}.`, awaiting: 'Pendiente de revisión veterinaria.',
+    reviewed: (by, date) => `Revisado por ${by} el ${date}.`, awaiting: 'Pendiente de revisión veterinaria.', careGuides: 'Guías de cuidados relacionadas',
   },
   care: {
     eyebrow: 'Cuidados preventivos', title: 'Pequeñas revisiones, menos preocupaciones.',
@@ -429,7 +434,7 @@ const es: Messages = {
     symptom: 'Síntoma:', started: 'Inicio:', preserved: 'Informe guardado:', petContext: 'Contexto de la mascota registrado:',
     ageUnknown: 'edad desconocida', sexLabel: 'sexo', neuteredLabel: 'castrado', breedSizeSuffix: 'tamaño de raza', born: 'nacido el',
     howDecided: 'Cómo se ha decidido', answers: 'Tus respuestas registradas', noAnswers: 'No se registraron respuestas al cuestionario.',
-    causes: 'Posibles causas para comentar con tu veterinario', exams: 'Tu veterinario puede querer revisar', sources: 'Fuentes registradas con esta revisión',
+    careGuides: 'Guías de cuidados para esta situación', causes: 'Posibles causas para comentar con tu veterinario', exams: 'Tu veterinario puede querer revisar', sources: 'Fuentes registradas con esta revisión',
     contentVersion: (version) => `Versión del contenido: ${version}`, contentVersionMissing: 'No registrada en esta revisión antigua',
     print: 'Imprimir / guardar PDF', downloadSummary: 'Descargar resumen', summaryStays: 'El resumen descargado se queda en tu dispositivo. Compártelo solo con quien tú elijas.',
     explanationGap: 'Las explicaciones originales de las reglas no se registraron en esta revisión.',
@@ -451,6 +456,7 @@ const es: Messages = {
     generic: 'Algo ha ido mal. Inténtalo de nuevo.', requestFailed: 'No se ha podido completar la petición. Inténtalo de nuevo.',
     timeout: 'La petición ha tardado demasiado. Comprueba tu conexión e inténtalo de nuevo.', network: 'No se ha podido conectar. Comprueba tu conexión e inténtalo de nuevo.',
   },
+  update: { ready: 'Hay una nueva versión de PETAdvice disponible.', refresh: 'Actualizar', dismiss: 'Cerrar' },
   server: {
     'Incorrect email or password': 'Correo o contraseña incorrectos',
     'An account with this email already exists': 'Ya existe una cuenta con este correo',

@@ -3,6 +3,8 @@ import { api, ApiError, type Condition, type Owner, type Privacy, type Pet, type
 import AccountLink from './AccountLink'
 import CheckResult from './CheckResult'
 import CheckHistory from './CheckHistory'
+import { CareGuides, StartCheckButtons } from './CareGuides'
+import { checkSymptoms } from './symptoms'
 import { downloadJson } from './download'
 import { errorMessage, useRequest } from './useRequest'
 import { formatDate, languages, readable, serverText, useI18n } from './i18n'
@@ -41,6 +43,7 @@ function App() {
   const [showAuth, setShowAuth] = useState(false)
   const [showQuickCheck, setShowQuickCheck] = useState(false)
   const [publicView, setPublicView] = useState<'library' | 'care' | null>(null)
+  const [checkRequest, setCheckRequest] = useState<{ symptom: string; species: Species; id: number } | null>(null)
   const [load, setLoad] = useState(0)
   const [petsLoaded, setPetsLoaded] = useState(false)
   const [loadError, setLoadError] = useState('')
@@ -105,6 +108,12 @@ function App() {
     })
   }
 
+  function startCheck(symptom: string, species: Species) {
+    setCheckRequest({ symptom, species, id: Date.now() })
+    if (auth === 'guest') { setPublicView(null); setShowQuickCheck(true) } else setView('triage')
+    window.scrollTo(0, 0)
+  }
+
   function retryLoad() { setLoadError(''); setPetsLoaded(false); setAuth('checking'); setLoad((count) => count + 1) }
 
   if (accountLink) return <Shell><AccountLink {...accountLink} onDone={() => { setAccountLink(null); setShowAuth(true); retryLoad() }} /><Emergency /></Shell>
@@ -113,9 +122,9 @@ function App() {
   if (auth === 'error' || loadError) return <Shell><h1>{t.app.loadErrorTitle}</h1><ErrorNotice message={loadError || t.app.loadErrorDetail} /><button className="primary" onClick={retryLoad}>{t.common.tryAgain}</button><Emergency /></Shell>
   if (auth === 'guest') {
     if (showAuth) return <AuthPanel onBack={() => setShowAuth(false)} onAuthenticated={() => { setShowAuth(false); setShowQuickCheck(false); retryLoad() }} />
-    if (showQuickCheck) return <Shell onBack={() => setShowQuickCheck(false)}><Triage pet={null} onLogin={guestOnlyPreview ? undefined : () => setShowAuth(true)} /><Emergency /></Shell>
-    if (publicView) return <PublicEducation initialView={publicView} onBack={() => setPublicView(null)} />
-    return <PublicLanding onBrowse={setPublicView} onQuickCheck={() => setShowQuickCheck(true)} onLogin={guestOnlyPreview ? undefined : () => setShowAuth(true)} />
+    if (showQuickCheck) return <Shell onBack={() => { setShowQuickCheck(false); setCheckRequest(null) }}><Triage key={checkRequest?.id} pet={null} initialSymptom={checkRequest?.symptom} initialSpecies={checkRequest?.species} onLogin={guestOnlyPreview ? undefined : () => setShowAuth(true)} /><Emergency /></Shell>
+    if (publicView) return <PublicEducation initialView={publicView} onBack={() => setPublicView(null)} onStartCheck={startCheck} />
+    return <PublicLanding onBrowse={setPublicView} onQuickCheck={() => { setCheckRequest(null); setShowQuickCheck(true) }} onLogin={guestOnlyPreview ? undefined : () => setShowAuth(true)} />
   }
 
   if (owner?.email_verification_required && !owner.email_verified_at) return <Shell><VerificationNotice email={owner.email} onLogout={resetAccount} /><Account onDeleted={resetAccount} /><Emergency /></Shell>
@@ -142,11 +151,11 @@ function App() {
       <button className="start-fresh" onClick={() => { setShowPetForm(true); setView('triage') }}>{t.app.newPet}</button>
       <button className="start-fresh" disabled={busy} onClick={() => void run(async () => { await api.logout(); resetAccount() })}>{t.common.logOut}</button>
     </div></header>
-    <nav className="tabs" aria-label={t.app.mainNavigation}>{(['triage', 'library', 'care', 'history', 'account'] as View[]).map((item) => <button aria-current={view === item ? 'page' : undefined} className={view === item ? 'active' : ''} onClick={() => setView(item)} key={item}>{t.app.tabs[item]}</button>)}</nav>
+    <nav className="tabs" aria-label={t.app.mainNavigation}>{(['triage', 'library', 'care', 'history', 'account'] as View[]).map((item) => <button aria-current={view === item ? 'page' : undefined} className={view === item ? 'active' : ''} onClick={() => { setView(item); setCheckRequest(null) }} key={item}>{t.app.tabs[item]}</button>)}</nav>
     <ErrorNotice message={error} />
-    {view === 'triage' && pet && <Triage key={pet.id} pet={pet} />}
-    {view === 'library' && pet && <Library key={pet.species} species={pet.species} />}
-    {view === 'care' && pet && <Care key={pet.id} pet={pet} />}
+    {view === 'triage' && pet && <Triage key={`${pet.id}-${checkRequest?.id ?? ''}`} pet={pet} initialSymptom={checkRequest?.species === pet.species ? checkRequest.symptom : undefined} />}
+    {view === 'library' && pet && <Library key={pet.species} species={pet.species} onStartCheck={startCheck} />}
+    {view === 'care' && pet && <Care key={pet.id} pet={pet} onStartCheck={startCheck} />}
     {view === 'history' && pet && <CheckHistory key={pet.id} pet={pet} />}
     {view === 'account' && <Account onDeleted={resetAccount} />}
     <Emergency />
@@ -174,13 +183,13 @@ function PublicLanding({ onQuickCheck, onLogin, onBrowse }: { onQuickCheck: () =
   </main>
 }
 
-function PublicEducation({ initialView, onBack }: { initialView: 'library' | 'care'; onBack: () => void }) {
+function PublicEducation({ initialView, onBack, onStartCheck }: { initialView: 'library' | 'care'; onBack: () => void; onStartCheck: StartCheck }) {
   const [view, setView] = useState(initialView)
   const [species, setSpecies] = useState<Species>('dog')
   const { t } = useI18n()
   return <Shell onBack={onBack}><nav className="tabs" aria-label={t.publicEducation.navigation}>{(['library', 'care'] as const).map((item) => <button key={item} aria-current={view === item ? 'page' : undefined} className={view === item ? 'active' : ''} onClick={() => setView(item)}>{item === 'library' ? t.publicEducation.learn : t.publicEducation.care}</button>)}</nav>
     <label className="guest-species">{t.publicEducation.browseFor}<select value={species} onChange={(event) => setSpecies(event.target.value as Species)}><option value="dog">{t.speciesPlural.dog}</option><option value="cat">{t.speciesPlural.cat}</option></select></label>
-    {view === 'library' ? <Library key={species} species={species} /> : <Care key={species} species={species} />}<Emergency />
+    {view === 'library' ? <Library key={species} species={species} onStartCheck={onStartCheck} /> : <Care key={species} species={species} onStartCheck={onStartCheck} />}<Emergency />
   </Shell>
 }
 
@@ -232,15 +241,11 @@ function AuthPanel({ onBack, onAuthenticated }: { onBack: () => void; onAuthenti
   </section><Emergency /></Shell>
 }
 
-const symptoms: { value: string; only?: Species }[] = [
-  { value: 'straining_to_urinate' }, { value: 'vomiting' }, { value: 'diarrhea' }, { value: 'limping', only: 'dog' },
-  { value: 'reverse_sneezing', only: 'dog' }, { value: 'scratching' }, { value: 'scooting' }, { value: 'nervous_or_stressed', only: 'cat' },
-  { value: 'increased_thirst' }, { value: 'vaginal_discharge' },
-]
+type StartCheck = (symptom: string, species: Species) => void
 
-function Triage({ pet, onLogin }: { pet: Pet | null; onLogin?: () => void }) {
-  const [symptom, setSymptom] = useState('')
-  const [species, setSpecies] = useState<Species>('dog')
+function Triage({ pet, onLogin, initialSymptom, initialSpecies }: { pet: Pet | null; onLogin?: () => void; initialSymptom?: string; initialSpecies?: Species }) {
+  const [symptom, setSymptom] = useState(initialSymptom ?? '')
+  const [species, setSpecies] = useState<Species>(initialSpecies ?? 'dog')
   const [question, setQuestion] = useState<Question | null>(null)
   const [session, setSession] = useState('')
   const [guestToken, setGuestToken] = useState<string | null>(null)
@@ -285,7 +290,7 @@ function Triage({ pet, onLogin }: { pet: Pet | null; onLogin?: () => void }) {
   if (question) return <section className="question" aria-busy={busy}><div className="progress">{tr.checkFor(pet?.name ?? tr.yourSpecies(t.speciesLower[species]))} <span>{tr.adaptive}</span></div><h1 ref={heading} tabIndex={-1}>{question.prompt}</h1><div className="options">{question.options.map((option, index) => <button disabled={busy} className="option" onClick={() => answer(option)} key={option}>{question.option_labels?.[index] ?? option}<span aria-hidden="true">→</span></button>)}</div><p role="status">{busy ? tr.savingAnswer : ''}</p><ErrorNotice message={error} /><button className="secondary" disabled={busy} onClick={restart}>{tr.restart}</button>{guestControls}</section>
   return <section className="panel" aria-busy={busy}><p className="eyebrow">{tr.eyebrow}</p><h1>{tr.title}</h1><p className="muted">{pet ? tr.checkingFor(pet.name) : ''}{tr.choose}</p>
     {!pet && <label className="guest-species">{tr.whoFor}<select disabled={busy} value={species} onChange={(event) => { setSpecies(event.target.value as Species); setSymptom(''); setError('') }}><option value="dog">{t.species.dog}</option><option value="cat">{t.species.cat}</option></select></label>}
-    <div className="symptoms">{symptoms.filter((item) => !item.only || item.only === activeSpecies).map((item) => <button disabled={busy} aria-pressed={symptom === item.value} className={symptom === item.value ? 'selected' : ''} onClick={() => setSymptom(item.value)} key={item.value}>{t.symptoms[item.value]}<span aria-hidden="true">＋</span></button>)}</div>
+    <div className="symptoms">{checkSymptoms.filter((item) => !item.only || item.only === activeSpecies).map((item) => <button disabled={busy} aria-pressed={symptom === item.value} className={symptom === item.value ? 'selected' : ''} onClick={() => setSymptom(item.value)} key={item.value}>{t.symptoms[item.value]}<span aria-hidden="true">＋</span></button>)}</div>
     <button className="primary wide" disabled={!symptom || busy} onClick={begin}>{busy ? tr.starting : tr.continue}</button><ErrorNotice message={error} />
     <p className="fine-print">{tr.finePrint}</p>
     {!pet && <PrivacyNotice />}
@@ -306,7 +311,7 @@ function Sources({ sources }: { sources: string[] }) {
   return links.length ? <details className="sources"><summary>{t.common.sources}</summary><ul>{links.map((source) => <li key={source}><a href={source} target="_blank" rel="noopener noreferrer">{t.common.opensNewTab(new URL(source).hostname)}</a></li>)}</ul></details> : null
 }
 
-function Library({ species }: { species: Species }) {
+function Library({ species, onStartCheck }: { species: Species; onStartCheck?: StartCheck }) {
   const [items, setItems] = useState<Condition[] | null>(null)
   const [query, setQuery] = useState('')
   const [error, setError] = useState('')
@@ -329,12 +334,12 @@ function Library({ species }: { species: Species }) {
     {items && filtered.length === 0 && <p>{lib.noMatch}</p>}
     <div className="entries">{filtered.map((item) => <details className="condition-entry" key={item.id}><summary aria-label={lib.readAbout(item.name, t.urgency[item.urgency_default])}><span className="tag">{category(item.category)}</span><strong>{item.name}</strong><span className={`urgency-label ${item.urgency_default}`}>{t.urgency[item.urgency_default]}</span></summary>
       {item.home_care_guidance && <p>{item.home_care_guidance}</p>}{item.red_flags.length > 0 && <><h3>{lib.promptSigns}</h3><ul>{item.red_flags.map((flag) => <li key={flag.description}>{flag.description} — {t.urgency[flag.escalates_to]}</li>)}</ul></>}
-      {item.prevention_tips && <p>{item.prevention_tips}</p>}<p className="fine-print">{item.vet_reviewed_by && item.last_reviewed_date ? lib.reviewed(item.vet_reviewed_by, item.last_reviewed_date) : lib.awaiting}</p><Sources sources={item.sources} />
+      {item.prevention_tips && <p>{item.prevention_tips}</p>}<CareGuides items={item.related_care_items} heading={lib.careGuides} level="h3" /><StartCheckButtons symptoms={item.symptom_tags ?? []} species={species} onStartCheck={onStartCheck} /><p className="fine-print">{item.vet_reviewed_by && item.last_reviewed_date ? lib.reviewed(item.vet_reviewed_by, item.last_reviewed_date) : lib.awaiting}</p><Sources sources={item.sources} />
     </details>)}</div>
   </section>
 }
 
-function Care({ pet, species = pet?.species ?? 'dog' }: { pet?: Pet; species?: Species }) {
+function Care({ pet, species = pet?.species ?? 'dog', onStartCheck }: { pet?: Pet; species?: Species; onStartCheck?: StartCheck }) {
   const [items, setItems] = useState<PreventiveCareItem[] | null>(null)
   const [error, setError] = useState('')
   const [retry, setRetry] = useState(0)
@@ -349,7 +354,7 @@ function Care({ pet, species = pet?.species ?? 'dog' }: { pet?: Pet; species?: S
   return <section className="panel"><p className="eyebrow">{c.eyebrow}</p><h1>{c.title}</h1><p className="muted">{pet?.life_stage ? c.basedOn(pet.name, lifeStageLabel(t, pet.life_stage)) : pet ? c.unknownAge(species, pet.name) : c.all(species)} {c.noReminders}</p>
     {!items && !error && <p role="status">{c.loading}</p>}<ErrorNotice message={error} />{error && <button className="secondary" onClick={() => { setError(''); setRetry((value) => value + 1) }}>{t.common.tryAgain}</button>}
     {items?.length === 0 && <p>{c.empty}</p>}
-    <div className="care-list">{items?.map((item) => <article key={item.id}><div><h3>{item.title}</h3><p>{item.description}</p>{item.recurrence && <p className="recurrence">{c.timing(item.recurrence)}</p>}<Sources sources={item.sources} /></div></article>)}</div>
+    <div className="care-list">{items?.map((item) => <article key={item.id}><div><h3>{item.title}</h3><p>{item.description}</p>{item.recurrence && <p className="recurrence">{c.timing(item.recurrence)}</p>}<StartCheckButtons symptoms={item.related_symptoms ?? []} species={species} onStartCheck={onStartCheck} /><Sources sources={item.sources} /></div></article>)}</div>
   </section>
 }
 
