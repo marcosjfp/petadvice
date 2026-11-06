@@ -46,8 +46,8 @@ def complete_remaining_questions(db, session_id):
 
 
 def test_content_batch_validates():
-    assert len(content_library.conditions) == 27
-    assert len(content_library.preventive_items) == 17
+    assert len(content_library.conditions) == 28
+    assert len(content_library.preventive_items) == 21
     assert content_library.condition_by_id("dog-cat-parasite-001").urgency_default == UrgencyLevel.monitor_home
     assert len(content_library.questions_for_symptom("diarrhea")) == 2
 

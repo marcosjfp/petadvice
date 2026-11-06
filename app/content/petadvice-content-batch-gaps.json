@@ -1,0 +1,170 @@
+{
+  "condition_entries": [
+    {
+      "id": "dog-cat-urinary-002",
+      "name": "Straining to urinate or frequent small pees (bladder infection, stones or cystitis)",
+      "species": "both",
+      "category": "urinary_reproductive",
+      "applicable_life_stages": [
+        "puppy",
+        "kitten",
+        "young_adult",
+        "mature_adult",
+        "senior"
+      ],
+      "environment_factors": [],
+      "breed_predispositions": [],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": [
+        "straining_to_urinate",
+        "frequent_urination",
+        "blood_in_urine"
+      ],
+      "urgency_default": "vet_24h",
+      "red_flags": [
+        {
+          "description": "Straining with no urine at all, or only drops, especially in a male cat or male dog",
+          "escalates_to": "emergency_now"
+        },
+        {
+          "description": "Vomiting, lethargy, collapse or a painful, swollen belly alongside straining",
+          "escalates_to": "emergency_now"
+        },
+        {
+          "description": "Blood in the urine",
+          "escalates_to": "vet_24h"
+        },
+        {
+          "description": "Crying or obvious pain when trying to pee",
+          "escalates_to": "vet_24h"
+        },
+        {
+          "description": "Peeing much more often than usual, or accidents in a house-trained pet",
+          "escalates_to": "vet_soon"
+        }
+      ],
+      "home_care_guidance": null,
+      "prevention_tips": "Make fresh water easy to reach and give dogs regular toilet breaks. For cats, offer wet food, clean litter trays (one per cat, plus one) and a calm routine, because stress is a common trigger of cystitis. Never wait to see whether straining passes: a blocked bladder can become life-threatening within a day.",
+      "possible_causes": [
+        "Bladder infection, more common in female dogs and older cats",
+        "Bladder stones or crystals that irritate the bladder or block the urethra",
+        "Stress-related cystitis in cats (feline idiopathic cystitis)",
+        "Prostate problems in male dogs that are not neutered",
+        "Less commonly: bladder tumours in older pets, or kidney disease"
+      ],
+      "recommended_examinations": [
+        "A urine test, often with a culture to choose the right antibiotic",
+        "Feeling the bladder to check whether it is overfull or painful",
+        "X-rays or ultrasound to look for stones",
+        "Blood tests if your pet is unwell or a blockage is suspected"
+      ],
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://vcahospitals.com/know-your-pet/bladder-stones-in-dogs",
+        "https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/feline-lower-urinary-tract-disease"
+      ],
+      "related_care": [
+        "prevent-006"
+      ]
+    }
+  ],
+  "preventive_care_items": [
+    {
+      "id": "prevent-018",
+      "species": "both",
+      "life_stage": "all",
+      "topic": "safety",
+      "title": "Poison-proof your home and garden",
+      "summary": "Many everyday foods, medicines and plants are dangerous to pets. Storing them safely prevents most poisonings.",
+      "description": "Many everyday foods, medicines and plants are dangerous to pets. Storing them safely prevents most poisonings. Keep chocolate, sugar-free gum and sweets (xylitol), grapes, raisins, onions and garlic out of reach, including in bags and bins. Store all human and pet medicines in closed cupboards, and never give your pet human painkillers such as paracetamol or ibuprofen. Keep rat and slug poison, antifreeze and cleaning products locked away, and wipe up spills straight away. If you have a cat, keep lilies out of the house completely: even the pollen or vase water can cause fatal kidney failure. Use only flea and tick products made for your pet's species; never use a dog product on a cat. Save your vet's number and an animal poison helpline in your phone so you can call immediately if something happens.",
+      "steps": [
+        "Keep chocolate, sugar-free gum and sweets (xylitol), grapes, raisins, onions and garlic out of reach, including in bags and bins.",
+        "Store all human and pet medicines in closed cupboards, and never give your pet human painkillers such as paracetamol or ibuprofen.",
+        "Keep rat and slug poison, antifreeze and cleaning products locked away, and wipe up spills straight away.",
+        "If you have a cat, keep lilies out of the house completely: even the pollen or vase water can cause fatal kidney failure.",
+        "Use only flea and tick products made for your pet's species; never use a dog product on a cat.",
+        "Save your vet's number and an animal poison helpline in your phone so you can call immediately if something happens."
+      ],
+      "recurrence": "check your home once, and again when you bring in new plants, products or medicines",
+      "reminder_interval_days": null,
+      "trigger_age_days": null,
+      "sources": [
+        "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "https://www.aspca.org/pet-care/animal-poison-control",
+        "https://www.rspca.org.uk/adviceandwelfare/pets/dogs/health/poisoning"
+      ],
+      "related_symptoms": [
+        "ate_something_toxic"
+      ]
+    },
+    {
+      "id": "prevent-019",
+      "species": "both",
+      "life_stage": "all",
+      "topic": "safety",
+      "title": "Keep your pet safe in hot weather",
+      "summary": "Heatstroke can kill within minutes. Dogs, flat-faced breeds, and overweight, older or very young pets are most at risk.",
+      "description": "Heatstroke can kill within minutes. Dogs, flat-faced breeds, and overweight, older or very young pets are most at risk. Never leave a pet in a car, conservatory or caravan on a warm day, even for a few minutes or with a window open. Walk dogs early in the morning or late in the evening. Test the pavement with the back of your hand: if you cannot hold it there for five seconds, it is too hot for paws. Make sure there is always shade and fresh water, indoors and outdoors. Take extra care with flat-faced breeds and with overweight, older and very young pets. Know the signs (heavy panting, drooling, weakness, confusion or collapse) and act at once: move your pet to shade, cool them with cool, not ice-cold, water and go to a vet.",
+      "steps": [
+        "Never leave a pet in a car, conservatory or caravan on a warm day, even for a few minutes or with a window open.",
+        "Walk dogs early in the morning or late in the evening. Test the pavement with the back of your hand: if you cannot hold it there for five seconds, it is too hot for paws.",
+        "Make sure there is always shade and fresh water, indoors and outdoors.",
+        "Take extra care with flat-faced breeds and with overweight, older and very young pets.",
+        "Know the signs (heavy panting, drooling, weakness, confusion or collapse) and act at once: move your pet to shade, cool them with cool, not ice-cold, water and go to a vet."
+      ],
+      "recurrence": "review before each summer and on every hot day",
+      "reminder_interval_days": 365,
+      "trigger_age_days": null,
+      "sources": [
+        "https://www.rspca.org.uk/adviceandwelfare/pets/dogs/health/heatstroke",
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/heatstroke-in-cats"
+      ],
+      "related_symptoms": [
+        "heatstroke"
+      ]
+    },
+    {
+      "id": "prevent-020",
+      "species": "dog",
+      "life_stage": "all",
+      "topic": "nutrition",
+      "title": "Lower the risk of bloat in large, deep-chested dogs",
+      "summary": "Bloat with a twisted stomach is a life-threatening emergency that mainly affects large, deep-chested breeds such as Great Danes, German Shepherds and Setters.",
+      "description": "Bloat with a twisted stomach is a life-threatening emergency that mainly affects large, deep-chested breeds such as Great Danes, German Shepherds and Setters. Feed two or three smaller meals a day rather than one large meal. Use a slow-feeder bowl if your dog eats very fast. Avoid vigorous exercise for about an hour before and after meals. Ask your vet about a preventive stomach-tacking operation (gastropexy), which can be done at the same time as neutering in high-risk dogs. Learn the signs (a swollen belly, retching without bringing anything up, restlessness and drooling) and go to a vet immediately if you see them.",
+      "steps": [
+        "Feed two or three smaller meals a day rather than one large meal.",
+        "Use a slow-feeder bowl if your dog eats very fast.",
+        "Avoid vigorous exercise for about an hour before and after meals.",
+        "Ask your vet about a preventive stomach-tacking operation (gastropexy), which can be done at the same time as neutering in high-risk dogs.",
+        "Learn the signs (a swollen belly, retching without bringing anything up, restlessness and drooling) and go to a vet immediately if you see them."
+      ],
+      "recurrence": null,
+      "reminder_interval_days": null,
+      "trigger_age_days": null,
+      "sources": [
+        "https://vcahospitals.com/know-your-pet/gastric-dilatation-and-volvulus-in-dogs",
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/symptoms/bloat-swollen-belly-in-dogs"
+      ],
+      "related_symptoms": [
+        "swollen_belly_retching"
+      ]
+    },
+    {
+      "id": "prevent-021",
+      "species": "cat",
+      "life_stage": "kitten",
+      "topic": "reproduction",
+      "title": "Discuss neutering your kitten by about 4 months",
+      "description": "Kittens can reach puberty and become pregnant from around 4 months old, often sooner than owners expect. Many vets and cat welfare organisations recommend neutering at about 4 months. Neutering prevents unplanned litters and reduces roaming, fighting, spraying and some diseases. Ask your vet about the right timing for your kitten.",
+      "recurrence": "one-time discussion by about 4 months of age",
+      "reminder_interval_days": null,
+      "trigger_age_days": 120,
+      "sources": [
+        "https://icatcare.org/advice/neutering-your-cat/"
+      ],
+      "related_symptoms": []
+    }
+  ]
+}

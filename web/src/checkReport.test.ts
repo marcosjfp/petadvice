@@ -21,3 +21,12 @@ test('downloaded report includes signs to watch for, re-check advice and context
   expect(html).toContain('No se indicó el sexo.')
   expect(html.indexOf('Primero')).toBeLessThan(html.indexOf('Segundo'))
 })
+
+test('source labels tell pages on the same site apart', async () => {
+  const { sourceHost } = await import('./checkReport')
+  expect(sourceHost('https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/fleas-on-cats')).toBe('pdsa.org.uk · fleas on cats')
+  expect(sourceHost('https://www.pdsa.org.uk/media/5834/phh_dog_c_fleas-on-dogs.pdf')).toBe('pdsa.org.uk · phh dog c fleas on dogs')
+  expect(sourceHost('https://vethelpdirect.com/?p=7623')).toBe('vethelpdirect.com')
+  expect(sourceHost('https://vetmed.illinois.edu/5580')).toBe('vetmed.illinois.edu')
+  expect(sourceHost('not a url')).toBe('not a url')
+})

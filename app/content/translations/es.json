@@ -1,5 +1,29 @@
 {
   "conditions": {
+    "dog-cat-urinary-002": {
+      "name": "Esfuerzo para orinar u orinar poco y a menudo (infección urinaria, cálculos o cistitis)",
+      "red_flags": [
+        "Esfuerzo sin que salga nada de orina, o solo unas gotas, sobre todo en un gato o perro macho",
+        "Vómitos, letargo, colapso o barriga hinchada y dolorosa además del esfuerzo para orinar",
+        "Sangre en la orina",
+        "Llora o muestra dolor evidente al intentar orinar",
+        "Orina mucho más a menudo de lo normal, o se hace pis en casa estando educado"
+      ],
+      "prevention_tips": "Deja agua fresca siempre a mano y saca a tu perro con regularidad a hacer sus necesidades. En los gatos, ofrece comida húmeda, areneros limpios (uno por gato, más uno) y una rutina tranquila, porque el estrés es un desencadenante habitual de la cistitis. Nunca esperes a ver si el esfuerzo se pasa: una vejiga obstruida puede poner en peligro la vida en menos de un día.",
+      "possible_causes": [
+        "Infección de vejiga, más frecuente en perras y gatos mayores",
+        "Cálculos o cristales en la vejiga que la irritan u obstruyen la uretra",
+        "Cistitis relacionada con el estrés en gatos (cistitis idiopática felina)",
+        "Problemas de próstata en perros machos sin castrar",
+        "Con menos frecuencia: tumores de vejiga en mascotas mayores, o enfermedad renal"
+      ],
+      "recommended_examinations": [
+        "Análisis de orina, a menudo con cultivo para elegir el antibiótico adecuado",
+        "Palpación de la vejiga para ver si está demasiado llena o duele",
+        "Radiografías o ecografía para buscar cálculos",
+        "Análisis de sangre si tu mascota está enferma o se sospecha una obstrucción"
+      ]
+    },
     "dog-cat-repro-001": {
       "name": "Piómetra (infección del útero)",
       "red_flags": [
@@ -452,6 +476,50 @@
     }
   },
   "preventive_care": {
+    "prevent-018": {
+      "title": "Proteger tu casa y tu jardín de los venenos",
+      "summary": "Muchos alimentos, medicamentos y plantas cotidianos son peligrosos para las mascotas. Guardarlos de forma segura evita la mayoría de las intoxicaciones.",
+      "description": "Muchos alimentos, medicamentos y plantas cotidianos son peligrosos para las mascotas. Guardarlos de forma segura evita la mayoría de las intoxicaciones. Mantén fuera de su alcance el chocolate, los chicles y caramelos sin azúcar (xilitol), las uvas, las pasas, la cebolla y el ajo, también en bolsas y cubos de basura. Guarda todos los medicamentos, de personas y de mascotas, en armarios cerrados, y nunca des a tu mascota analgésicos para personas como paracetamol o ibuprofeno. Guarda bajo llave los venenos para ratas y babosas, el anticongelante y los productos de limpieza, y limpia enseguida cualquier derrame. Si tienes un gato, no tengas lirios en casa: incluso el polen o el agua del jarrón pueden causar una insuficiencia renal mortal. Usa solo productos antipulgas y antigarrapatas hechos para la especie de tu mascota; nunca uses un producto para perros en un gato. Guarda en el móvil el teléfono de tu veterinario y de una línea de ayuda para intoxicaciones de mascotas, para poder llamar enseguida si pasa algo.",
+      "steps": [
+        "Mantén fuera de su alcance el chocolate, los chicles y caramelos sin azúcar (xilitol), las uvas, las pasas, la cebolla y el ajo, también en bolsas y cubos de basura.",
+        "Guarda todos los medicamentos, de personas y de mascotas, en armarios cerrados, y nunca des a tu mascota analgésicos para personas como paracetamol o ibuprofeno.",
+        "Guarda bajo llave los venenos para ratas y babosas, el anticongelante y los productos de limpieza, y limpia enseguida cualquier derrame.",
+        "Si tienes un gato, no tengas lirios en casa: incluso el polen o el agua del jarrón pueden causar una insuficiencia renal mortal.",
+        "Usa solo productos antipulgas y antigarrapatas hechos para la especie de tu mascota; nunca uses un producto para perros en un gato.",
+        "Guarda en el móvil el teléfono de tu veterinario y de una línea de ayuda para intoxicaciones de mascotas, para poder llamar enseguida si pasa algo."
+      ],
+      "recurrence": "revisa tu casa una vez, y otra vez cuando traigas plantas, productos o medicamentos nuevos"
+    },
+    "prevent-019": {
+      "title": "Proteger a tu mascota del calor",
+      "summary": "El golpe de calor puede matar en minutos. Los perros, las razas de hocico chato y las mascotas con sobrepeso, mayores o muy jóvenes son las que más riesgo corren.",
+      "description": "El golpe de calor puede matar en minutos. Los perros, las razas de hocico chato y las mascotas con sobrepeso, mayores o muy jóvenes son las que más riesgo corren. Nunca dejes a una mascota en un coche, una galería acristalada o una caravana en un día caluroso, ni siquiera unos minutos ni con la ventanilla abierta. Pasea a tu perro a primera hora de la mañana o al final de la tarde. Prueba la acera con el dorso de la mano: si no aguantas cinco segundos, está demasiado caliente para sus patas. Asegúrate de que siempre haya sombra y agua fresca, dentro y fuera de casa. Ten especial cuidado con las razas de hocico chato y con las mascotas con sobrepeso, mayores y muy jóvenes. Conoce los signos (jadeo intenso, babeo, debilidad, confusión o colapso) y actúa enseguida: lleva a tu mascota a la sombra, refréscala con agua fresca, no helada, y ve al veterinario.",
+      "steps": [
+        "Nunca dejes a una mascota en un coche, una galería acristalada o una caravana en un día caluroso, ni siquiera unos minutos ni con la ventanilla abierta.",
+        "Pasea a tu perro a primera hora de la mañana o al final de la tarde. Prueba la acera con el dorso de la mano: si no aguantas cinco segundos, está demasiado caliente para sus patas.",
+        "Asegúrate de que siempre haya sombra y agua fresca, dentro y fuera de casa.",
+        "Ten especial cuidado con las razas de hocico chato y con las mascotas con sobrepeso, mayores y muy jóvenes.",
+        "Conoce los signos (jadeo intenso, babeo, debilidad, confusión o colapso) y actúa enseguida: lleva a tu mascota a la sombra, refréscala con agua fresca, no helada, y ve al veterinario."
+      ],
+      "recurrence": "revisar antes de cada verano y en cada día de calor"
+    },
+    "prevent-020": {
+      "title": "Reducir el riesgo de dilatación-torsión gástrica en perros grandes de pecho profundo",
+      "summary": "La dilatación con torsión de estómago es una urgencia que pone en peligro la vida y afecta sobre todo a razas grandes de pecho profundo, como el Gran Danés, el Pastor Alemán y los Setter.",
+      "description": "La dilatación con torsión de estómago es una urgencia que pone en peligro la vida y afecta sobre todo a razas grandes de pecho profundo, como el Gran Danés, el Pastor Alemán y los Setter. Da dos o tres comidas pequeñas al día en lugar de una comida grande. Usa un comedero antivoracidad si tu perro come muy deprisa. Evita el ejercicio intenso durante aproximadamente una hora antes y después de las comidas. Pregunta a tu veterinario por una cirugía preventiva para fijar el estómago (gastropexia), que puede hacerse a la vez que la castración en perros de alto riesgo. Conoce los signos (barriga hinchada, arcadas sin expulsar nada, inquietud y babeo) y ve enseguida al veterinario si los ves.",
+      "steps": [
+        "Da dos o tres comidas pequeñas al día en lugar de una comida grande.",
+        "Usa un comedero antivoracidad si tu perro come muy deprisa.",
+        "Evita el ejercicio intenso durante aproximadamente una hora antes y después de las comidas.",
+        "Pregunta a tu veterinario por una cirugía preventiva para fijar el estómago (gastropexia), que puede hacerse a la vez que la castración en perros de alto riesgo.",
+        "Conoce los signos (barriga hinchada, arcadas sin expulsar nada, inquietud y babeo) y ve enseguida al veterinario si los ves."
+      ]
+    },
+    "prevent-021": {
+      "title": "Hablar sobre la castración de tu gatito hacia los 4 meses",
+      "description": "Los gatitos pueden alcanzar la pubertad y quedarse preñados desde los 4 meses, a menudo antes de lo que esperan sus dueños. Muchos veterinarios y organizaciones de bienestar felino recomiendan castrar hacia los 4 meses. La castración evita camadas no planificadas y reduce las escapadas, las peleas, el marcaje con orina y algunas enfermedades. Pregunta a tu veterinario cuál es el momento adecuado para tu gatito.",
+      "recurrence": "una conversación hacia los 4 meses de edad"
+    },
     "prevent-001": {
       "title": "Recalcular la dieta después de la esterilización o castración",
       "summary": "Las mascotas esterilizadas o castradas suelen necesitar menos calorías; revisa su dieta y su peso después de la cirugía.",

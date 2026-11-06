@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { type TriageResult } from './api'
 import { downloadFile } from './download'
 import { petContextLine, petDisplayName, reportDate, reportHtml, sourceHost, symptomLabel, watchSignLine } from './checkReport'
@@ -9,6 +9,7 @@ export default function CheckResult({ result, petName, saved = false, children }
   const { t } = useI18n()
   const r = t.result
   const heading = useRef<HTMLHeadingElement>(null)
+  const [saveOpen, setSaveOpen] = useState(false)
   useEffect(() => { window.scrollTo?.(0, 0); heading.current?.focus() }, [])
   const watchFor = result.watch_for ?? []
   return <section className={`result ${result.resulting_urgency}`}>
@@ -31,6 +32,11 @@ export default function CheckResult({ result, petName, saved = false, children }
       <p className="fine-print">{r.boundary}</p>
       <details className="technical-info"><summary>{r.technicalInfo}</summary><p className="fine-print">{r.contentVersion(result.content_version ?? r.contentVersionMissing)}</p></details>
     </article>
-    <div className="report-controls"><button className="primary" onClick={() => window.print()}>{r.print}</button><button className="secondary" onClick={() => downloadFile(reportHtml(result), 'petadvice-check-summary.html', 'text/html')}>{r.downloadSummary}</button><p className="fine-print">{r.summaryStays}</p>{children}</div>
+    <div className="report-controls">
+      <div className="save-actions"><button className="primary" aria-expanded={saveOpen} aria-controls="save-options" onClick={() => setSaveOpen((open) => !open)}>{r.saveOrPrint} <span aria-hidden="true">{saveOpen ? '▴' : '▾'}</span></button>
+        {saveOpen && <div id="save-options" className="save-options"><button className="secondary" onClick={() => window.print()}>{r.print}</button><button className="secondary" onClick={() => downloadFile(reportHtml(result), 'petadvice-check-summary.html', 'text/html')}>{r.downloadSummary}</button><p className="fine-print">{r.summaryStays}</p></div>}
+      </div>
+      {children && <div className="result-next">{children}</div>}
+    </div>
   </section>
 }

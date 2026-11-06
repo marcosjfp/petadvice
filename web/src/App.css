@@ -447,3 +447,23 @@ header > .language-switch + .header-actions, header > .language-switch + .cancel
 .choice-mark { flex: none; width: 18px; height: 18px; border: 2px solid var(--line); border-radius: 50%; background: #fff; }
 .symptoms button[aria-pressed=true] .choice-mark { border: 5px solid var(--green); }
 .symptom-group.urgent .symptoms button:hover, .symptom-group.urgent .symptoms button.selected { border-color: var(--green); background: var(--mint); }
+/* Result actions: one primary "Save or print", then what to do next. */
+.save-actions { display: grid; justify-items: start; gap: 12px; }
+.save-actions > .primary { margin: 0; }
+.save-options { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.save-options .secondary { margin: 0; }
+.save-options .fine-print { flex-basis: 100%; margin: 2px 0 0; }
+.result-next { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line); }
+.result-next > .secondary, .result-next > .primary { margin: 0; }
+.result-next > .guest-controls { flex-basis: 100%; }
+@media print { .save-actions, .result-next { display: none; } }
+/* Account: keep the data-control buttons apart. */
+.panel > .security-password ~ .secondary { margin-right: 10px; }
+/* Disabled primary buttons stay readable (WCAG contrast) while still looking inactive. */
+.primary:disabled { background: #dfe7e2; color: #4f5f57; -webkit-text-fill-color: #4f5f57; box-shadow: none; cursor: not-allowed; opacity: 1; }
+/* Wide screens: centre the 760px reading column under the full-width header instead of leaving the right half empty. */
+@media (min-width: 1100px) {
+  .shell:not(.landing) > :not(header):not(.emergency-pill) { max-width: 760px; margin-left: auto; margin-right: auto; }
+  .shell:not(.landing) > .panel, .shell:not(.landing) > .question, .shell:not(.landing) > .result { width: 100%; }
+}
+.result-next > .guest-controls { margin-top: 4px; padding-top: 0; border-top: 0; }

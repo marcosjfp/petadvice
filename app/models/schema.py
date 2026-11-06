@@ -212,6 +212,7 @@ class TriageQuestion(BaseModel):
 class CareTopic(str, Enum):
     """Groups preventive care guides on the Care page; the order here is the display order."""
     getting_started = "getting_started"
+    safety = "safety"
     vaccinations = "vaccinations"
     parasites = "parasites"
     health_checks = "health_checks"

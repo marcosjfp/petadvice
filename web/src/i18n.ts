@@ -107,6 +107,7 @@ const en = {
     sex: 'Sex', female: 'Female', male: 'Male', neutered: 'Spayed or neutered',
     leaveTitle: 'Leave this check?', leaveBody: 'Guest checks are not saved. If you leave now, the answers and guidance for this check will be lost.',
     leaveResultBody: 'This guest check is not saved. Download the summary first if you want to keep it.', leave: 'Leave this check', stay: 'Stay on this check',
+    leaveAccountBody: 'This check is not finished. If you leave, it stays in Check history as incomplete and you will need to start a new check to get guidance.',
   },
   library: {
     eyebrow: 'Reference library', title: 'Plain-language starting points', muted: 'Information for conversations with your vet. Beta content awaits veterinary review.',
@@ -127,7 +128,7 @@ const en = {
     timing: (value: string) => `Timing: ${value}`,
     expandAll: 'Expand all', collapseAll: 'Collapse all', steps: 'Steps',
     topics: {
-      getting_started: 'Getting started', vaccinations: 'Vaccinations', parasites: 'Parasites', health_checks: 'Health checks', dental: 'Teeth and gums',
+      safety: 'Safety at home and outdoors', getting_started: 'Getting started', vaccinations: 'Vaccinations', parasites: 'Parasites', health_checks: 'Health checks', dental: 'Teeth and gums',
       nutrition: 'Food and weight', grooming: 'Grooming', behaviour: 'Behaviour and wellbeing', reproduction: 'Neutering and reproduction',
     } as Record<string, string>,
     otherTopic: 'More care guides',
@@ -155,7 +156,7 @@ const en = {
     careGuides: 'Care guides for this situation', causes: 'Possible causes to discuss with your vet', exams: 'Your vet may want to check', sources: 'Sources recorded with this check',
     contentVersion: (version: string) => `Content version: ${version}`, contentVersionMissing: 'Not recorded for this older check',
     watchFor: 'Watch for these signs — contact a vet if…', contextNotes: 'Details that could change this guidance', adult: 'adult', technicalInfo: 'Technical information',
-    print: 'Print / save PDF', downloadSummary: 'Download summary', summaryStays: 'The downloaded summary stays on your device. Share it only with someone you choose.',
+    saveOrPrint: 'Save or print', print: 'Print or save as PDF', downloadSummary: 'Download as a file', summaryStays: 'The downloaded summary stays on your device. Share it only with someone you choose.',
     explanationGap: 'The original rule explanations were not recorded for this check.',
     historicalNotice: 'This is a saved check, not a new assessment. Older checks may not include the original pet context, sources or question wording.',
     boundary: 'General educational guidance, not a diagnosis. Beta content awaits veterinary review. This summary records this check; it does not assess later changes in symptoms. If your pet worsens or you are unsure, contact your veterinary practice.',
@@ -280,6 +281,7 @@ const pt: Messages = {
     sex: 'Sexo', female: 'Fêmea', male: 'Macho', neutered: 'Esterilizado ou castrado',
     leaveTitle: 'Sair desta verificação?', leaveBody: 'As verificações de convidado não são guardadas. Se sair agora, as respostas e orientações desta verificação perdem-se.',
     leaveResultBody: 'Esta verificação de convidado não está guardada. Descarregue primeiro o resumo se a quiser manter.', leave: 'Sair desta verificação', stay: 'Continuar nesta verificação',
+    leaveAccountBody: 'Esta verificação ainda não terminou. Se sair, fica no histórico como incompleta e terá de fazer uma nova verificação para obter orientação.',
   },
   library: {
     eyebrow: 'Biblioteca de referência', title: 'Pontos de partida em linguagem simples', muted: 'Informação para conversar com o seu veterinário. O conteúdo beta aguarda revisão veterinária.',
@@ -300,7 +302,7 @@ const pt: Messages = {
     timing: (value) => `Frequência: ${value}`,
     expandAll: 'Expandir tudo', collapseAll: 'Recolher tudo', steps: 'Passos',
     topics: {
-      getting_started: 'Primeiros passos', vaccinations: 'Vacinação', parasites: 'Parasitas', health_checks: 'Consultas de rotina', dental: 'Dentes e gengivas',
+      safety: 'Segurança em casa e na rua', getting_started: 'Primeiros passos', vaccinations: 'Vacinação', parasites: 'Parasitas', health_checks: 'Consultas de rotina', dental: 'Dentes e gengivas',
       nutrition: 'Alimentação e peso', grooming: 'Higiene e cuidados', behaviour: 'Comportamento e bem-estar', reproduction: 'Esterilização e reprodução',
     },
     otherTopic: 'Mais guias de cuidados',
@@ -328,7 +330,7 @@ const pt: Messages = {
     careGuides: 'Guias de cuidados para esta situação', causes: 'Causas possíveis para falar com o veterinário', exams: 'O veterinário pode querer verificar', sources: 'Fontes registadas com esta verificação',
     contentVersion: (version) => `Versão do conteúdo: ${version}`, contentVersionMissing: 'Não registada nesta verificação mais antiga',
     watchFor: 'Esteja atento a estes sinais — contacte um veterinário se…', contextNotes: 'Dados que podem mudar esta orientação', adult: 'adulto', technicalInfo: 'Informação técnica',
-    print: 'Imprimir / guardar PDF', downloadSummary: 'Descarregar resumo', summaryStays: 'O resumo descarregado fica no seu dispositivo. Partilhe-o apenas com quem escolher.',
+    saveOrPrint: 'Guardar ou imprimir', print: 'Imprimir ou guardar como PDF', downloadSummary: 'Descarregar como ficheiro', summaryStays: 'O resumo descarregado fica no seu dispositivo. Partilhe-o apenas com quem escolher.',
     explanationGap: 'As explicações originais das regras não foram registadas nesta verificação.',
     historicalNotice: 'Esta é uma verificação guardada, não uma nova avaliação. As verificações mais antigas podem não incluir o contexto original do animal, as fontes ou o texto das perguntas.',
     boundary: 'Orientação educativa geral, não um diagnóstico. O conteúdo beta aguarda revisão veterinária. Este resumo regista esta verificação; não avalia alterações posteriores nos sintomas. Se o seu animal piorar ou tiver dúvidas, contacte o seu veterinário.',
@@ -479,6 +481,7 @@ const es: Messages = {
     sex: 'Sexo', female: 'Hembra', male: 'Macho', neutered: 'Esterilizado o castrado',
     leaveTitle: '¿Salir de esta revisión?', leaveBody: 'Las revisiones de invitado no se guardan. Si sales ahora, se perderán las respuestas y la orientación de esta revisión.',
     leaveResultBody: 'Esta revisión de invitado no está guardada. Descarga primero el resumen si quieres conservarla.', leave: 'Salir de esta revisión', stay: 'Seguir en esta revisión',
+    leaveAccountBody: 'Esta revisión no ha terminado. Si sales, quedará en el historial como incompleta y tendrás que hacer una nueva revisión para obtener orientación.',
   },
   library: {
     eyebrow: 'Biblioteca de consulta', title: 'Puntos de partida en lenguaje sencillo', muted: 'Información para hablar con tu veterinario. El contenido beta está pendiente de revisión veterinaria.',
@@ -499,7 +502,7 @@ const es: Messages = {
     timing: (value) => `Frecuencia: ${value}`,
     expandAll: 'Desplegar todo', collapseAll: 'Plegar todo', steps: 'Pasos',
     topics: {
-      getting_started: 'Primeros pasos', vaccinations: 'Vacunación', parasites: 'Parásitos', health_checks: 'Revisiones de salud', dental: 'Dientes y encías',
+      safety: 'Seguridad en casa y fuera', getting_started: 'Primeros pasos', vaccinations: 'Vacunación', parasites: 'Parásitos', health_checks: 'Revisiones de salud', dental: 'Dientes y encías',
       nutrition: 'Alimentación y peso', grooming: 'Aseo y cuidados', behaviour: 'Comportamiento y bienestar', reproduction: 'Esterilización y reproducción',
     },
     otherTopic: 'Más guías de cuidados',
@@ -527,7 +530,7 @@ const es: Messages = {
     careGuides: 'Guías de cuidados para esta situación', causes: 'Posibles causas para comentar con tu veterinario', exams: 'Tu veterinario puede querer revisar', sources: 'Fuentes registradas con esta revisión',
     contentVersion: (version) => `Versión del contenido: ${version}`, contentVersionMissing: 'No registrada en esta revisión antigua',
     watchFor: 'Vigila estos signos — contacta con un veterinario si…', contextNotes: 'Datos que pueden cambiar esta orientación', adult: 'adulto', technicalInfo: 'Información técnica',
-    print: 'Imprimir / guardar PDF', downloadSummary: 'Descargar resumen', summaryStays: 'El resumen descargado se queda en tu dispositivo. Compártelo solo con quien tú elijas.',
+    saveOrPrint: 'Guardar o imprimir', print: 'Imprimir o guardar como PDF', downloadSummary: 'Descargar como archivo', summaryStays: 'El resumen descargado se queda en tu dispositivo. Compártelo solo con quien tú elijas.',
     explanationGap: 'Las explicaciones originales de las reglas no se registraron en esta revisión.',
     historicalNotice: 'Esta es una revisión guardada, no una nueva valoración. Las revisiones antiguas pueden no incluir el contexto original de la mascota, las fuentes o el texto de las preguntas.',
     boundary: 'Orientación educativa general, no un diagnóstico. El contenido beta está pendiente de revisión veterinaria. Este resumen registra esta revisión; no valora cambios posteriores en los síntomas. Si tu mascota empeora o tienes dudas, contacta con tu clínica veterinaria.',

@@ -45,7 +45,7 @@
         "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
         "https://www.rspca.org.uk/adviceandwelfare/pets/dogs/health/poisoning"
       ],
-      "related_care": []
+      "related_care": ["prevent-018"]
     },
     {
       "id": "cat-tox-002",
@@ -85,7 +85,7 @@
         "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/lily-poisoning-in-cats",
         "https://icatcare.org/articles/permethrin-poisoning"
       ],
-      "related_care": []
+      "related_care": ["prevent-018", "prevent-005"]
     },
     {
       "id": "dog-appetite-001",
@@ -127,7 +127,7 @@
       "sources": [
         "https://vcahospitals.com/know-your-pet/anorexia-in-dogs"
       ],
-      "related_care": []
+      "related_care": ["prevent-013", "prevent-015"]
     },
     {
       "id": "cat-appetite-001",
@@ -170,7 +170,7 @@
         "https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/hepatic-lipidosis",
         "https://vcahospitals.com/know-your-pet/anorexia-in-cats"
       ],
-      "related_care": []
+      "related_care": ["prevent-013", "prevent-015"]
     },
     {
       "id": "dog-resp-002",
@@ -212,7 +212,7 @@
         "https://vcahospitals.com/know-your-pet/coughing-in-dogs",
         "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/kennel-cough"
       ],
-      "related_care": []
+      "related_care": ["prevent-011"]
     },
     {
       "id": "cat-resp-002",
@@ -339,7 +339,7 @@
         "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/ear-infections-in-cats",
         "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/grass-seeds-in-dogs"
       ],
-      "related_care": []
+      "related_care": ["prevent-010"]
     },
     {
       "id": "dog-cat-gi-003",
@@ -382,7 +382,7 @@
         "https://vcahospitals.com/know-your-pet/constipation-in-dogs",
         "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/constipation-in-cats"
       ],
-      "related_care": []
+      "related_care": ["prevent-014"]
     },
     {
       "id": "dog-cat-heat-001",
@@ -423,7 +423,7 @@
         "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/heatstroke-in-cats",
         "https://vcahospitals.com/know-your-pet/heat-stroke-in-dogs"
       ],
-      "related_care": []
+      "related_care": ["prevent-019"]
     },
     {
       "id": "dog-gi-gdv-001",
@@ -461,7 +461,7 @@
         "https://vcahospitals.com/know-your-pet/gastric-dilatation-and-volvulus-in-dogs",
         "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/symptoms/bloat-swollen-belly-in-dogs"
       ],
-      "related_care": []
+      "related_care": ["prevent-020"]
     }
   ],
   "preventive_care_items": []

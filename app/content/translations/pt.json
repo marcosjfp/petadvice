@@ -1,5 +1,29 @@
 {
   "conditions": {
+    "dog-cat-urinary-002": {
+      "name": "Esforço para urinar ou urinar pouco e muitas vezes (infeção urinária, cálculos ou cistite)",
+      "red_flags": [
+        "Esforço sem sair urina nenhuma, ou só umas gotas, sobretudo num gato ou cão macho",
+        "Vómitos, letargia, colapso ou barriga inchada e dolorosa além do esforço para urinar",
+        "Sangue na urina",
+        "Chora ou mostra dor evidente ao tentar urinar",
+        "Urina muito mais vezes do que o habitual, ou faz chichi em casa apesar de estar educado"
+      ],
+      "prevention_tips": "Deixe água fresca sempre à mão e dê ao seu cão saídas regulares para fazer as necessidades. Nos gatos, ofereça comida húmida, caixas de areia limpas (uma por gato, mais uma) e uma rotina calma, porque o stress é um desencadeador frequente da cistite. Nunca espere para ver se o esforço passa: uma bexiga bloqueada pode pôr a vida em risco em menos de um dia.",
+      "possible_causes": [
+        "Infeção da bexiga, mais frequente em cadelas e gatos mais velhos",
+        "Cálculos ou cristais na bexiga que a irritam ou bloqueiam a uretra",
+        "Cistite relacionada com stress nos gatos (cistite idiopática felina)",
+        "Problemas da próstata em cães machos não castrados",
+        "Menos frequentemente: tumores da bexiga em animais mais velhos, ou doença renal"
+      ],
+      "recommended_examinations": [
+        "Análise à urina, muitas vezes com cultura para escolher o antibiótico certo",
+        "Palpação da bexiga para ver se está demasiado cheia ou dolorosa",
+        "Raio-X ou ecografia para procurar cálculos",
+        "Análises ao sangue se o animal estiver doente ou houver suspeita de bloqueio"
+      ]
+    },
     "dog-cat-repro-001": {
       "name": "Piómetra (infeção do útero)",
       "red_flags": [
@@ -452,6 +476,50 @@
     }
   },
   "preventive_care": {
+    "prevent-018": {
+      "title": "Tornar a casa e o jardim seguros contra venenos",
+      "summary": "Muitos alimentos, medicamentos e plantas do dia a dia são perigosos para os animais. Guardá-los em segurança evita a maioria das intoxicações.",
+      "description": "Muitos alimentos, medicamentos e plantas do dia a dia são perigosos para os animais. Guardá-los em segurança evita a maioria das intoxicações. Mantenha fora do alcance chocolate, pastilhas e doces sem açúcar (xilitol), uvas, passas, cebola e alho, incluindo em sacos e caixotes do lixo. Guarde todos os medicamentos, humanos e veterinários, em armários fechados, e nunca dê ao seu animal analgésicos para pessoas como paracetamol ou ibuprofeno. Guarde fechados os venenos para ratos e lesmas, o anticongelante e os produtos de limpeza, e limpe logo qualquer derrame. Se tem um gato, não tenha lírios em casa: até o pólen ou a água da jarra podem causar insuficiência renal fatal. Use apenas produtos contra pulgas e carraças feitos para a espécie do seu animal; nunca use um produto para cães num gato. Guarde no telemóvel o número do seu veterinário e de uma linha de apoio para intoxicações em animais, para poder ligar logo se acontecer alguma coisa.",
+      "steps": [
+        "Mantenha fora do alcance chocolate, pastilhas e doces sem açúcar (xilitol), uvas, passas, cebola e alho, incluindo em sacos e caixotes do lixo.",
+        "Guarde todos os medicamentos, humanos e veterinários, em armários fechados, e nunca dê ao seu animal analgésicos para pessoas como paracetamol ou ibuprofeno.",
+        "Guarde fechados os venenos para ratos e lesmas, o anticongelante e os produtos de limpeza, e limpe logo qualquer derrame.",
+        "Se tem um gato, não tenha lírios em casa: até o pólen ou a água da jarra podem causar insuficiência renal fatal.",
+        "Use apenas produtos contra pulgas e carraças feitos para a espécie do seu animal; nunca use um produto para cães num gato.",
+        "Guarde no telemóvel o número do seu veterinário e de uma linha de apoio para intoxicações em animais, para poder ligar logo se acontecer alguma coisa."
+      ],
+      "recurrence": "verifique a casa uma vez, e de novo quando trouxer plantas, produtos ou medicamentos novos"
+    },
+    "prevent-019": {
+      "title": "Proteger o seu animal do calor",
+      "summary": "O golpe de calor pode matar em minutos. Os cães, as raças de focinho achatado e os animais com excesso de peso, idosos ou muito jovens correm mais risco.",
+      "description": "O golpe de calor pode matar em minutos. Os cães, as raças de focinho achatado e os animais com excesso de peso, idosos ou muito jovens correm mais risco. Nunca deixe um animal num carro, marquise ou caravana num dia quente, nem por poucos minutos nem com a janela aberta. Passeie o seu cão de manhã cedo ou ao fim do dia. Teste o passeio com as costas da mão: se não aguentar ali cinco segundos, está demasiado quente para as patas. Garanta sempre sombra e água fresca, dentro e fora de casa. Tenha cuidado redobrado com raças de focinho achatado e com animais com excesso de peso, idosos e muito jovens. Conheça os sinais (respiração muito ofegante, baba, fraqueza, confusão ou colapso) e aja logo: leve o animal para a sombra, arrefeça-o com água fresca, não gelada, e vá ao veterinário.",
+      "steps": [
+        "Nunca deixe um animal num carro, marquise ou caravana num dia quente, nem por poucos minutos nem com a janela aberta.",
+        "Passeie o seu cão de manhã cedo ou ao fim do dia. Teste o passeio com as costas da mão: se não aguentar ali cinco segundos, está demasiado quente para as patas.",
+        "Garanta sempre sombra e água fresca, dentro e fora de casa.",
+        "Tenha cuidado redobrado com raças de focinho achatado e com animais com excesso de peso, idosos e muito jovens.",
+        "Conheça os sinais (respiração muito ofegante, baba, fraqueza, confusão ou colapso) e aja logo: leve o animal para a sombra, arrefeça-o com água fresca, não gelada, e vá ao veterinário."
+      ],
+      "recurrence": "rever antes de cada verão e em todos os dias de calor"
+    },
+    "prevent-020": {
+      "title": "Reduzir o risco de dilatação-torção gástrica em cães grandes de peito fundo",
+      "summary": "A dilatação com torção do estômago é uma urgência que põe a vida em risco e afeta sobretudo raças grandes de peito fundo, como o Dogue Alemão, o Pastor Alemão e os Setters.",
+      "description": "A dilatação com torção do estômago é uma urgência que põe a vida em risco e afeta sobretudo raças grandes de peito fundo, como o Dogue Alemão, o Pastor Alemão e os Setters. Dê duas ou três refeições pequenas por dia em vez de uma refeição grande. Use uma taça de comer devagar se o seu cão come muito depressa. Evite exercício intenso cerca de uma hora antes e depois das refeições. Pergunte ao veterinário sobre uma cirurgia preventiva para fixar o estômago (gastropexia), que pode ser feita ao mesmo tempo que a castração em cães de alto risco. Conheça os sinais (barriga inchada, tentativas de vomitar sem sair nada, agitação e baba) e vá logo ao veterinário se os vir.",
+      "steps": [
+        "Dê duas ou três refeições pequenas por dia em vez de uma refeição grande.",
+        "Use uma taça de comer devagar se o seu cão come muito depressa.",
+        "Evite exercício intenso cerca de uma hora antes e depois das refeições.",
+        "Pergunte ao veterinário sobre uma cirurgia preventiva para fixar o estômago (gastropexia), que pode ser feita ao mesmo tempo que a castração em cães de alto risco.",
+        "Conheça os sinais (barriga inchada, tentativas de vomitar sem sair nada, agitação e baba) e vá logo ao veterinário se os vir."
+      ]
+    },
+    "prevent-021": {
+      "title": "Falar sobre a castração do seu gatinho por volta dos 4 meses",
+      "description": "Os gatinhos podem chegar à puberdade e engravidar a partir dos 4 meses, muitas vezes mais cedo do que os donos esperam. Muitos veterinários e organizações de bem-estar felino recomendam a castração por volta dos 4 meses. A castração evita ninhadas não planeadas e reduz as fugas, as lutas, a marcação com urina e algumas doenças. Pergunte ao veterinário qual o momento certo para o seu gatinho.",
+      "recurrence": "uma conversa até cerca dos 4 meses de idade"
+    },
     "prevent-001": {
       "title": "Recalcular a alimentação depois da esterilização ou castração",
       "summary": "Os animais esterilizados ou castrados precisam muitas vezes de menos calorias; reveja a alimentação e o peso depois da cirurgia.",

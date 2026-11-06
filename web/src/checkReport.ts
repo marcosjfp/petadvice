@@ -13,8 +13,15 @@ export function lifeStageLabel(t: Messages, stage: string) { return t.lifeStage[
 function ageLabel(t: Messages, pet: NonNullable<TriageResult['pet']>) {
   return pet.life_stage ? lifeStageLabel(t, pet.life_stage) : pet.age_group === 'adult' ? t.result.adult : null
 }
+/** A short, distinguishable label: the site plus the page topic from its path, e.g. "pdsa.org.uk · fleas on cats". */
 export function sourceHost(source: string) {
-  try { return new URL(source).hostname } catch { return source }
+  try {
+    const url = new URL(source)
+    const host = url.hostname.replace(/^www\./, '')
+    const slug = decodeURIComponent(url.pathname.split('/').filter(Boolean).pop() ?? '').replace(/\.(html?|pdf|php|aspx?)$/i, '')
+    const topic = slug && !/^\d+$/.test(slug) ? slug.replace(/[-_]+/g, ' ').replace(/%20/g, ' ').trim().toLowerCase() : ''
+    return topic ? `${host} · ${topic.length > 60 ? `${topic.slice(0, 57)}…` : topic}` : host
+  } catch { return source }
 }
 export function watchSignLine(t: Messages, sign: { description: string; urgency: keyof Messages['urgency'] }) { return `${sign.description} — ${t.urgency[sign.urgency]}` }
 

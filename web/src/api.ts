@@ -56,7 +56,7 @@ export type Condition = {
   symptom_tags?: string[]; related_care_items?: CareGuide[];
 }
 export type CareGuide = { id: string; title: string; description: string; recurrence: string | null }
-export const careTopics = ['getting_started', 'vaccinations', 'parasites', 'health_checks', 'dental', 'nutrition', 'grooming', 'behaviour', 'reproduction'] as const
+export const careTopics = ['getting_started', 'safety', 'vaccinations', 'parasites', 'health_checks', 'dental', 'nutrition', 'grooming', 'behaviour', 'reproduction'] as const
 export type CareTopic = typeof careTopics[number]
 export type PreventiveCareItem = CareGuide & {
   sources: string[]; related_symptoms?: string[]; topic?: CareTopic | string;

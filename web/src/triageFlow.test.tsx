@@ -126,7 +126,7 @@ test('result shows signs to watch for, re-check advice, context notes and tidy t
   expect(within(watch).getByText('Blood in the vomit — Emergency veterinary care now')).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'Details that could change this guidance' })).toBeInTheDocument()
   expect(screen.getByText(/adult; sex male/)).toBeInTheDocument()
-  expect(screen.getByRole('link', { name: 'www.vet.example.org (opens a new tab)' })).toHaveAttribute('href', 'https://www.vet.example.org/vomiting?ref=1')
+  expect(screen.getByRole('link', { name: 'vet.example.org · vomiting (opens a new tab)' })).toHaveAttribute('href', 'https://www.vet.example.org/vomiting?ref=1')
   expect(screen.getByText(`Content version: ${'a'.repeat(64)}`)).not.toBeVisible()
   await userEvent.setup().click(screen.getByText('Technical information'))
   expect(screen.getByText(`Content version: ${'a'.repeat(64)}`)).toBeVisible()

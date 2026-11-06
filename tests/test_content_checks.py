@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from app.content.loader import TRANSLATIONS_DIR, content_library
-from app.models.schema import Species, TriageAnswerRequest, TriageSession, UrgencyLevel
+from app.models.schema import Sex, Species, TriageAnswerRequest, TriageSession, UrgencyLevel
 from app.services import triage_engine
 from tests.test_backend import complete_remaining_questions, db, make_pet  # noqa: F401
 
@@ -185,3 +185,25 @@ def test_danger_answers_escalate_to_emergency(db, symptom, answers):
 def test_ear_balance_problems_escalate(db):
     result = run_check(db, guest_pet(db, Species.dog), "ear_scratching_or_head_shaking", {"q-ear-001": "Yes"})
     assert result.resulting_urgency == UrgencyLevel.vet_24h
+
+
+@pytest.mark.parametrize(("species", "sex", "neutered"), [("dog", None, None), ("dog", Sex.female, True), ("cat", Sex.female, True), ("cat", None, None)])
+def test_straining_to_urinate_has_real_guidance_beyond_male_cats(db, species, sex, neutered):
+    pet = make_pet(db, owner_id=None, species=Species(species), sex=sex, neutered=neutered, date_of_birth=None)
+    session, _ = triage_engine.start_session(db, pet, "straining_to_urinate")
+    while (question_id := db.get(TriageSession, session.id).current_question_id) is not None:
+        question = content_library.question_by_id(question_id)
+        triage_engine.answer_question(db, session.id, TriageAnswerRequest(question_id=question_id, answer=question.options[0]))
+    result = triage_engine.compute_result(db, session.id)
+    assert "dog-cat-urinary-002" in result.matched_condition_ids
+    assert result.resulting_urgency.rank >= UrgencyLevel.vet_24h.rank
+    assert result.watch_for and result.possible_causes
+
+
+def test_new_checks_link_to_care_guides_and_kittens_get_neutering_guidance():
+    for condition_id, guide in [("dog-cat-tox-001", "prevent-018"), ("dog-cat-heat-001", "prevent-019"), ("dog-gi-gdv-001", "prevent-020")]:
+        assert guide in content_library.condition_by_id(condition_id).related_care
+    kitten = {item.id for item in content_library.filter_preventive("cat", "kitten")}
+    assert "prevent-021" in kitten and "prevent-004" not in kitten
+    assert "prevent-004" in {item.id for item in content_library.filter_preventive("dog", "puppy")}
+    assert {item.topic.value for item in content_library.preventive_items} >= {"safety"}

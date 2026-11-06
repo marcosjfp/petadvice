@@ -9,7 +9,7 @@ import { downloadFile, downloadJson } from './download'
 import { buildCareReminderIcs, reminderFileName, tomorrow } from './careReminders'
 import { errorMessage, useRequest } from './useRequest'
 import { formatDate, languages, readable, serverText, useI18n } from './i18n'
-import { lifeStageLabel } from './checkReport'
+import { lifeStageLabel, sourceHost } from './checkReport'
 import fullLogo from './assets/brand/Logo_new.png'
 import nameLogo from './assets/brand/Logo_Just_Name.png'
 import petsLogo from './assets/brand/Logo_Just_Pets.png'
@@ -88,6 +88,10 @@ function App() {
   const [checkRequest, setCheckRequest] = useState<{ symptom: string; species: Species; id: number } | null>(null)
   const [guestCheck, setGuestCheck] = useState<CheckState>('idle')
   const [confirmLeave, setConfirmLeave] = useState(false)
+  // Signed-in results are saved, but an unfinished check cannot be resumed, so leaving one asks first.
+  const [accountCheck, setAccountCheck] = useState<CheckState>('idle')
+  const [pendingLeave, setPendingLeave] = useState<(() => void) | null>(null)
+  const guardCheck = (action: () => void) => { if (accountCheck === 'in_progress') setPendingLeave(() => action); else action() }
   const [load, setLoad] = useState(0)
   const [petsLoaded, setPetsLoaded] = useState(false)
   const [loadError, setLoadError] = useState('')
@@ -218,13 +222,14 @@ function App() {
 
   return <main className="shell">
     <header><img className="name-logo" src={nameLogo} alt="PETAdvice" /><LanguageSwitch /><div className="header-actions">
-      {pet && <label className="pet-switcher"><img className="pets-logo" src={petsLogo} alt="" /><span className="pet-switcher-copy"><strong>{pet.name}</strong><small>{pet.life_stage ? lifeStageLabel(t, pet.life_stage) : t.app.ageUnknown}</small></span><select aria-label={t.app.changePet} value={pet.id} onChange={(event) => setSelectedPetId(event.target.value)}>{pets.map((item) => <option value={item.id} key={item.id}>{item.name} ({t.speciesLower[item.species]})</option>)}</select><span className="switcher-chevron" aria-hidden="true">⌄</span></label>}
-      <button className="start-fresh" onClick={() => { setShowPetForm(true); setView('triage') }}>{t.app.newPet}</button>
-      <button className="start-fresh" disabled={busy} onClick={() => void run(async () => { await api.logout(); resetAccount() })}>{t.common.logOut}</button>
+      {pet && <label className="pet-switcher"><img className="pets-logo" src={petsLogo} alt="" /><span className="pet-switcher-copy"><strong>{pet.name}</strong><small>{pet.life_stage ? lifeStageLabel(t, pet.life_stage) : t.app.ageUnknown}</small></span><select aria-label={t.app.changePet} value={pet.id} onChange={(event) => { const id = event.target.value; guardCheck(() => setSelectedPetId(id)) }}>{pets.map((item) => <option value={item.id} key={item.id}>{item.name} ({t.speciesLower[item.species]})</option>)}</select><span className="switcher-chevron" aria-hidden="true">⌄</span></label>}
+      <button className="start-fresh" onClick={() => guardCheck(() => { setShowPetForm(true); setView('triage') })}>{t.app.newPet}</button>
+      <button className="start-fresh" disabled={busy} onClick={() => guardCheck(() => void run(async () => { await api.logout(); resetAccount() }))}>{t.common.logOut}</button>
     </div></header>
-    <Tabs items={['triage', 'library', 'care', 'history', 'account'] as const} current={view} label={t.app.mainNavigation} text={(item) => t.app.tabs[item]} onSelect={(item) => { setView(item); setCheckRequest(null); setPetStatus('') }} />
+    <Tabs items={['triage', 'library', 'care', 'history', 'account'] as const} current={view} label={t.app.mainNavigation} text={(item) => t.app.tabs[item]} onSelect={(item) => guardCheck(() => { setView(item); setCheckRequest(null); setPetStatus('') })} />
+    {pendingLeave && <LeaveCheckConfirm state="in_progress" account onLeave={() => { const action = pendingLeave; setPendingLeave(null); setAccountCheck('idle'); action() }} onStay={() => setPendingLeave(null)} />}
     <ErrorNotice message={error} />
-    {view === 'triage' && pet && <Triage key={`${pet.id}-${checkRequest?.id ?? ''}`} pet={pet} initialSymptom={checkRequest?.species === pet.species ? checkRequest.symptom : undefined} />}
+    {view === 'triage' && pet && <Triage key={`${pet.id}-${checkRequest?.id ?? ''}`} pet={pet} initialSymptom={checkRequest?.species === pet.species ? checkRequest.symptom : undefined} onCheckStateChange={setAccountCheck} />}
     {view === 'library' && pet && <Library key={pet.species} species={pet.species} onStartCheck={startCheck} />}
     {view === 'care' && pet && <Care key={pet.id} pet={pet} onStartCheck={startCheck} />}
     {view === 'history' && pet && <CheckHistory key={pet.id} pet={pet} />}
@@ -422,7 +427,7 @@ function Triage({ pet, onLogin, initialSymptom, initialSpecies, onCheckStateChan
   function restart() { setResult(null); setSession(''); setGuestToken(null); setExpiresAt(null); setQuestion(null); setProgress(null); setComplete(false); setError('') }
   const guestControls = guestToken ? <GuestControls session={session} token={guestToken} expiresAt={expiresAt} disabled={busy} onDeleted={restart} /> : null
   if (result) return <CheckResult result={result} petName={pet?.name}>
-    {onLogin && <button className="primary" onClick={onLogin}>{tr.createAccountCta}</button>}
+    {onLogin && <button className="secondary" onClick={onLogin}>{tr.createAccountCta}</button>}
     <button className="secondary" onClick={restart}>{tr.startAnother}</button>
     {guestControls}
   </CheckResult>
@@ -451,18 +456,18 @@ function GuestControls({ session, token, expiresAt, disabled, onDeleted }: { ses
   return <div className="guest-controls"><p className="fine-print">{expiresAt ? g.expires(formatDate(expiresAt)) : ''}{g.closingLoses}</p><div className="guest-actions"><button className="secondary" disabled={disabled || busy} onClick={() => void run(async () => { await api.deleteGuestCheck(session, token); onDeleted() })}>{g.delete}</button><button className="link-button" disabled={disabled || busy} onClick={() => void run(async () => { downloadJson(await api.exportCheck(session, token), 'petadvice-guest-check.json'); setStatus(g.downloaded) })}>{g.download}</button></div><p role="status">{status}</p><ErrorNotice message={error} /></div>
 }
 
-function LeaveCheckConfirm({ state, onLeave, onStay }: { state: CheckState; onLeave: () => void; onStay: () => void }) {
+function LeaveCheckConfirm({ state, account = false, onLeave, onStay }: { state: CheckState; account?: boolean; onLeave: () => void; onStay: () => void }) {
   const { t } = useI18n()
   const g = t.guest
   const stay = useRef<HTMLButtonElement>(null)
   useEffect(() => { window.scrollTo?.(0, 0); stay.current?.focus() }, [])
-  return <section className="leave-confirm" role="alertdialog" aria-labelledby="leave-check-title" aria-describedby="leave-check-body"><h2 id="leave-check-title">{g.leaveTitle}</h2><p id="leave-check-body">{state === 'result' ? g.leaveResultBody : g.leaveBody}</p><div className="leave-actions"><button ref={stay} className="primary" onClick={onStay}>{g.stay}</button><button className="secondary" onClick={onLeave}>{g.leave}</button></div></section>
+  return <section className="leave-confirm" role="alertdialog" aria-labelledby="leave-check-title" aria-describedby="leave-check-body"><h2 id="leave-check-title">{g.leaveTitle}</h2><p id="leave-check-body">{account ? g.leaveAccountBody : state === 'result' ? g.leaveResultBody : g.leaveBody}</p><div className="leave-actions"><button ref={stay} className="primary" onClick={onStay}>{g.stay}</button><button className="secondary" onClick={onLeave}>{g.leave}</button></div></section>
 }
 
 function Sources({ sources }: { sources: string[] }) {
   const { t } = useI18n()
   const links = sources.filter((source) => /^https?:\/\//.test(source))
-  return links.length ? <details className="sources"><summary>{t.common.sources}</summary><ul>{links.map((source) => <li key={source}><a href={source} target="_blank" rel="noopener noreferrer">{t.common.opensNewTab(new URL(source).hostname)}</a></li>)}</ul></details> : null
+  return links.length ? <details className="sources"><summary>{t.common.sources}</summary><ul>{links.map((source) => <li key={source}><a href={source} target="_blank" rel="noopener noreferrer">{t.common.opensNewTab(sourceHost(source))}</a></li>)}</ul></details> : null
 }
 
 function Library({ species, onStartCheck }: { species: Species; onStartCheck?: StartCheck }) {
