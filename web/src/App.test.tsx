@@ -297,3 +297,65 @@ test('guests can go from a Learn entry to a check and see related care guides in
   await user.click(screen.getByText('Treat a flea infestation in your home'))
   expect(screen.getByText('Vacuum daily.')).toBeVisible()
 })
+
+test('care guides are grouped by topic, collapsed by default and can all be expanded', async () => {
+  const user = userEvent.setup()
+  vi.mocked(api.listPreventive).mockResolvedValue([
+    { id: 'nails', topic: 'grooming', title: 'Trim nails', summary: 'Short nails keep paws comfortable.', description: 'Full nail text.', steps: ['Check every 2 weeks.', 'Clip only the tip.'], recurrence: 'every 2 weeks', reminder_interval_days: 14, sources: [] },
+    { id: 'vaccines', topic: 'vaccinations', title: 'Keep vaccines up to date', summary: 'Vaccines protect your dog.', description: 'Full vaccine text.', steps: ['Start at 6–8 weeks.'], recurrence: 'yearly review', reminder_interval_days: 365, sources: [] },
+    { id: 'legacy', title: 'Older guide', description: 'Plain description only.', recurrence: null, sources: [] },
+  ])
+  render(<App />)
+  await user.click(await screen.findByRole('button', { name: 'Care plan' }))
+  const headings = (await screen.findAllByRole('heading', { level: 2 })).map((heading) => heading.textContent)
+  expect(headings).toEqual(['Vaccinations', 'Grooming', 'More care guides'])
+  const nails = screen.getByRole('heading', { name: 'Trim nails' }).closest('details') as HTMLDetailsElement
+  expect(nails.open).toBe(false)
+  expect(screen.getByText('Short nails keep paws comfortable.')).toBeVisible()
+  expect(screen.getByText('Check every 2 weeks.')).not.toBeVisible()
+  expect(screen.queryByText('Full nail text.')).not.toBeInTheDocument() // steps replace the plain-text fallback
+  expect(screen.getByText('Plain description only.').closest('summary')).not.toBeNull()
+  expect(Array.from(nails.querySelectorAll('.care-steps li'), (item) => item.textContent)).toEqual(['Check every 2 weeks.', 'Clip only the tip.'])
+  await user.click(screen.getByRole('button', { name: 'Expand all' }))
+  expect(document.querySelectorAll('details.care-item[open]')).toHaveLength(3)
+  expect(screen.getByText('Check every 2 weeks.')).toBeVisible()
+  await user.click(screen.getByRole('button', { name: 'Collapse all' }))
+  expect(document.querySelectorAll('details.care-item[open]')).toHaveLength(0)
+  await user.click(screen.getByText('Trim nails'))
+  expect(nails.open).toBe(true)
+  expect(screen.getByRole('button', { name: 'Expand all' })).toHaveAttribute('aria-expanded', 'false')
+})
+
+test('care reminders download a translated calendar file with the pet name', async () => {
+  const user = userEvent.setup()
+  setLanguage('pt')
+  const blobs: Blob[] = []
+  const createObjectURL = vi.spyOn(URL, 'createObjectURL').mockImplementation((blob) => { blobs.push(blob as Blob); return 'blob:reminder' })
+  const revokeObjectURL = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined)
+  const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined)
+  vi.mocked(api.listPreventive).mockResolvedValue([
+    { id: 'prevent-008', topic: 'grooming', title: 'Cortar as unhas', summary: 'Unhas curtas, patas confortáveis.', description: 'Texto.', steps: ['Verifique, a cada 2 semanas.'], recurrence: 'a cada 2 semanas', reminder_interval_days: 14, sources: [] },
+    { id: 'once', topic: 'reproduction', title: 'Falar com o veterinário', description: 'Uma vez.', recurrence: null, sources: [] },
+  ])
+  try {
+    render(<App />)
+    await user.click(await screen.findByRole('button', { name: 'Plano de cuidados' }))
+    expect(await screen.findByRole('heading', { name: 'Higiene e cuidados' })).toBeInTheDocument()
+    const reminders = screen.getAllByRole('button', { name: 'Adicionar lembrete ao calendário', hidden: true })
+    expect(reminders).toHaveLength(1) // only guides with a recurrence
+    await user.click(screen.getByText('Cortar as unhas'))
+    await user.click(reminders[0])
+    expect(click).toHaveBeenCalled()
+    expect(blobs[0].type).toBe('text/calendar;charset=utf-8')
+    const ics = (await blobs[0].text()).replace(/\r\n /g, '') // unfold long lines
+    expect(ics).toContain('SUMMARY:Rex: Cortar as unhas')
+    expect(ics).toContain('RRULE:FREQ=WEEKLY;INTERVAL=2')
+    expect(ics).toContain('1. Verifique\\, a cada 2 semanas.')
+    expect(ics).not.toContain('test@example.com')
+    expect(await screen.findByText(/Ficheiro de calendário de “Cortar as unhas” transferido/)).toBeInTheDocument()
+  } finally {
+    createObjectURL.mockRestore()
+    revokeObjectURL.mockRestore()
+    click.mockRestore()
+  }
+})

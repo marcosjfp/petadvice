@@ -87,38 +87,72 @@
       "id": "prevent-005",
       "species": "both",
       "life_stage": "all",
+      "topic": "parasites",
       "title": "Treat a flea infestation in your home",
+      "summary": "Most fleas live in your home rather than on your pet, so treat every pet and the home together.",
       "description": "Most of a flea population (eggs, larvae and cocoons) lives in your home, not on your pet. Treat every pet in the household on the same day with a vet-recommended product. Wash pet bedding, blankets and your own bed linen on a hot wash (60°C or more) and tumble-dry on high heat. Vacuum carpets, rugs, furniture, skirting boards and car seats thoroughly, and after each use empty the canister or seal and throw away the vacuum bag outside your home so fleas cannot escape. Clean hard floors and surfaces with hot, soapy water or a steam cleaner. If you use a household flea spray, choose one your vet recommends, follow the label and keep pets away until it is dry. Never use permethrin products around cats. Keep going: new fleas can hatch from cocoons for several weeks.",
+      "steps": [
+        "Treat every pet in the household on the same day with a vet-recommended product. Never use permethrin products around cats.",
+        "Hot-wash pet bedding, blankets and your own bed linen at 60°C or more, then tumble-dry on high heat.",
+        "Vacuum carpets, rugs, furniture, skirting boards and car seats thoroughly; empty the canister, or seal and throw away the bag outside, straight away.",
+        "Clean hard floors and surfaces with hot, soapy water or a steam cleaner.",
+        "If you use a household flea spray, choose one your vet recommends, follow the label and keep pets away until it is dry.",
+        "Keep going for several weeks: new fleas can keep hatching from cocoons."
+      ],
       "recurrence": "vacuum every day or two and wash bedding weekly until no fleas are seen for several weeks",
+      "reminder_interval_days": 7,
       "trigger_age_days": null,
       "sources": [
         "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/fleas-on-cats",
         "https://www.medicalnewstoday.com/articles/how-to-get-rid-of-fleas",
         "https://mypetandi.elanco.com/au/parasites/fleas/six-steps-get-rid-fleas-your-home-fast"
       ],
-      "related_symptoms": ["scratching"]
+      "related_symptoms": [
+        "scratching"
+      ]
     },
     {
       "id": "prevent-006",
       "species": "cat",
       "life_stage": "all",
+      "topic": "behaviour",
       "title": "Use pheromones to ease stressful events",
+      "summary": "Synthetic feline pheromones can help cats feel safe during changes and stressful events.",
       "description": "Synthetic feline facial pheromones (diffusers, sprays, wipes and collars) can help cats feel safe. Plug a diffuser into the room your cat uses most and leave it on continuously. Before travel, vet visits, visitors or fireworks, spray the carrier or bedding about 15 minutes before your cat goes in, so the alcohol evaporates. Never spray your cat directly. Leave the carrier out at home with familiar bedding so it is not only linked with stressful trips.",
+      "steps": [
+        "Plug a diffuser into the room your cat uses most and leave it on continuously.",
+        "Before travel, vet visits, visitors or fireworks, spray the carrier or bedding about 15 minutes before your cat goes in, so the alcohol evaporates.",
+        "Never spray your cat directly.",
+        "Leave the carrier out at home with familiar bedding so it is not only linked with stressful trips."
+      ],
       "recurrence": "diffuser refill about monthly; spray 15 minutes before each stressful event",
+      "reminder_interval_days": 30,
       "trigger_age_days": null,
       "sources": [
         "https://us.feliway.com/products/feliway-classic-spray-60ml",
         "https://www.drugs.com/vet/feliway-diffuser.html"
       ],
-      "related_symptoms": ["nervous_or_stressed"]
+      "related_symptoms": [
+        "nervous_or_stressed"
+      ]
     },
     {
       "id": "prevent-007",
       "species": "cat",
       "life_stage": "all",
+      "topic": "grooming",
       "title": "Trim nails and provide scratching posts",
+      "summary": "Regular trims and good scratching posts keep your cat's claws comfortable and healthy.",
       "description": "Trim your cat's nails regularly to prevent discomfort, snagging and injury. Gently press the paw pad to extend each claw and clip only the sharp, clear tip, staying well away from the pink quick, which bleeds and hurts if cut. Provide a sturdy scratching post tall enough for a full stretch, plus horizontal scratching pads: scratching naturally sheds the outer claw layers. Check older cats' claws often, because they can thicken and grow into the paw pads. Ask your vet to show you how if you are unsure.",
+      "steps": [
+        "Gently press the paw pad to extend each claw.",
+        "Clip only the sharp, clear tip, staying well away from the pink quick, which bleeds and hurts if cut.",
+        "Provide a sturdy scratching post tall enough for a full stretch, plus horizontal scratching pads.",
+        "Check older cats' claws often: they can thicken and grow into the paw pads.",
+        "Ask your vet to show you how if you are unsure."
+      ],
       "recurrence": "every 2–4 weeks",
+      "reminder_interval_days": 21,
       "trigger_age_days": null,
       "sources": [
         "https://partnersah.vet.cornell.edu/pet-owners/trimming-cat-claws",
@@ -129,9 +163,19 @@
       "id": "prevent-008",
       "species": "dog",
       "life_stage": "all",
+      "topic": "grooming",
       "title": "Keep nails at a healthy length",
+      "summary": "Walks help, but most dogs still need regular nail trims; if nails click on the floor, it is time.",
       "description": "Regular walks on hard surfaces such as pavement help wear nails down, but usually do not replace trimming, and dewclaws never touch the ground. If you hear nails clicking on the floor, they need a trim. Use proper dog nail clippers or a grinder and trim only the very tip, avoiding the quick: the sensitive pink area inside the nail that bleeds if cut. With dark nails, take tiny slices and stop when a dark dot appears in the centre of the cut surface. Keep styptic powder or cornflour nearby in case a nail bleeds, and reward your dog to keep trims calm. Ask your vet or groomer to show you if you are unsure.",
+      "steps": [
+        "Check nails every 2 weeks, including the dewclaws, which never touch the ground.",
+        "Use proper dog nail clippers or a grinder and trim only the very tip.",
+        "Avoid the quick, the sensitive pink area inside the nail. With dark nails, take tiny slices and stop when a dark dot appears in the centre of the cut surface.",
+        "Keep styptic powder or cornflour nearby in case a nail bleeds.",
+        "Reward your dog to keep trims calm, and ask your vet or groomer to show you if you are unsure."
+      ],
       "recurrence": "check every 2 weeks; trim every 3–4 weeks or when nails click on the floor",
+      "reminder_interval_days": 14,
       "trigger_age_days": null,
       "sources": [
         "https://vcahospitals.com/resources/conditions-dog/skin-coat/dogs-who-regularly-walk-on-pavement-and-cats-who-routinely-use-scratching-posts",
@@ -142,30 +186,55 @@
       "id": "prevent-009",
       "species": "both",
       "life_stage": "all",
+      "topic": "parasites",
       "title": "Protect your family from internal parasites",
+      "summary": "Some pet worms can infect people, especially young children, older adults, pregnant people and anyone with a weakened immune system.",
       "description": "Some pet worms, such as roundworms and hookworms, can infect people. Young children, older adults, pregnant people and anyone with a weakened immune system are most at risk. Keep to a regular, vet-recommended deworming and flea-control programme. Pick up dog faeces promptly, especially where children play, and clean litter trays daily; pregnant people should wear gloves or avoid litter-tray duties because of toxoplasmosis. Wash hands after handling pets, soil or faeces, and always before eating. Cover sandpits when not in use and keep children away from areas where pets go to the toilet.",
+      "steps": [
+        "Keep to a regular, vet-recommended deworming and flea-control programme.",
+        "Pick up dog faeces promptly, especially where children play.",
+        "Clean litter trays daily. Pregnant people should wear gloves or avoid litter-tray duties because of toxoplasmosis.",
+        "Wash hands after handling pets, soil or faeces, and always before eating.",
+        "Cover sandpits when not in use and keep children away from areas where pets go to the toilet."
+      ],
       "recurrence": "deworming as advised by your vet, often at least every 3 months for adult pets",
+      "reminder_interval_days": 91,
       "trigger_age_days": null,
       "sources": [
         "https://aaha.org/globalassets/02-guidelines/canine-life-stage-2019/roundworm_hookworm_cdc_brochure.pdf",
         "https://stacks.cdc.gov/view/cdc/13560/cdc_13560_DS1.pdf",
         "https://www.esccap.org/uploads/docs/ag51r456_0778_ESCCAP_GL1__English_2026_v23.pdf"
       ],
-      "related_symptoms": ["scooting"]
+      "related_symptoms": [
+        "scooting"
+      ]
     },
     {
       "id": "prevent-010",
       "species": "both",
       "life_stage": "all",
+      "topic": "parasites",
       "title": "Spot the signs of internal and external parasites",
+      "summary": "A quick weekly check helps you spot worms, fleas, ticks and mites early.",
       "description": "Internal parasites: diarrhoea, weight loss despite a good appetite, a dull coat, vomiting, and scooting (dragging the bottom along the floor or carpet). Puppies and kittens may have a swollen pot belly, and you may actually see worms in their faeces or diarrhoea: roundworms look like spaghetti, and tapeworm segments look like rice grains around the bottom. External parasites: excessive scratching, licking or biting, red or irritated skin, scabs and hair loss. Look for fleas or black flea dirt (it turns red on damp white paper), ticks attached to the skin, and dark ear wax or head-shaking from ear mites. If you notice these signs, ask your vet about a faecal test and the right treatment.",
+      "steps": [
+        "Internal parasites: watch for diarrhoea, weight loss despite a good appetite, a dull coat, vomiting and scooting.",
+        "Puppies and kittens may have a swollen pot belly; roundworms in faeces look like spaghetti, and tapeworm segments look like rice grains around the bottom.",
+        "External parasites: watch for excessive scratching, licking or biting, red or irritated skin, scabs and hair loss.",
+        "Look for fleas or black flea dirt (it turns red on damp white paper), ticks attached to the skin, and dark ear wax or head-shaking from ear mites.",
+        "If you notice these signs, ask your vet about a faecal test and the right treatment."
+      ],
       "recurrence": "check coat, skin and ears weekly, and after walks in long grass",
+      "reminder_interval_days": 7,
       "trigger_age_days": null,
       "sources": [
         "https://www.esccap.org/uploads/docs/ag51r456_0778_ESCCAP_GL1__English_2026_v23.pdf",
         "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/fleas-on-cats"
       ],
-      "related_symptoms": ["scooting", "scratching"]
+      "related_symptoms": [
+        "scooting",
+        "scratching"
+      ]
     }
   ]
 }

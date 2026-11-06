@@ -5,7 +5,7 @@ from datetime import date, datetime, timezone
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field as PydanticField, field_validator
+from pydantic import BaseModel, EmailStr, Field as PydanticField, field_validator, model_validator
 from sqlalchemy import JSON, Column, Index, Enum as SAEnum
 from sqlmodel import Field, SQLModel
 
@@ -209,16 +209,43 @@ class TriageQuestion(BaseModel):
     next_question_by_answer: dict[str, str] = PydanticField(default_factory=dict)
 
 
+class CareTopic(str, Enum):
+    """Groups preventive care guides on the Care page; the order here is the display order."""
+    getting_started = "getting_started"
+    vaccinations = "vaccinations"
+    parasites = "parasites"
+    health_checks = "health_checks"
+    dental = "dental"
+    nutrition = "nutrition"
+    grooming = "grooming"
+    behaviour = "behaviour"
+    reproduction = "reproduction"
+
+
 class PreventiveCareItem(BaseModel):
     id: str
     species: Species
     life_stage: str
+    topic: CareTopic
     title: str
-    description: str
+    summary: Optional[str] = None
+    description: str  # complete plain-text fallback, also used in related care and saved reports
+    steps: list[str] = PydanticField(default_factory=list)
     recurrence: Optional[str] = None
+    reminder_interval_days: Optional[int] = PydanticField(default=None, ge=1, le=3650)
     trigger_age_days: Optional[int] = None
     sources: list[str] = PydanticField(default_factory=list)
     related_symptoms: list[str] = PydanticField(default_factory=list)
+
+    @model_validator(mode="after")
+    def check_guide_shape(self) -> "PreventiveCareItem":
+        if any(not step.strip() for step in self.steps):
+            raise ValueError(f"{self.id} has an empty step")
+        if self.steps and not (self.summary and self.summary.strip()):
+            raise ValueError(f"{self.id} has steps but no summary")
+        if self.reminder_interval_days is not None and not self.recurrence:
+            raise ValueError(f"{self.id} has a reminder interval but no recurrence")
+        return self
 
 
 class PetCreate(BaseModel):

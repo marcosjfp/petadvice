@@ -37,6 +37,8 @@ def test_translations_cover_all_published_content(language):
     for item in content_library.preventive_items:
         fields = data["preventive_care"][item.id]
         assert fields["title"] and fields["description"] and ("recurrence" in fields) == (item.recurrence is not None)
+        assert ("summary" in fields) == (item.summary is not None), item.id
+        assert len(fields.get("steps", [])) == len(item.steps), item.id
     for question in content_library.questions:
         fields = data["questions"][question.id]
         assert fields["prompt"] and len(fields["options"]) == len(question.options)
@@ -150,3 +152,74 @@ def test_result_and_learn_include_related_care_for_the_pet_species(db):
     client = TestClient(app)
     wound = next(item for item in client.get("/conditions", params={"species": "dog"}).json() if item["id"] == "dog-cat-wound-001")
     assert [item["id"] for item in wound["related_care_items"]] == ["prevent-008"]  # the cat nail guide is filtered out
+
+
+def test_care_guides_have_topics_steps_and_reminder_intervals():
+    items = {item.id: item for item in content_library.preventive_items}
+    assert all(item.topic for item in items.values())
+    assert {item.topic.value for item in items.values()} >= {"vaccinations", "parasites", "dental", "nutrition", "health_checks", "grooming", "behaviour", "reproduction", "getting_started"}
+    for item_id in ("prevent-001", "prevent-005", "prevent-006", "prevent-007", "prevent-008", "prevent-009", "prevent-010"):
+        assert items[item_id].summary and len(items[item_id].steps) >= 3, item_id
+    for item in items.values():
+        if item.steps:  # the plain-text description must stay a complete fallback, not just the summary
+            assert len(item.description) > len(item.summary), item.id
+        if item.reminder_interval_days:
+            assert item.recurrence, item.id
+    assert items["prevent-013"].reminder_interval_days == 1
+    assert items["prevent-015"].reminder_interval_days == 182
+    assert items["prevent-016"].reminder_interval_days is None  # one-off reminder
+
+
+@pytest.mark.parametrize(("species", "stage", "expected", "excluded"), [
+    ("dog", "puppy", {"prevent-011", "prevent-013", "prevent-014", "prevent-016"}, {"prevent-012", "prevent-015", "prevent-017"}),
+    ("cat", "kitten", {"prevent-012", "prevent-013", "prevent-014", "prevent-017"}, {"prevent-011", "prevent-015", "prevent-016"}),
+    ("cat", "senior", {"prevent-012", "prevent-013", "prevent-014", "prevent-015"}, {"prevent-017"}),
+])
+def test_essential_care_content_is_species_and_stage_appropriate(species, stage, expected, excluded):
+    ids = {item.id for item in content_library.filter_preventive(species, stage)}
+    assert expected <= ids and not (excluded & ids)
+
+
+def test_care_api_returns_localized_steps_and_grouping_fields():
+    client = TestClient(app)
+    care = client.get("/preventive-care", params={"species": "cat", "life_stage": "senior"}, headers={"Accept-Language": "pt-PT"}).json()
+    dental = next(item for item in care if item["id"] == "prevent-013")
+    assert dental["topic"] == "dental" and dental["reminder_interval_days"] == 1
+    assert dental["title"].startswith("Escovar") and dental["summary"] and dental["steps"][0].startswith("Use uma escova")
+    english = next(item for item in client.get("/preventive-care", params={"species": "cat"}).json() if item["id"] == "prevent-013")
+    assert len(english["steps"]) == len(dental["steps"]) and "xylitol" in english["steps"][0]
+    assert "xylitol" in english["description"]  # description stays a complete fallback
+
+
+@pytest.mark.parametrize(("fields", "message"), [
+    ({"steps": ["Só um passo"]}, "must have 4 items"),
+    ({"topic": "dental"}, "invalid fields"),
+    ({"reminder_interval_days": "7"}, "invalid fields"),
+])
+def test_malformed_care_translation_is_rejected(monkeypatch, tmp_path, fields, message):
+    (tmp_path / "pt.json").write_text(json.dumps({"preventive_care": {"prevent-001": fields}}))
+    monkeypatch.setattr("app.content.loader.TRANSLATIONS_DIR", tmp_path)
+    with pytest.raises(RuntimeError, match=message):
+        ContentLibrary().load()
+
+
+def test_care_translation_cannot_add_a_summary_missing_in_english(monkeypatch, tmp_path):
+    (tmp_path / "pt.json").write_text(json.dumps({"preventive_care": {"prevent-002": {"summary": "Resumo"}}}))
+    monkeypatch.setattr("app.content.loader.TRANSLATIONS_DIR", tmp_path)
+    with pytest.raises(RuntimeError, match="invalid fields"):
+        ContentLibrary().load()
+
+
+@pytest.mark.parametrize(("update", "message"), [
+    ({"steps": ["Do this"], "summary": None}, "steps but no summary"),
+    ({"steps": ["  "], "summary": "Short"}, "empty step"),
+    ({"reminder_interval_days": 7, "recurrence": None}, "no recurrence"),
+    ({"reminder_interval_days": 0, "recurrence": "daily"}, "greater than or equal to 1"),
+    ({"topic": "astrology"}, "topic"),
+])
+def test_care_item_shape_is_validated(update, message):
+    from pydantic import ValidationError
+    from app.models.schema import PreventiveCareItem
+    base = {"id": "x", "species": "dog", "life_stage": "all", "topic": "dental", "title": "T", "description": "D"}
+    with pytest.raises(ValidationError, match=message):
+        PreventiveCareItem.model_validate(base | update)

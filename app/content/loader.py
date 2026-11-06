@@ -13,7 +13,8 @@ TRANSLATIONS_DIR = CONTENT_DIR / "translations"
 ALL_LIFE_STAGES = "all"
 _CONDITION_TEXT = ("name", "home_care_guidance", "prevention_tips")
 _CONDITION_LISTS = ("possible_causes", "recommended_examinations")
-_PREVENTIVE_TEXT = ("title", "description", "recurrence")
+_PREVENTIVE_TEXT = ("title", "summary", "description", "recurrence")
+_PREVENTIVE_LISTS = ("steps",)
 
 
 class ContentLibrary:
@@ -149,9 +150,15 @@ class ContentLibrary:
                         list_fields |= {name: getattr(source, name) for name in _CONDITION_LISTS}
                     if kind == "questions":
                         list_fields["options"] = source.options
+                    if kind == "preventive_care":
+                        list_fields |= {name: getattr(source, name) for name in _PREVENTIVE_LISTS}
+                        unknown = set(fields) - {*_PREVENTIVE_TEXT, *_PREVENTIVE_LISTS}
+                        missing_source = [name for name in _PREVENTIVE_TEXT if name in fields and getattr(source, name) is None]
+                        if unknown or missing_source:
+                            raise ValueError(f"Translation {language} {item_id} has invalid fields: {sorted(unknown | set(missing_source))}")
                     for name, value in fields.items():
                         if name in list_fields:
-                            if not isinstance(value, list) or len(value) != len(list_fields[name]):
+                            if not isinstance(value, list) or len(value) != len(list_fields[name]) or not all(isinstance(text, str) and text.strip() for text in value):
                                 raise ValueError(f"Translation {language} {item_id}.{name} must have {len(list_fields[name])} items")
                         elif not hasattr(source, name) or not isinstance(value, str):
                             raise ValueError(f"Translation {language} {item_id} has an invalid field: {name}")
@@ -175,6 +182,7 @@ class ContentLibrary:
     def localize_preventive(self, item: PreventiveCareItem, language: str) -> PreventiveCareItem:
         fields = self._translation(language, "preventive_care", item.id)
         update = {name: fields[name] for name in _PREVENTIVE_TEXT if name in fields and getattr(item, name) is not None}
+        update |= {name: list(fields[name]) for name in _PREVENTIVE_LISTS if name in fields}
         return item.model_copy(update=update) if update else item
 
     def question_prompt(self, question: TriageQuestion, language: str) -> str:
