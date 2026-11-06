@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { api, ApiError, careTopics, type Condition, type GuestContext, type Owner, type Privacy, type Pet, type Progress, type Question, type Species, type TriageResult, type PreventiveCareItem } from './api'
+import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
+import { api, ApiError, careTopics, type Condition, type GuestContext, type Owner, type Privacy, type Pet, type PetCreate, type Progress, type Question, type Species, type TriageResult, type PreventiveCareItem } from './api'
 import AccountLink from './AccountLink'
 import CheckResult from './CheckResult'
 import CheckHistory from './CheckHistory'
@@ -17,6 +17,33 @@ import './App.css'
 
 type View = 'triage' | 'library' | 'care' | 'history' | 'account'
 
+// A non-sensitive hint that this browser had a signed-in session last time. It only decides whether the
+// first paint shows "loading your account" or the public landing while the session check runs.
+const SIGNED_IN_HINT = 'petadvice_signed_in_hint'
+function readSignedInHint() {
+  try { return localStorage.getItem(SIGNED_IN_HINT) === '1' } catch { return false }
+}
+function writeSignedInHint(signedIn: boolean) {
+  try {
+    if (signedIn) localStorage.setItem(SIGNED_IN_HINT, '1')
+    else localStorage.removeItem(SIGNED_IN_HINT)
+  } catch { /* Storage can be disabled; the landing then shows during the session check. */ }
+}
+
+// Every change of screen starts at the top, and keyboard and screen-reader focus moves to the new heading.
+function useScreenChange(screen: string) {
+  const previous = useRef(screen)
+  useEffect(() => {
+    if (previous.current === screen) return
+    previous.current = screen
+    window.scrollTo(0, 0)
+    const heading = document.querySelector<HTMLElement>('main h1')
+    if (!heading) return
+    if (!heading.hasAttribute('tabindex')) heading.setAttribute('tabindex', '-1')
+    heading.focus({ preventScroll: true })
+  }, [screen])
+}
+
 function ErrorNotice({ message }: { message: string }) {
   return message ? <p className="error" role="alert">{message}</p> : null
 }
@@ -24,6 +51,17 @@ function ErrorNotice({ message }: { message: string }) {
 function LanguageSwitch() {
   const { language, t, setLanguage } = useI18n()
   return <div className="language-switch" role="group" aria-label={t.language}>{languages.map((item) => <button key={item.code} type="button" lang={item.code} aria-label={item.label} title={item.label} aria-pressed={language === item.code} onClick={() => setLanguage(item.code)}>{item.code.toUpperCase()}</button>)}</div>
+}
+
+// One row of tabs; on narrow screens it scrolls sideways and keeps the active tab in view.
+function Tabs<T extends string>({ items, current, label, text, onSelect }: { items: readonly T[]; current: T; label: string; text: (item: T) => string; onSelect: (item: T) => void }) {
+  const nav = useRef<HTMLElement>(null)
+  useEffect(() => {
+    const row = nav.current
+    const active = row?.querySelector<HTMLElement>('[aria-current="page"]')
+    if (row && active && row.scrollWidth > row.clientWidth) row.scrollLeft = active.offsetLeft - (row.clientWidth - active.offsetWidth) / 2
+  }, [current])
+  return <nav ref={nav} className="tabs" aria-label={label}>{items.map((item) => <button key={item} aria-current={current === item ? 'page' : undefined} className={current === item ? 'active' : ''} onClick={() => onSelect(item)}>{text(item)}</button>)}</nav>
 }
 
 function App() {
@@ -37,10 +75,13 @@ function App() {
   })
   const [owner, setOwner] = useState<Owner | null>(null)
   const [auth, setAuth] = useState<'checking' | 'signed-in' | 'guest' | 'error'>(guestOnlyPreview ? 'guest' : 'checking')
+  const [signedInHint, setSignedInHint] = useState(() => !guestOnlyPreview && readSignedInHint())
   const [view, setView] = useState<View>('triage')
   const [pets, setPets] = useState<Pet[]>([])
   const [selectedPetId, setSelectedPetId] = useState<string | null>(null)
   const [showPetForm, setShowPetForm] = useState(false)
+  const [editingPetId, setEditingPetId] = useState<string | null>(null)
+  const [petStatus, setPetStatus] = useState('')
   const [showAuth, setShowAuth] = useState(false)
   const [showQuickCheck, setShowQuickCheck] = useState(false)
   const [publicView, setPublicView] = useState<'library' | 'care' | null>(null)
@@ -55,7 +96,17 @@ function App() {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
   })
   const pet = pets.find((item) => item.id === selectedPetId) ?? pets[0] ?? null
+  const editingPet = pets.find((item) => item.id === editingPetId) ?? null
   const { busy, error, run } = useRequest()
+
+  // Without the hint, visitors see the public app straight away; a session found in the background then takes over.
+  const accountPending = auth === 'checking' || (auth === 'signed-in' && !petsLoaded && !loadError)
+  const showGuest = auth === 'guest' || (!signedInHint && (accountPending || auth === 'error'))
+  const addingPet = (!pet || showPetForm) && view !== 'account'
+  useScreenChange(accountLink ? 'account-link'
+    : showGuest ? `guest:${showAuth ? 'auth' : showQuickCheck ? 'check' : publicView ?? 'landing'}`
+    : accountPending ? 'loading'
+    : `app:${editingPet ? 'edit' : addingPet ? 'new-pet' : view}`)
 
   useEffect(() => {
     if (accountLink) window.history.replaceState(null, '', window.location.pathname + window.location.search)
@@ -66,11 +117,19 @@ function App() {
     try { localStorage.removeItem('petadvice_token') } catch { /* Storage can be disabled; cookie auth still works. */ }
     if (guestOnlyPreview) return
     let cancelled = false
-    api.getMe().then((data) => { if (!cancelled) { setOwner(data); setAuth('signed-in') } })
-      .catch((failure) => { if (!cancelled) setAuth(failure instanceof ApiError && failure.status === 401 ? 'guest' : 'error') })
+    api.getMe().then((data) => {
+      if (cancelled) return
+      // Only remembered for the next visit: switching the hint now would flash a loading screen over the landing.
+      writeSignedInHint(true)
+      setOwner(data); setAuth('signed-in')
+    }).catch((failure) => {
+      if (cancelled) return
+      if (failure instanceof ApiError && failure.status === 401) { writeSignedInHint(false); setSignedInHint(false); setAuth('guest') } else setAuth('error')
+    })
     const expired = () => {
+      writeSignedInHint(false); setSignedInHint(false)
       setOwner(null)
-      setAuth('guest'); setPets([]); setSelectedPetId(null); setPetsLoaded(false)
+      setAuth('guest'); setPets([]); setSelectedPetId(null); setPetsLoaded(false); setEditingPetId(null)
       setShowAuth(true); setShowQuickCheck(false)
     }
     window.addEventListener('petadvice:session-expired', expired)
@@ -89,42 +148,45 @@ function App() {
   }, [auth, load])
 
   function resetAccount() {
+    writeSignedInHint(false); setSignedInHint(false)
     setOwner(null)
-    setAuth('guest'); setPets([]); setSelectedPetId(null); setPetsLoaded(false)
-    setShowPetForm(false); setShowAuth(false); setShowQuickCheck(false); setView('triage')
+    setAuth('guest'); setPets([]); setSelectedPetId(null); setPetsLoaded(false); setEditingPetId(null); setPetStatus('')
+    setShowPetForm(false); setShowAuth(false); setShowQuickCheck(false); setPublicView(null); setView('triage')
   }
 
-  function createPet(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    const form = new FormData(event.currentTarget)
+  function createPet(values: PetCreate) {
     void run(async () => {
-      const neutered = form.get('neutered')
-      const created = await api.createPet({
-        name: String(form.get('name')).trim(), species: form.get('species') as Species,
-        date_of_birth: String(form.get('date_of_birth') || '') || null,
-        sex: String(form.get('sex') || '') || null,
-        neutered: neutered === '' ? null : neutered === 'yes',
-        breed_size: String(form.get('breed_size') || '') || null, environment_factors: [],
-      })
+      const created = await api.createPet(values)
       setPets((current) => [...current, created]); setSelectedPetId(created.id)
       setShowPetForm(false); setView('triage')
     })
   }
 
+  function updatePet(target: Pet, values: PetCreate) {
+    void run(async () => {
+      const updated = await api.updatePet(target.id, { name: values.name, date_of_birth: values.date_of_birth, sex: values.sex, neutered: values.neutered, breed_size: values.breed_size })
+      setPets((current) => current.map((item) => item.id === updated.id ? updated : item))
+      setEditingPetId(null); setPetStatus(t.account.petSaved(updated.name))
+    })
+  }
+
+  function petDeleted(target: Pet) {
+    setPets((current) => current.filter((item) => item.id !== target.id))
+    setSelectedPetId((current) => current === target.id ? null : current)
+    setPetStatus(t.account.petDeleted(target.name))
+  }
+
   function startCheck(symptom: string, species: Species) {
     setCheckRequest({ symptom, species, id: Date.now() })
-    if (auth === 'guest') { setPublicView(null); setShowQuickCheck(true) } else setView('triage')
-    window.scrollTo(0, 0)
+    if (showGuest) { setPublicView(null); setShowQuickCheck(true) } else setView('triage')
   }
 
   function retryLoad() { setLoadError(''); setPetsLoaded(false); setAuth('checking'); setLoad((count) => count + 1) }
 
   if (accountLink) return <Shell><AccountLink {...accountLink} onDone={() => { setAccountLink(null); setShowAuth(true); retryLoad() }} /><Emergency /></Shell>
 
-  if (auth === 'checking' || (auth === 'signed-in' && !petsLoaded)) return <Shell><p role="status">{t.app.loadingAccount}</p><Emergency /></Shell>
-  if (auth === 'error' || loadError) return <Shell><h1>{t.app.loadErrorTitle}</h1><ErrorNotice message={loadError || t.app.loadErrorDetail} /><button className="primary" onClick={retryLoad}>{t.common.tryAgain}</button><Emergency /></Shell>
-  if (auth === 'guest') {
-    if (showAuth) return <AuthPanel onBack={() => setShowAuth(false)} onAuthenticated={() => { setShowAuth(false); setShowQuickCheck(false); retryLoad() }} />
+  if (showGuest) {
+    if (showAuth) return <AuthPanel onBack={() => setShowAuth(false)} onAuthenticated={() => { writeSignedInHint(true); setSignedInHint(true); setShowAuth(false); setShowQuickCheck(false); setPublicView(null); retryLoad() }} />
     if (showQuickCheck) {
       // Guest checks are not saved, so leaving a started one asks first.
       const leave = () => { setConfirmLeave(false); setGuestCheck('idle'); setShowQuickCheck(false); setCheckRequest(null) }
@@ -134,20 +196,22 @@ function App() {
     return <PublicLanding onBrowse={setPublicView} onQuickCheck={() => { setCheckRequest(null); setShowQuickCheck(true) }} onLogin={guestOnlyPreview ? undefined : () => setShowAuth(true)} />
   }
 
+  if (accountPending) return <Shell><p role="status">{t.app.loadingAccount}</p><Emergency /></Shell>
+  if (auth === 'error' || loadError) return <Shell><h1>{t.app.loadErrorTitle}</h1><ErrorNotice message={loadError || t.app.loadErrorDetail} /><button className="primary" onClick={retryLoad}>{t.common.tryAgain}</button><Emergency /></Shell>
+
   if (owner?.email_verification_required && !owner.email_verified_at) return <Shell><VerificationNotice email={owner.email} onLogout={resetAccount} /><Account onDeleted={resetAccount} /><Emergency /></Shell>
 
-  if ((!pet || showPetForm) && view !== 'account') return <Shell onBack={pet ? () => setShowPetForm(false) : undefined}>
+  if (editingPet) return <Shell onBack={() => setEditingPetId(null)}>
+    <section className="welcome"><p className="eyebrow">{t.petForm.editEyebrow}</p>
+      <h1>{t.petForm.editTitle(editingPet.name)}</h1><p className="lead">{t.petForm.editLead}</p>
+      <PetForm key={editingPet.id} pet={editingPet} today={today} busy={busy} onSubmit={(values) => updatePet(editingPet, values)} /><ErrorNotice message={error} />
+    </section><Emergency />
+  </Shell>
+
+  if (addingPet) return <Shell onBack={pet ? () => setShowPetForm(false) : undefined}>
     <section className="welcome"><p className="eyebrow">{pet ? t.petForm.eyebrowAnother : t.petForm.eyebrowFirst}</p>
       <h1>{t.petForm.title}</h1><p className="lead">{t.petForm.lead}</p>
-      <form className="profile-form" onSubmit={createPet} aria-busy={busy}>
-        <label>{t.petForm.name}<input name="name" required maxLength={100} placeholder={t.petForm.namePlaceholder} /></label>
-        <label>{t.petForm.species}<select name="species"><option value="dog">{t.species.dog}</option><option value="cat">{t.species.cat}</option></select></label>
-        <label>{t.petForm.dateOfBirth}<input name="date_of_birth" type="date" max={today} /></label>
-        <label>{t.petForm.sex}<select name="sex"><option value="">{t.common.unknown}</option><option value="female">{t.petForm.female}</option><option value="male">{t.petForm.male}</option></select></label>
-        <label>{t.petForm.neutered}<select name="neutered"><option value="">{t.common.unknown}</option><option value="yes">{t.common.yes}</option><option value="no">{t.common.no}</option></select></label>
-        <label>{t.petForm.breedSize}<select name="breed_size"><option value="">{t.petForm.unknownOrCat}</option><option value="small">{t.petForm.small}</option><option value="medium">{t.petForm.medium}</option><option value="large">{t.petForm.large}</option><option value="giant">{t.petForm.giant}</option></select></label>
-        <button className="primary" disabled={busy}>{busy ? t.petForm.saving : t.petForm.create}</button>
-      </form><ErrorNotice message={error} />
+      <PetForm today={today} busy={busy} onSubmit={createPet} /><ErrorNotice message={error} />
       {!pet && <button className="secondary" onClick={() => setView('account')}>{t.petForm.accountPrivacy}</button>}
     </section><Emergency />
   </Shell>
@@ -158,15 +222,42 @@ function App() {
       <button className="start-fresh" onClick={() => { setShowPetForm(true); setView('triage') }}>{t.app.newPet}</button>
       <button className="start-fresh" disabled={busy} onClick={() => void run(async () => { await api.logout(); resetAccount() })}>{t.common.logOut}</button>
     </div></header>
-    <nav className="tabs" aria-label={t.app.mainNavigation}>{(['triage', 'library', 'care', 'history', 'account'] as View[]).map((item) => <button aria-current={view === item ? 'page' : undefined} className={view === item ? 'active' : ''} onClick={() => { setView(item); setCheckRequest(null) }} key={item}>{t.app.tabs[item]}</button>)}</nav>
+    <Tabs items={['triage', 'library', 'care', 'history', 'account'] as const} current={view} label={t.app.mainNavigation} text={(item) => t.app.tabs[item]} onSelect={(item) => { setView(item); setCheckRequest(null); setPetStatus('') }} />
     <ErrorNotice message={error} />
     {view === 'triage' && pet && <Triage key={`${pet.id}-${checkRequest?.id ?? ''}`} pet={pet} initialSymptom={checkRequest?.species === pet.species ? checkRequest.symptom : undefined} />}
     {view === 'library' && pet && <Library key={pet.species} species={pet.species} onStartCheck={startCheck} />}
     {view === 'care' && pet && <Care key={pet.id} pet={pet} onStartCheck={startCheck} />}
     {view === 'history' && pet && <CheckHistory key={pet.id} pet={pet} />}
-    {view === 'account' && <Account onDeleted={resetAccount} />}
+    {view === 'account' && <Account onDeleted={resetAccount} pets={pets} status={petStatus} onEditPet={(item) => { setPetStatus(''); setEditingPetId(item.id) }} onPetDeleted={petDeleted} />}
     <Emergency />
   </main>
+}
+
+function PetForm({ pet, today, busy, onSubmit }: { pet?: Pet; today: string; busy: boolean; onSubmit: (values: PetCreate) => void }) {
+  const { t } = useI18n()
+  const lockedId = useId()
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const form = new FormData(event.currentTarget)
+    const neutered = form.get('neutered')
+    onSubmit({
+      name: String(form.get('name')).trim(), species: pet?.species ?? form.get('species') as Species,
+      date_of_birth: String(form.get('date_of_birth') || '') || null,
+      sex: String(form.get('sex') || '') || null,
+      neutered: neutered === '' ? null : neutered === 'yes',
+      breed_size: String(form.get('breed_size') || '') || null, environment_factors: [],
+    })
+  }
+  const neutered = pet?.neutered == null ? '' : pet.neutered ? 'yes' : 'no'
+  return <form className="profile-form" onSubmit={submit} aria-busy={busy}>
+    <label>{t.petForm.name}<input name="name" required maxLength={100} placeholder={t.petForm.namePlaceholder} defaultValue={pet?.name} /></label>
+    <div className="form-field"><label>{t.petForm.species}<select name="species" defaultValue={pet?.species ?? 'dog'} disabled={Boolean(pet)} aria-describedby={pet ? lockedId : undefined}><option value="dog">{t.species.dog}</option><option value="cat">{t.species.cat}</option></select></label>{pet && <small id={lockedId} className="field-note">{t.petForm.speciesLocked}</small>}</div>
+    <label>{t.petForm.dateOfBirth}<input name="date_of_birth" type="date" max={today} defaultValue={pet?.date_of_birth ?? ''} /></label>
+    <label>{t.petForm.sex}<select name="sex" defaultValue={pet?.sex ?? ''}><option value="">{t.common.unknown}</option><option value="female">{t.petForm.female}</option><option value="male">{t.petForm.male}</option></select></label>
+    <label>{t.petForm.neutered}<select name="neutered" defaultValue={neutered}><option value="">{t.common.unknown}</option><option value="yes">{t.common.yes}</option><option value="no">{t.common.no}</option></select></label>
+    <label>{t.petForm.breedSize}<select name="breed_size" defaultValue={pet?.breed_size ?? ''}><option value="">{t.petForm.unknownOrCat}</option><option value="small">{t.petForm.small}</option><option value="medium">{t.petForm.medium}</option><option value="large">{t.petForm.large}</option><option value="giant">{t.petForm.giant}</option></select></label>
+    <button className="primary" disabled={busy}>{busy ? t.petForm.saving : pet ? t.petForm.saveChanges : t.petForm.create}</button>
+  </form>
 }
 
 function Shell({ children, onBack }: { children: React.ReactNode; onBack?: () => void }) {
@@ -178,9 +269,10 @@ function PublicLanding({ onQuickCheck, onLogin, onBrowse }: { onQuickCheck: () =
   const { t } = useI18n()
   const l = t.landing
   return <main className="shell landing"><header><img className="main-logo" src={fullLogo} alt={l.logoAlt} /><LanguageSwitch />{onLogin && <button className="start-fresh login-button" onClick={onLogin}>{l.login}</button>}</header>
-    <section className="intro"><p className="eyebrow">{l.eyebrow}</p><h1>{l.title}</h1><p className="intro-lead">{l.lead}</p>
-      <div className="intro-actions"><button className="primary" onClick={onQuickCheck}>{l.start} <span aria-hidden="true">→</span></button>{onLogin && <button className="secondary" onClick={onLogin}>{l.save}</button>}</div>
-      <div className="public-links"><button className="secondary" onClick={() => onBrowse('library')}>{l.browseLearn}</button><button className="secondary" onClick={() => onBrowse('care')}>{l.browseCare}</button></div>
+    <section className="intro"><div className="intro-hero"><div className="intro-copy"><p className="eyebrow">{l.eyebrow}</p><h1>{l.title}</h1><p className="intro-lead">{l.lead}</p>
+      <div className="intro-actions"><button className="primary" onClick={onQuickCheck}>{l.start} <span aria-hidden="true">→</span></button></div>
+      <div className="intro-more" role="group" aria-label={l.moreActions}>{onLogin && <button className="secondary" onClick={onLogin}>{l.save}</button>}<button className="secondary" onClick={() => onBrowse('library')}>{l.browseLearn}</button><button className="secondary" onClick={() => onBrowse('care')}>{l.browseCare}</button></div>
+      </div><SampleCheck /></div>
       <div className="intro-points"><article><span>01</span><div><h2>{l.point1Title}</h2><p>{l.point1Body}</p></div></article><article><span>02</span><div><h2>{l.point2Title}</h2><p>{l.point2Body}</p></div></article><article><span>03</span><div><h2>{l.point3Title}</h2><p>{onLogin ? l.point3Account : l.point3Guest}</p></div></article></div>
       <p className="intro-boundary">{l.boundary}</p>
     </section>
@@ -190,13 +282,27 @@ function PublicLanding({ onQuickCheck, onLogin, onBrowse }: { onQuickCheck: () =
   </main>
 }
 
+// An illustrative check summary for the wide landing layout, built from the app's own styles.
+function SampleCheck() {
+  const { t } = useI18n()
+  const l = t.landing
+  return <figure className="sample-check" aria-label={l.sampleLabel}>
+    <div className="sample-head"><img src={petsLogo} alt="" /><div><p className="eyebrow">{l.sampleEyebrow}</p><strong>{l.samplePet}</strong></div></div>
+    <p className="sample-symptom">{t.symptoms.vomiting}</p>
+    <div className="sample-urgency"><span>{l.sampleNextStep}</span><strong>{t.urgency.vet_soon}</strong></div>
+    <ul><li>{l.sampleReason1}</li><li>{l.sampleReason2}</li></ul>
+    <figcaption>{l.sampleNote}</figcaption>
+  </figure>
+}
+
 function PublicEducation({ initialView, onBack, onStartCheck }: { initialView: 'library' | 'care'; onBack: () => void; onStartCheck: StartCheck }) {
   const [view, setView] = useState(initialView)
   const [species, setSpecies] = useState<Species>('dog')
   const { t } = useI18n()
-  return <Shell onBack={onBack}><nav className="tabs" aria-label={t.publicEducation.navigation}>{(['library', 'care'] as const).map((item) => <button key={item} aria-current={view === item ? 'page' : undefined} className={view === item ? 'active' : ''} onClick={() => setView(item)}>{item === 'library' ? t.publicEducation.learn : t.publicEducation.care}</button>)}</nav>
+  useScreenChange(view)
+  return <Shell onBack={onBack}><div className="education"><Tabs items={['library', 'care'] as const} current={view} label={t.publicEducation.navigation} text={(item) => item === 'library' ? t.publicEducation.learn : t.publicEducation.care} onSelect={setView} />
     <label className="guest-species">{t.publicEducation.browseFor}<select value={species} onChange={(event) => setSpecies(event.target.value as Species)}><option value="dog">{t.speciesPlural.dog}</option><option value="cat">{t.speciesPlural.cat}</option></select></label>
-    {view === 'library' ? <Library key={species} species={species} onStartCheck={onStartCheck} /> : <Care key={species} species={species} onStartCheck={onStartCheck} />}<Emergency />
+    {view === 'library' ? <Library key={species} species={species} onStartCheck={onStartCheck} /> : <Care key={species} species={species} onStartCheck={onStartCheck} />}</div><Emergency />
   </Shell>
 }
 
@@ -362,6 +468,7 @@ function Sources({ sources }: { sources: string[] }) {
 function Library({ species, onStartCheck }: { species: Species; onStartCheck?: StartCheck }) {
   const [items, setItems] = useState<Condition[] | null>(null)
   const [query, setQuery] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [retry, setRetry] = useState(0)
   const { language, t } = useI18n()
@@ -373,14 +480,20 @@ function Library({ species, onStartCheck }: { species: Species; onStartCheck?: S
     return () => { cancelled = true }
   }, [species, retry, language])
   const category = (value: string) => t.category[value] ?? readable(value)
-  const filtered = items?.filter((item) => `${item.name} ${category(item.category)} ${(item.symptom_tags ?? []).map((tag) => `${t.symptoms[tag] ?? ''} ${readable(tag)}`).join(' ')}`.toLocaleLowerCase(language).includes(query.toLocaleLowerCase(language))) ?? []
+  const matches = items?.filter((item) => `${item.name} ${category(item.category)} ${(item.symptom_tags ?? []).map((tag) => `${t.symptoms[tag] ?? ''} ${readable(tag)}`).join(' ')}`.toLocaleLowerCase(language).includes(query.toLocaleLowerCase(language))) ?? []
+  const counts = new Map<string, number>()
+  for (const item of matches) counts.set(item.category, (counts.get(item.category) ?? 0) + 1)
+  const categories = [...new Set((items ?? []).map((item) => item.category))].sort((a, b) => category(a).localeCompare(category(b), language))
+  const filtered = categoryFilter ? matches.filter((item) => item.category === categoryFilter) : matches
+  const chip = (value: string | null, label: string, count: number) => <button type="button" key={value ?? ''} className="chip" aria-pressed={categoryFilter === value} onClick={() => setCategoryFilter(value)}><span className="chip-label">{label}</span> <span className="chip-count">{count}</span></button>
   return <section className="panel"><p className="eyebrow">{lib.eyebrow}</p><h1>{lib.title}</h1><p className="muted">{lib.muted}</p>
     <label className="search-label">{lib.search}<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={lib.searchPlaceholder} /></label>
+    {categories.length > 1 && <div className="filter-chips" role="group" aria-label={lib.filterLabel}>{chip(null, lib.all, matches.length)}{categories.map((value) => chip(value, category(value), counts.get(value) ?? 0))}</div>}
     {!items && !error && <p role="status">{lib.loading}</p>}<ErrorNotice message={error} />
     {error && <button className="secondary" onClick={() => { setError(''); setRetry((value) => value + 1) }}>{t.common.tryAgain}</button>}
     {items && <p role="status">{lib.entries(filtered.length)}</p>}
     {items && filtered.length === 0 && <p>{lib.noMatch}</p>}
-    <div className="entries">{filtered.map((item) => <details className="condition-entry" key={item.id}><summary aria-label={lib.readAbout(item.name, t.urgency[item.urgency_default])}><span className="tag">{category(item.category)}</span><strong>{item.name}</strong><span className={`urgency-label ${item.urgency_default}`}>{t.urgency[item.urgency_default]}</span></summary>
+    <div className="entries">{filtered.map((item) => <details className="condition-entry" key={item.id}><summary className="condition-summary" aria-label={lib.readAbout(item.name, t.urgency[item.urgency_default])}><span className="condition-heading"><strong>{item.name}</strong><span className="condition-meta"><span className="tag">{category(item.category)}</span><span className={`urgency-label ${item.urgency_default}`}>{t.urgency[item.urgency_default]}</span></span></span><span className="disclosure-chevron" aria-hidden="true" /></summary>
       {item.home_care_guidance && <p>{item.home_care_guidance}</p>}{item.red_flags.length > 0 && <><h3>{lib.promptSigns}</h3><ul>{item.red_flags.map((flag) => <li key={flag.description}>{flag.description} — {t.urgency[flag.escalates_to]}</li>)}</ul></>}
       {item.prevention_tips && <p>{item.prevention_tips}</p>}<CareGuides items={item.related_care_items} heading={lib.careGuides} level="h3" /><StartCheckButtons symptoms={item.symptom_tags ?? []} species={species} onStartCheck={onStartCheck} /><p className="fine-print">{item.vet_reviewed_by && item.last_reviewed_date ? lib.reviewed(item.vet_reviewed_by, item.last_reviewed_date) : lib.awaiting}</p><Sources sources={item.sources} />
     </details>)}</div>
@@ -456,7 +569,7 @@ function Care({ pet, species = pet?.species ?? 'dog', onStartCheck }: { pet?: Pe
   </section>
 }
 
-function Account({ onDeleted }: { onDeleted: () => void }) {
+function Account({ onDeleted, pets, status: petStatus = '', onEditPet, onPetDeleted }: { onDeleted: () => void; pets?: Pet[]; status?: string; onEditPet?: (pet: Pet) => void; onPetDeleted?: (pet: Pet) => void }) {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [password, setPassword] = useState('')
   const { busy, error, run } = useRequest()
@@ -471,16 +584,61 @@ function Account({ onDeleted }: { onDeleted: () => void }) {
       setStatus(a.downloaded)
     })
   }
-  return <section className="panel"><p className="eyebrow">{a.eyebrow}</p><h1>{a.title}</h1><PrivacyNotice /><label className="security-password">{a.confirmPassword}<input type="password" autoComplete="current-password" maxLength={128} value={password} onChange={(e) => setPassword(e.target.value)} /></label><button className="secondary" disabled={busy || !password} onClick={exportData}>{a.download}</button><button className="secondary" disabled={busy || !password} onClick={() => void run(async () => { await api.reauthenticate(password); await api.logoutAll(); onDeleted() })}>{a.logoutAll}</button><p role="status">{status}</p><ErrorNotice message={error} />
+  return <section className="panel"><p className="eyebrow">{a.eyebrow}</p><h1>{a.title}</h1>
+    {pets && onEditPet && onPetDeleted && <div className="pet-list"><h2>{a.petsTitle}</h2><p className="muted">{a.petsBody}</p><p role="status">{petStatus}</p>
+      {pets.length === 0 ? <p>{a.noPets}</p> : <ul>{pets.map((item) => <PetRow key={item.id} pet={item} onEdit={() => onEditPet(item)} onDeleted={() => onPetDeleted(item)} />)}</ul>}
+    </div>}
+    <PrivacyNotice /><label className="security-password">{a.confirmPassword}<input type="password" autoComplete="current-password" maxLength={128} value={password} onChange={(e) => setPassword(e.target.value)} /></label><button className="secondary" disabled={busy || !password} onClick={exportData}>{a.download}</button><button className="secondary" disabled={busy || !password} onClick={() => void run(async () => { await api.reauthenticate(password); await api.logoutAll(); onDeleted() })}>{a.logoutAll}</button><p role="status">{status}</p><ErrorNotice message={error} />
     <div className="delete-account"><h3>{a.deleteTitle}</h3><p>{a.deleteBody}</p>
       {!confirmDelete ? <button className="secondary" disabled={busy} onClick={() => setConfirmDelete(true)}>{a.deleteStart}</button> : <><p role="alert">{a.deleteWarning}</p><button className="danger" disabled={busy || !password} onClick={() => void run(async () => { await api.reauthenticate(password); await api.deleteMyAccount(); onDeleted() })}>{a.deleteConfirm}</button><button className="secondary" disabled={busy} onClick={() => setConfirmDelete(false)}>{t.common.cancel}</button></>}
     </div>
   </section>
 }
 
+// Deleting a pet removes its saved checks too, so it asks for the password again, in the page.
+function PetRow({ pet, onEdit, onDeleted }: { pet: Pet; onEdit: () => void; onDeleted: () => void }) {
+  const [confirming, setConfirming] = useState(false)
+  const [password, setPassword] = useState('')
+  const passwordInput = useRef<HTMLInputElement>(null)
+  const deleteButton = useRef<HTMLButtonElement>(null)
+  const { busy, error, run } = useRequest()
+  const { t } = useI18n()
+  const a = t.account
+  useEffect(() => { if (confirming) passwordInput.current?.focus() }, [confirming])
+  function cancel() { setConfirming(false); setPassword(''); requestAnimationFrame(() => deleteButton.current?.focus()) }
+  return <li className="pet-row">
+    <div className="pet-row-main"><img className="pets-logo" src={petsLogo} alt="" /><div className="pet-row-copy"><strong>{pet.name}</strong><small>{t.species[pet.species]} · {pet.life_stage ? lifeStageLabel(t, pet.life_stage) : t.app.ageUnknown}</small></div>
+      <div className="pet-row-actions"><button className="secondary" disabled={busy} onClick={onEdit}>{a.editPet(pet.name)}</button>{!confirming && <button ref={deleteButton} className="secondary delete-pet" onClick={() => setConfirming(true)}>{a.deletePet(pet.name)}</button>}</div></div>
+    {confirming && <div className="pet-delete-confirm"><p role="alert">{a.deletePetWarning(pet.name)}</p>
+      <label className="security-password">{a.deletePetPassword(pet.name)}<input ref={passwordInput} type="password" autoComplete="current-password" maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} /></label>
+      <button className="danger" disabled={busy || !password} onClick={() => void run(async () => { await api.reauthenticate(password); await api.deletePet(pet.id); onDeleted() })}>{a.deletePetConfirm(pet.name)}</button><button className="secondary" disabled={busy} onClick={cancel}>{t.common.cancel}</button>
+      <ErrorNotice message={error} />
+    </div>}
+  </li>
+}
+
+// The full warning sits at the end of each page. On wide screens, a compact pill stays on screen while
+// the full warning is out of view, and opens to show the emergency signs.
 function Emergency() {
   const { t } = useI18n()
-  return <aside className="emergency" aria-label={t.emergency.label}><span className="pulse" aria-hidden="true">!</span><div><strong>{t.emergency.title}</strong><span>{t.emergency.body}</span></div></aside>
+  const banner = useRef<HTMLElement>(null)
+  const [bannerVisible, setBannerVisible] = useState(true)
+  const [open, setOpen] = useState(false)
+  const detailsId = useId()
+  useEffect(() => {
+    const element = banner.current
+    if (!element || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(([entry]) => { setBannerVisible(entry.isIntersecting); if (entry.isIntersecting) setOpen(false) })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
+  return <>
+    <aside ref={banner} className="emergency" aria-label={t.emergency.label}><span className="pulse" aria-hidden="true">!</span><div><strong>{t.emergency.title}</strong><span>{t.emergency.body}</span></div></aside>
+    {!bannerVisible && <div className={`emergency-pill${open ? ' open' : ''}`}>
+      <p id={detailsId} hidden={!open}>{t.emergency.body}</p>
+      <button type="button" aria-expanded={open} aria-controls={detailsId} onClick={() => setOpen((value) => !value)}><span className="pulse" aria-hidden="true">!</span>{t.emergency.title}</button>
+    </div>}
+  </>
 }
 
 export default App

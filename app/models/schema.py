@@ -290,6 +290,44 @@ class GuestContext(BaseModel):
     neutered: Optional[bool] = None
 
 
+class PetUpdate(BaseModel):
+    """Partial update of a pet profile. Omitted fields are unchanged; an explicit null clears an optional detail.
+
+    Species is accepted only so a client may echo it back: it cannot change, because saved checks were
+    assessed with species-specific content.
+    """
+    name: Optional[str] = PydanticField(default=None, min_length=1, max_length=100)
+    species: Optional[Species] = None
+    breed: Optional[str] = None
+    breed_size: Optional[BreedSize] = None
+    date_of_birth: Optional[date] = None
+    sex: Optional[Sex] = None
+    neutered: Optional[bool] = None
+    weight_kg: Optional[float] = PydanticField(default=None, gt=0, le=200, allow_inf_nan=False)
+    environment_factors: Optional[list[EnvironmentFactor]] = None
+
+    @field_validator("name", mode="before")
+    @classmethod
+    def trim_name(cls, value: str | None) -> str | None:
+        if value is None:
+            raise ValueError("A pet name is required")
+        return value.strip() if isinstance(value, str) else value
+
+    @field_validator("species")
+    @classmethod
+    def individual_species(cls, value: Species | None) -> Species | None:
+        if value == Species.both:
+            raise ValueError("Choose dog or cat for a pet")
+        return value
+
+    @field_validator("date_of_birth")
+    @classmethod
+    def birth_date_not_future(cls, value: date | None) -> date | None:
+        if value and value > date.today():
+            raise ValueError("Date of birth cannot be in the future")
+        return value
+
+
 class TriageStartRequest(BaseModel):
     pet_id: Optional[str] = None
     symptom_tag: str = PydanticField(min_length=1, max_length=100)
