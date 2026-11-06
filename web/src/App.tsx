@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { api, ApiError, type Condition, type GuestContext, type Owner, type Privacy, type Pet, type Progress, type Question, type Species, type TriageResult, type PreventiveCareItem } from './api'
+import { api, ApiError, careTopics, type Condition, type GuestContext, type Owner, type Privacy, type Pet, type Progress, type Question, type Species, type TriageResult, type PreventiveCareItem } from './api'
 import AccountLink from './AccountLink'
 import CheckResult from './CheckResult'
 import CheckHistory from './CheckHistory'
 import { CareGuides, StartCheckButtons } from './CareGuides'
 import { checkSymptoms } from './symptoms'
-import { downloadJson } from './download'
+import { downloadFile, downloadJson } from './download'
+import { buildCareReminderIcs, reminderFileName, tomorrow } from './careReminders'
 import { errorMessage, useRequest } from './useRequest'
 import { formatDate, languages, readable, serverText, useI18n } from './i18n'
 import { lifeStageLabel } from './checkReport'
@@ -386,12 +387,45 @@ function Library({ species, onStartCheck }: { species: Species; onStartCheck?: S
   </section>
 }
 
+const OTHER_CARE_TOPIC = 'other'
+
+/** Group care guides by topic in a fixed, meaningful order; unknown topics go last. */
+function groupCareItems(items: PreventiveCareItem[]) {
+  const order: string[] = [...careTopics]
+  const groups = new Map<string, PreventiveCareItem[]>()
+  for (const item of items) {
+    const topic = item.topic && order.includes(item.topic) ? item.topic : OTHER_CARE_TOPIC
+    groups.set(topic, [...(groups.get(topic) ?? []), item])
+  }
+  return [...order, OTHER_CARE_TOPIC].filter((topic) => groups.has(topic)).map((topic) => ({ topic, items: groups.get(topic) ?? [] }))
+}
+
 function Care({ pet, species = pet?.species ?? 'dog', onStartCheck }: { pet?: Pet; species?: Species; onStartCheck?: StartCheck }) {
   const [items, setItems] = useState<PreventiveCareItem[] | null>(null)
   const [error, setError] = useState('')
   const [retry, setRetry] = useState(0)
+  const [openIds, setOpenIds] = useState<Set<string>>(() => new Set())
+  const [reminderStatus, setReminderStatus] = useState('')
   const { language, t } = useI18n()
   const c = t.care
+  const allOpen = !!items?.length && items.every((item) => openIds.has(item.id))
+  function setItemOpen(id: string, open: boolean) {
+    setOpenIds((current) => {
+      if (current.has(id) === open) return current
+      const next = new Set(current)
+      if (open) next.add(id)
+      else next.delete(id)
+      return next
+    })
+  }
+  function addReminder(item: PreventiveCareItem) {
+    const steps = item.steps ?? []
+    const body = steps.length ? [item.summary ?? '', ...steps.map((step, index) => `${index + 1}. ${step}`)] : [item.description]
+    const description = [...body, item.recurrence ? c.timing(item.recurrence) : '', c.reminderFooter].filter(Boolean).join('\n')
+    const ics = buildCareReminderIcs({ id: item.id, title: c.reminderTitle(item.title, pet?.name), description, intervalDays: item.reminder_interval_days, start: tomorrow() })
+    downloadFile(ics, reminderFileName(item.id), 'text/calendar;charset=utf-8')
+    setReminderStatus(c.reminderAdded(item.title))
+  }
   useEffect(() => {
     let cancelled = false
     api.listPreventive(species, pet?.life_stage ?? null).then((data) => { if (!cancelled) { setItems(data); setError('') } })
@@ -401,7 +435,24 @@ function Care({ pet, species = pet?.species ?? 'dog', onStartCheck }: { pet?: Pe
   return <section className="panel"><p className="eyebrow">{c.eyebrow}</p><h1>{c.title}</h1><p className="muted">{pet?.life_stage ? c.basedOn(pet.name, lifeStageLabel(t, pet.life_stage)) : pet ? c.unknownAge(species, pet.name) : c.all(species)} {c.noReminders}</p>
     {!items && !error && <p role="status">{c.loading}</p>}<ErrorNotice message={error} />{error && <button className="secondary" onClick={() => { setError(''); setRetry((value) => value + 1) }}>{t.common.tryAgain}</button>}
     {items?.length === 0 && <p>{c.empty}</p>}
-    <div className="care-list">{items?.map((item) => <article key={item.id}><div><h3>{item.title}</h3><p>{item.description}</p>{item.recurrence && <p className="recurrence">{c.timing(item.recurrence)}</p>}<StartCheckButtons symptoms={item.related_symptoms ?? []} species={species} onStartCheck={onStartCheck} /><Sources sources={item.sources} /></div></article>)}</div>
+    {!!items?.length && <div className="care-toolbar"><button type="button" className="secondary" aria-expanded={allOpen} onClick={() => setOpenIds(allOpen ? new Set() : new Set(items.map((item) => item.id)))}>{allOpen ? c.collapseAll : c.expandAll}</button></div>}
+    <p className="care-reminder-status" role="status">{reminderStatus}</p>
+    <div className="care-list">{groupCareItems(items ?? []).map(({ topic, items: group }) => <section key={topic} className="care-topic" aria-labelledby={`care-topic-${topic}`}><h2 id={`care-topic-${topic}`}>{c.topics[topic] ?? c.otherTopic}</h2>
+      {group.map((item) => {
+        const steps = item.steps ?? []
+        const lead = item.summary || (steps.length ? null : item.description)
+        return <details key={item.id} className="care-item" open={openIds.has(item.id)} onToggle={(event) => setItemOpen(item.id, event.currentTarget.open)}>
+          <summary><h3>{item.title}</h3>{lead && <p>{lead}</p>}</summary>
+          <div className="care-item-body">
+            {steps.length > 0 && <ol className="care-steps" aria-label={c.steps}>{steps.map((step) => <li key={step}>{step}</li>)}</ol>}
+            {!!item.summary && steps.length === 0 && <p>{item.description}</p>}
+            {item.recurrence && <p className="recurrence">{c.timing(item.recurrence)}</p>}
+            {item.recurrence && <button type="button" className="secondary care-reminder" onClick={() => addReminder(item)}>{c.addReminder}</button>}
+            <StartCheckButtons symptoms={item.related_symptoms ?? []} species={species} onStartCheck={onStartCheck} /><Sources sources={item.sources} />
+          </div>
+        </details>
+      })}
+    </section>)}</div>
   </section>
 }
 

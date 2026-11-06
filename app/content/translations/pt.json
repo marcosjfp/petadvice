@@ -195,7 +195,14 @@
   "preventive_care": {
     "prevent-001": {
       "title": "Recalcular a alimentação depois da esterilização ou castração",
-      "description": "Reavalie as necessidades calóricas e a condição corporal depois da castração e continue a controlar o peso regularmente.",
+      "summary": "Os animais esterilizados ou castrados precisam muitas vezes de menos calorias; reveja a alimentação e o peso depois da cirurgia.",
+      "description": "Os animais esterilizados ou castrados precisam muitas vezes de menos calorias. Depois da cirurgia, peça ao veterinário que pese o animal, avalie a condição corporal e combine uma quantidade diária de comida. Pese cada refeição, conte os petiscos como parte da quantidade diária e volte a verificar o peso e a condição corporal a cada 6 meses, ajustando as porções se mudarem.",
+      "steps": [
+        "Peça ao veterinário que pese o animal e avalie a condição corporal na consulta pós-operatória.",
+        "Combine com o veterinário uma quantidade diária de calorias; muitos animais precisam de menos comida depois da castração.",
+        "Pese cada refeição e conte os petiscos como parte da quantidade diária.",
+        "Volte a verificar o peso e a condição corporal a cada 6 meses e ajuste as porções se mudarem."
+      ],
       "recurrence": "um novo cálculo e depois a cada 6 meses"
     },
     "prevent-002": {
@@ -215,33 +222,175 @@
     },
     "prevent-005": {
       "title": "Tratar uma infestação de pulgas em casa",
+      "summary": "A maior parte das pulgas vive em casa e não no animal, por isso trate todos os animais e a casa ao mesmo tempo.",
       "description": "A maior parte de uma população de pulgas (ovos, larvas e casulos) vive na sua casa e não no animal. Trate todos os animais da casa no mesmo dia com um produto recomendado pelo veterinário. Lave as camas e mantas dos animais e a sua roupa de cama a alta temperatura (60 °C ou mais) e seque na máquina a temperatura elevada. Aspire bem alcatifas, tapetes, sofás, rodapés e bancos do carro e, depois de cada utilização, esvazie o depósito ou feche e deite fora o saco do aspirador fora de casa para as pulgas não escaparem. Limpe pavimentos e superfícies com água quente e detergente ou com uma máquina a vapor. Se usar um spray antipulgas para a casa, escolha um recomendado pelo veterinário, siga o rótulo e mantenha os animais afastados até secar. Nunca use produtos com permetrina perto de gatos. Persista: podem continuar a nascer pulgas dos casulos durante várias semanas.",
+      "steps": [
+        "Trate todos os animais da casa no mesmo dia com um produto recomendado pelo veterinário. Nunca use produtos com permetrina perto de gatos.",
+        "Lave as camas dos animais, as mantas e a sua roupa de cama a 60 °C ou mais e seque na máquina a temperatura alta.",
+        "Aspire bem tapetes, carpetes, sofás, rodapés e bancos do carro; esvazie logo o depósito, ou feche o saco e deite-o fora fora de casa.",
+        "Limpe pavimentos e superfícies duras com água quente e detergente ou com uma máquina a vapor.",
+        "Se usar um spray antipulgas para a casa, escolha um recomendado pelo veterinário, siga o rótulo e mantenha os animais afastados até secar.",
+        "Continue durante várias semanas: podem continuar a nascer pulgas dos casulos."
+      ],
       "recurrence": "aspirar a cada um ou dois dias e lavar as camas todas as semanas até não ver pulgas durante várias semanas"
     },
     "prevent-006": {
       "title": "Usar feromonas para aliviar situações de stress",
+      "summary": "As feromonas felinas sintéticas podem ajudar os gatos a sentirem-se seguros durante mudanças e situações de stress.",
       "description": "As feromonas faciais felinas sintéticas (difusores, sprays, toalhitas e coleiras) podem ajudar os gatos a sentirem-se seguros. Ligue um difusor na divisão que o gato mais usa e deixe-o sempre ligado. Antes de viagens, idas ao veterinário, visitas ou fogo de artifício, borrife a transportadora ou a cama cerca de 15 minutos antes de o gato entrar, para o álcool evaporar. Nunca borrife diretamente o gato. Deixe a transportadora à vista em casa, com uma manta conhecida, para que não fique associada só a viagens stressantes.",
+      "steps": [
+        "Ligue um difusor na divisão que o gato usa mais e deixe-o sempre ligado.",
+        "Antes de viagens, consultas no veterinário, visitas ou fogo de artifício, borrife a transportadora ou a cama cerca de 15 minutos antes de o gato entrar, para o álcool evaporar.",
+        "Nunca borrife diretamente o gato.",
+        "Deixe a transportadora à vista em casa, com uma manta conhecida, para que não fique associada apenas a saídas stressantes."
+      ],
       "recurrence": "recarga do difusor cerca de uma vez por mês; spray 15 minutos antes de cada situação de stress"
     },
     "prevent-007": {
       "title": "Cortar as unhas e ter arranhadores",
+      "summary": "Cortes regulares e bons arranhadores mantêm as unhas do gato confortáveis e saudáveis.",
       "description": "Corte as unhas do seu gato com regularidade para evitar desconforto, unhas presas e lesões. Pressione suavemente a almofada da pata para expor cada unha e corte apenas a ponta afiada e transparente, bem longe da zona rosada (o sabugo), que sangra e dói se for cortada. Tenha um arranhador firme, alto o suficiente para o gato se esticar por completo, e também arranhadores horizontais: arranhar ajuda naturalmente a soltar as camadas exteriores da unha. Verifique com frequência as unhas dos gatos mais velhos, porque podem engrossar e crescer para dentro das almofadas. Peça ao veterinário que lhe mostre como fazer, se tiver dúvidas.",
+      "steps": [
+        "Pressione suavemente a almofada da pata para fazer sair cada unha.",
+        "Corte apenas a ponta afiada e transparente, bem longe da zona rosada (o sabugo), que sangra e dói se for cortada.",
+        "Disponibilize um arranhador estável e alto o suficiente para o gato se esticar por completo, e também arranhadores horizontais.",
+        "Verifique com frequência as unhas dos gatos mais velhos: podem engrossar e crescer para dentro das almofadas.",
+        "Peça ao veterinário que lhe mostre como fazer se tiver dúvidas."
+      ],
       "recurrence": "a cada 2 a 4 semanas"
     },
     "prevent-008": {
       "title": "Manter as unhas com um comprimento saudável",
+      "summary": "Os passeios ajudam, mas a maioria dos cães continua a precisar de cortar as unhas; se fazem barulho no chão, está na hora.",
       "description": "Passeios regulares em superfícies duras, como o passeio, ajudam a desgastar as unhas, mas normalmente não substituem o corte, e os esporões (as unhas do lado de dentro da pata) nunca tocam no chão. Se ouvir as unhas a bater no chão, precisam de ser cortadas. Use um corta-unhas próprio para cães ou uma lima elétrica e corte apenas a pontinha, evitando o sabugo: a zona sensível e rosada dentro da unha que sangra se for cortada. Em unhas escuras, corte fatias muito finas e pare quando aparecer um ponto escuro no centro da superfície cortada. Tenha à mão pó hemostático ou amido de milho para o caso de uma unha sangrar e recompense o seu cão para manter o corte tranquilo. Peça ao veterinário ou ao tosquiador que lhe mostre como fazer, se tiver dúvidas.",
+      "steps": [
+        "Verifique as unhas a cada 2 semanas, incluindo os ergôs (esporões), que nunca tocam no chão.",
+        "Use um corta-unhas próprio para cães ou uma lima elétrica e corte apenas a pontinha.",
+        "Evite o sabugo, a zona rosada e sensível dentro da unha. Nas unhas escuras, corte fatias muito finas e pare quando aparecer um ponto escuro no centro do corte.",
+        "Tenha à mão pó hemostático ou amido de milho, caso uma unha sangre.",
+        "Recompense o cão para manter o corte calmo e peça ao veterinário ou tosquiador que lhe mostre como fazer se tiver dúvidas."
+      ],
       "recurrence": "verificar a cada 2 semanas; cortar a cada 3 a 4 semanas ou quando as unhas batem no chão"
     },
     "prevent-009": {
       "title": "Proteger a família dos parasitas internos",
+      "summary": "Alguns parasitas intestinais dos animais podem infetar pessoas, sobretudo crianças pequenas, idosos, grávidas e pessoas com o sistema imunitário enfraquecido.",
       "description": "Alguns vermes dos animais, como as lombrigas e os ancilostomas, podem infetar pessoas. As crianças pequenas, os idosos, as grávidas e as pessoas com o sistema imunitário enfraquecido correm mais risco. Mantenha um plano regular de desparasitação e controlo de pulgas recomendado pelo veterinário. Apanhe rapidamente as fezes do cão, sobretudo onde as crianças brincam, e limpe a caixa de areia todos os dias; as grávidas devem usar luvas ou evitar limpar a caixa de areia por causa da toxoplasmose. Lave as mãos depois de mexer em animais, terra ou fezes e sempre antes de comer. Tape as caixas de areia de brincar quando não estão a ser usadas e mantenha as crianças longe dos sítios onde os animais fazem as necessidades.",
+      "steps": [
+        "Siga um programa regular de desparasitação e controlo de pulgas recomendado pelo veterinário.",
+        "Apanhe logo as fezes do cão, sobretudo onde as crianças brincam.",
+        "Limpe a caixa de areia todos os dias. As grávidas devem usar luvas ou evitar limpar a caixa por causa da toxoplasmose.",
+        "Lave as mãos depois de mexer em animais, terra ou fezes, e sempre antes de comer.",
+        "Tape as caixas de areia de brincar quando não estão a ser usadas e mantenha as crianças longe dos sítios onde os animais fazem as necessidades."
+      ],
       "recurrence": "desparasitação conforme indicação do veterinário, muitas vezes pelo menos a cada 3 meses em animais adultos"
     },
     "prevent-010": {
       "title": "Reconhecer sinais de parasitas internos e externos",
+      "summary": "Uma verificação rápida todas as semanas ajuda a detetar cedo lombrigas, pulgas, carraças e ácaros.",
       "description": "Parasitas internos: diarreia, perda de peso apesar de bom apetite, pelo baço, vómitos e arrastar o rabo no chão ou no tapete. Cachorros e gatinhos podem ter a barriga inchada, e é possível ver mesmo os vermes nas fezes ou na diarreia: as lombrigas parecem esparguete e os segmentos de ténia parecem grãos de arroz à volta do rabo. Parasitas externos: coçar, lamber ou morder em excesso, pele vermelha ou irritada, crostas e perda de pelo. Procure pulgas ou a sujidade preta das pulgas (fica vermelha em papel branco húmido), carraças agarradas à pele, e cera escura nos ouvidos ou abanar da cabeça por ácaros dos ouvidos. Se notar estes sinais, pergunte ao veterinário sobre uma análise às fezes e o tratamento adequado.",
+      "steps": [
+        "Parasitas internos: esteja atento a diarreia, perda de peso apesar de bom apetite, pelo baço, vómitos e arrastar o rabo no chão.",
+        "Os cachorros e gatinhos podem ter a barriga inchada; as lombrigas nas fezes parecem esparguete e os segmentos de ténia parecem grãos de arroz à volta do ânus.",
+        "Parasitas externos: esteja atento a coçar, lamber ou morder em excesso, pele vermelha ou irritada, crostas e queda de pelo.",
+        "Procure pulgas ou fezes de pulga (pontos pretos que ficam vermelhos num papel branco húmido), carraças presas à pele e cera escura nos ouvidos ou abanar a cabeça devido a ácaros.",
+        "Se notar estes sinais, pergunte ao veterinário sobre uma análise às fezes e o tratamento adequado."
+      ],
       "recurrence": "verificar pelo, pele e ouvidos todas as semanas e depois de passeios em erva alta"
+    },
+    "prevent-011": {
+      "title": "Manter as vacinas essenciais em dia",
+      "summary": "As vacinas protegem o cão contra doenças infeciosas graves. O veterinário vai adaptar o plano à sua zona e ao estilo de vida do cão.",
+      "description": "As vacinas protegem o cão contra doenças infeciosas graves. O veterinário vai adaptar o plano à sua zona e ao estilo de vida do cão. Primovacinação do cachorro: as vacinas essenciais começam normalmente às 6–8 semanas e repetem-se a cada 2–4 semanas até às 16 semanas de idade ou mais. As vacinas essenciais protegem contra a esgana, a parvovirose e a hepatite infeciosa (adenovírus). A vacina da leptospirose é recomendada em muitas zonas e a da raiva é obrigatória por lei em alguns países e para viajar. Um reforço aos 6 ou 12 meses completa a primovacinação. Reforços no adulto: algumas vacinas essenciais duram cerca de 3 anos, enquanto a da leptospirose costuma precisar de reforço anual. O veterinário pode sugerir vacinas não essenciais, como a da tosse do canil, conforme o estilo de vida. Mantenha o cachorro afastado de cães não vacinados e de locais usados por outros cães até o veterinário confirmar que a vacinação está completa. Guarde o boletim de vacinas e leve-o a todas as consultas, estadias em hotel canino ou viagens ao estrangeiro.",
+      "steps": [
+        "Primovacinação do cachorro: as vacinas essenciais começam normalmente às 6–8 semanas e repetem-se a cada 2–4 semanas até às 16 semanas de idade ou mais.",
+        "As vacinas essenciais protegem contra a esgana, a parvovirose e a hepatite infeciosa (adenovírus). A vacina da leptospirose é recomendada em muitas zonas e a da raiva é obrigatória por lei em alguns países e para viajar.",
+        "Um reforço aos 6 ou 12 meses completa a primovacinação.",
+        "Reforços no adulto: algumas vacinas essenciais duram cerca de 3 anos, enquanto a da leptospirose costuma precisar de reforço anual. O veterinário pode sugerir vacinas não essenciais, como a da tosse do canil, conforme o estilo de vida.",
+        "Mantenha o cachorro afastado de cães não vacinados e de locais usados por outros cães até o veterinário confirmar que a vacinação está completa.",
+        "Guarde o boletim de vacinas e leve-o a todas as consultas, estadias em hotel canino ou viagens ao estrangeiro."
+      ],
+      "recurrence": "primovacinação a partir das 6–8 semanas; depois revisão anual das vacinas, com reforços conforme indicação do veterinário"
+    },
+    "prevent-012": {
+      "title": "Manter as vacinas do gato em dia",
+      "summary": "As vacinas protegem o gato contra doenças infeciosas graves, mesmo que viva dentro de casa. O veterinário vai adaptar o plano à sua zona e ao estilo de vida do gato.",
+      "description": "As vacinas protegem o gato contra doenças infeciosas graves, mesmo que viva dentro de casa. O veterinário vai adaptar o plano à sua zona e ao estilo de vida do gato. Primovacinação do gatinho: as vacinas essenciais começam normalmente às 6–8 semanas e repetem-se a cada 2–4 semanas até às 16 semanas de idade ou mais. As vacinas essenciais protegem contra a panleucopenia felina (parvovírus felino), o herpesvírus felino e o calicivírus felino, as principais causas da gripe felina. A vacina contra o vírus da leucemia felina (FeLV) é recomendada para gatinhos e para gatos que saem à rua ou vivem com gatos que saem. A da raiva é obrigatória em alguns países e para viajar. Um reforço aos 6 ou 12 meses completa a primovacinação. Reforços no adulto: o veterinário vai indicar os intervalos, muitas vezes a cada 1–3 anos, conforme a vacina e o risco do gato. Mantenha o gatinho dentro de casa até a vacinação estar completa e guarde o boletim de vacinas para consultas, hotéis para gatos e viagens.",
+      "steps": [
+        "Primovacinação do gatinho: as vacinas essenciais começam normalmente às 6–8 semanas e repetem-se a cada 2–4 semanas até às 16 semanas de idade ou mais.",
+        "As vacinas essenciais protegem contra a panleucopenia felina (parvovírus felino), o herpesvírus felino e o calicivírus felino, as principais causas da gripe felina.",
+        "A vacina contra o vírus da leucemia felina (FeLV) é recomendada para gatinhos e para gatos que saem à rua ou vivem com gatos que saem. A da raiva é obrigatória em alguns países e para viajar.",
+        "Um reforço aos 6 ou 12 meses completa a primovacinação.",
+        "Reforços no adulto: o veterinário vai indicar os intervalos, muitas vezes a cada 1–3 anos, conforme a vacina e o risco do gato.",
+        "Mantenha o gatinho dentro de casa até a vacinação estar completa e guarde o boletim de vacinas para consultas, hotéis para gatos e viagens."
+      ],
+      "recurrence": "primovacinação a partir das 6–8 semanas; depois revisão anual das vacinas, com reforços conforme indicação do veterinário"
+    },
+    "prevent-013": {
+      "title": "Escovar os dentes e detetar cedo a doença dentária",
+      "summary": "A maioria dos cães e gatos desenvolve doença dentária com a idade. Escovar os dentes todos os dias e uma verificação dentária anual ajudam a manter a boca saudável e sem dor.",
+      "description": "A maioria dos cães e gatos desenvolve doença dentária com a idade. Escovar os dentes todos os dias e uma verificação dentária anual ajudam a manter a boca saudável e sem dor. Use uma escova macia para animais ou uma dedeira e uma pasta de dentes própria para animais. Nunca use pasta de dentes humana: pode conter xilitol, que é tóxico para os cães, e flúor e espumantes que não devem ser engolidos. Comece devagar: deixe o animal lamber a pasta, depois toque nos dentes e nas gengivas e depois escove alguns dentes de cada vez, recompensando a calma. Tente escovar todos os dias; várias vezes por semana já ajuda. Concentre-se na face exterior dos dentes de trás e na linha da gengiva. Esteja atento a sinais de doença dentária: mau hálito, tártaro amarelo-acastanhado, gengivas vermelhas ou a sangrar, baba, deixar cair comida, mastigar só de um lado, passar a pata pela boca ou menos apetite. Peça ao veterinário que verifique os dentes pelo menos uma vez por ano e marque consulta mais cedo se notar algum destes sinais. A limpeza abaixo da gengiva exige anestesia geral.",
+      "steps": [
+        "Use uma escova macia para animais ou uma dedeira e uma pasta de dentes própria para animais. Nunca use pasta de dentes humana: pode conter xilitol, que é tóxico para os cães, e flúor e espumantes que não devem ser engolidos.",
+        "Comece devagar: deixe o animal lamber a pasta, depois toque nos dentes e nas gengivas e depois escove alguns dentes de cada vez, recompensando a calma.",
+        "Tente escovar todos os dias; várias vezes por semana já ajuda. Concentre-se na face exterior dos dentes de trás e na linha da gengiva.",
+        "Esteja atento a sinais de doença dentária: mau hálito, tártaro amarelo-acastanhado, gengivas vermelhas ou a sangrar, baba, deixar cair comida, mastigar só de um lado, passar a pata pela boca ou menos apetite.",
+        "Peça ao veterinário que verifique os dentes pelo menos uma vez por ano e marque consulta mais cedo se notar algum destes sinais. A limpeza abaixo da gengiva exige anestesia geral."
+      ],
+      "recurrence": "escovar todos os dias; verificação dentária pelo menos uma vez por ano"
+    },
+    "prevent-014": {
+      "title": "Manter o animal com um peso saudável",
+      "summary": "O excesso de peso encurta a vida e agrava problemas nas articulações, na pele e na respiração. Verificações pequenas e regulares mantêm o peso controlado.",
+      "description": "O excesso de peso encurta a vida e agrava problemas nas articulações, na pele e na respiração. Verificações pequenas e regulares mantêm o peso controlado. Aprenda a avaliar a condição corporal: com o peso ideal, sente facilmente as costelas sob uma fina camada de gordura, vê a cintura de cima e vê a barriga recolhida de lado. Pese a comida diária numa balança de cozinha em vez de usar um copo ou medir a olho, e ajuste a partir da tabela do rótulo com o conselho do veterinário. Limite os petiscos e extras a não mais de 10% das calorias diárias e reduza as refeições nos dias com mais petiscos. Pese o animal cerca de uma vez por mês e registe o resultado; fale com o veterinário antes de iniciar uma dieta para emagrecer. Contacte o veterinário se houver perda ou aumento de peso sem explicação, sobretudo se o animal também estiver a beber mais ou a comer de forma diferente.",
+      "steps": [
+        "Aprenda a avaliar a condição corporal: com o peso ideal, sente facilmente as costelas sob uma fina camada de gordura, vê a cintura de cima e vê a barriga recolhida de lado.",
+        "Pese a comida diária numa balança de cozinha em vez de usar um copo ou medir a olho, e ajuste a partir da tabela do rótulo com o conselho do veterinário.",
+        "Limite os petiscos e extras a não mais de 10% das calorias diárias e reduza as refeições nos dias com mais petiscos.",
+        "Pese o animal cerca de uma vez por mês e registe o resultado; fale com o veterinário antes de iniciar uma dieta para emagrecer.",
+        "Contacte o veterinário se houver perda ou aumento de peso sem explicação, sobretudo se o animal também estiver a beber mais ou a comer de forma diferente."
+      ],
+      "recurrence": "pesar e avaliar a condição corporal todos os meses; rever as quantidades de comida em cada consulta"
+    },
+    "prevent-015": {
+      "title": "Marcar consultas sénior duas vezes por ano",
+      "summary": "Os animais mais velhos mudam depressa e muitas doenças da idade são mais fáceis de controlar quando detetadas cedo.",
+      "description": "Os animais mais velhos mudam depressa e muitas doenças da idade são mais fáceis de controlar quando detetadas cedo. A partir da idade sénior, marque uma consulta a cada 6 meses, mesmo que o animal pareça bem. Os gatos são normalmente considerados séniores a partir dos 10 anos; os cães no último quarto da esperança de vida, que chega mais cedo nas raças grandes. Pergunte por análises ao sangue e à urina e pela medição da tensão arterial para detetar cedo problemas nos rins, na tiroide, no fígado e outros. Diga ao veterinário se o animal está a beber ou a urinar mais, a perder peso, a comer de forma diferente ou se tem nódulos novos. Esteja atento a rigidez, passeios mais lentos, dificuldade em subir escadas ou saltar, ou a um gato que deixou de usar sítios altos. Registe mudanças de comportamento, como confusão, inquietação à noite, acidentes ao fazer as necessidades ou estar mais retraído ou irritável. Facilite a vida em casa com camas macias, pisos antiderrapantes, rampas e comida, água e caixa de areia fáceis de alcançar.",
+      "steps": [
+        "A partir da idade sénior, marque uma consulta a cada 6 meses, mesmo que o animal pareça bem. Os gatos são normalmente considerados séniores a partir dos 10 anos; os cães no último quarto da esperança de vida, que chega mais cedo nas raças grandes.",
+        "Pergunte por análises ao sangue e à urina e pela medição da tensão arterial para detetar cedo problemas nos rins, na tiroide, no fígado e outros.",
+        "Diga ao veterinário se o animal está a beber ou a urinar mais, a perder peso, a comer de forma diferente ou se tem nódulos novos.",
+        "Esteja atento a rigidez, passeios mais lentos, dificuldade em subir escadas ou saltar, ou a um gato que deixou de usar sítios altos.",
+        "Registe mudanças de comportamento, como confusão, inquietação à noite, acidentes ao fazer as necessidades ou estar mais retraído ou irritável.",
+        "Facilite a vida em casa com camas macias, pisos antiderrapantes, rampas e comida, água e caixa de areia fáceis de alcançar."
+      ],
+      "recurrence": "consulta a cada 6 meses a partir da idade sénior"
+    },
+    "prevent-016": {
+      "title": "Essenciais do cachorro: socialização, microchip e controlo de parasitas",
+      "summary": "Os primeiros meses moldam a saúde e a confiança do cachorro para toda a vida.",
+      "description": "Os primeiros meses moldam a saúde e a confiança do cachorro para toda a vida. Socialização: o período mais importante vai aproximadamente das 3 às 14 semanas de idade. Apresente com calma o cachorro a pessoas diferentes, cães tranquilos e vacinados, sons, superfícies, viagens de carro e manipulação, usando petiscos e mantendo cada experiência curta e positiva. Até a vacinação estar completa, leve o cachorro ao colo para conhecer o mundo e convide cães saudáveis e vacinados a visitá-lo em vez de ir a parques. Pergunte ao veterinário por aulas para cachorros. Microchip: confirme que o cachorro tem microchip (obrigatório por lei para cães em muitos países) e atualize logo a base de dados com os seus dados, e de novo sempre que mudar de casa ou de número de telefone. Controlo de parasitas: os cachorros são normalmente desparasitados a cada 2 semanas no início e depois todos os meses até aos 6 meses; use produtos contra pulgas e carraças adequados à idade e ao peso, conforme indicação do veterinário. Marque uma primeira consulta pouco depois de levar o cachorro para casa para iniciar as vacinas e combinar um plano de controlo de parasitas.",
+      "steps": [
+        "Socialização: o período mais importante vai aproximadamente das 3 às 14 semanas de idade. Apresente com calma o cachorro a pessoas diferentes, cães tranquilos e vacinados, sons, superfícies, viagens de carro e manipulação, usando petiscos e mantendo cada experiência curta e positiva.",
+        "Até a vacinação estar completa, leve o cachorro ao colo para conhecer o mundo e convide cães saudáveis e vacinados a visitá-lo em vez de ir a parques. Pergunte ao veterinário por aulas para cachorros.",
+        "Microchip: confirme que o cachorro tem microchip (obrigatório por lei para cães em muitos países) e atualize logo a base de dados com os seus dados, e de novo sempre que mudar de casa ou de número de telefone.",
+        "Controlo de parasitas: os cachorros são normalmente desparasitados a cada 2 semanas no início e depois todos os meses até aos 6 meses; use produtos contra pulgas e carraças adequados à idade e ao peso, conforme indicação do veterinário.",
+        "Marque uma primeira consulta pouco depois de levar o cachorro para casa para iniciar as vacinas e combinar um plano de controlo de parasitas."
+      ],
+      "recurrence": "nas primeiras semanas em casa; desparasitação a cada 2 semanas no início, conforme indicação do veterinário"
+    },
+    "prevent-017": {
+      "title": "Essenciais do gatinho: socialização, microchip e controlo de parasitas",
+      "summary": "Os primeiros meses moldam a saúde e a confiança do gatinho para toda a vida.",
+      "description": "Os primeiros meses moldam a saúde e a confiança do gatinho para toda a vida. Socialização: os gatinhos aprendem mais entre as 2 e as 7 semanas de idade, aproximadamente, por isso escolha um gatinho que tenha sido manipulado com cuidado num ambiente familiar. Continue com manipulação curta e positiva, brincadeira e novas imagens e sons depois de chegar a casa. Habitue o gatinho à transportadora, a pegarem nele e a que lhe toquem nos dentes, orelhas e patas, usando petiscos, para facilitar as consultas e os cuidados de higiene. Microchip: confirme que o gatinho tem microchip (obrigatório para gatos em alguns países) e mantenha os seus contactos atualizados na base de dados. Controlo de parasitas: os gatinhos são normalmente desparasitados a cada 2 semanas no início e depois todos os meses até aos 6 meses; use antiparasitários adequados à idade e ao peso. Nunca use produtos antipulgas de cão em gatos. Marque uma primeira consulta para iniciar as vacinas e pergunte pela esterilização, muitas vezes recomendada por volta dos 4 meses, antes de o gatinho sair à rua.",
+      "steps": [
+        "Socialização: os gatinhos aprendem mais entre as 2 e as 7 semanas de idade, aproximadamente, por isso escolha um gatinho que tenha sido manipulado com cuidado num ambiente familiar. Continue com manipulação curta e positiva, brincadeira e novas imagens e sons depois de chegar a casa.",
+        "Habitue o gatinho à transportadora, a pegarem nele e a que lhe toquem nos dentes, orelhas e patas, usando petiscos, para facilitar as consultas e os cuidados de higiene.",
+        "Microchip: confirme que o gatinho tem microchip (obrigatório para gatos em alguns países) e mantenha os seus contactos atualizados na base de dados.",
+        "Controlo de parasitas: os gatinhos são normalmente desparasitados a cada 2 semanas no início e depois todos os meses até aos 6 meses; use antiparasitários adequados à idade e ao peso. Nunca use produtos antipulgas de cão em gatos.",
+        "Marque uma primeira consulta para iniciar as vacinas e pergunte pela esterilização, muitas vezes recomendada por volta dos 4 meses, antes de o gatinho sair à rua."
+      ],
+      "recurrence": "nas primeiras semanas em casa; desparasitação a cada 2 semanas no início, conforme indicação do veterinário"
     }
   },
   "questions": {

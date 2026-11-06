@@ -127,41 +127,61 @@
 			"id": "prevent-001",
 			"species": "both",
 			"life_stage": "young_adult",
+			"topic": "nutrition",
 			"title": "Recalculate diet after spaying or neutering",
-			"description": "Reassess calorie needs and body condition after neutering, then continue regular weight checks.",
+			"summary": "Neutered pets often need fewer calories, so review their diet and weight after surgery.",
+			"description": "Neutered pets often need fewer calories. After spaying or neutering, ask your vet to weigh your pet, score their body condition and agree a daily food amount. Weigh out each meal, count treats as part of the daily amount, and recheck weight and body condition every 6 months, adjusting portions if they change.",
+			"steps": [
+				"Ask your vet to weigh your pet and score their body condition at the post-surgery check.",
+				"Agree a daily calorie amount with your vet; many pets need less food after neutering.",
+				"Weigh out each meal and count treats as part of the daily amount.",
+				"Recheck weight and body condition every 6 months, and adjust portions if they change."
+			],
 			"recurrence": "one-time recalculation, then every 6 months",
+			"reminder_interval_days": 182,
 			"trigger_age_days": null,
-			"sources": ["https://dvm360.com/view/managing-weight-loss-dogs-and-cats-proceedings"]
+			"sources": [
+				"https://dvm360.com/view/managing-weight-loss-dogs-and-cats-proceedings"
+			]
 		},
 		{
 			"id": "prevent-002",
 			"species": "dog",
 			"life_stage": "puppy",
+			"topic": "reproduction",
 			"title": "Discuss neuter timing for large-breed puppies",
 			"description": "For dogs expected to exceed roughly 20kg, discuss breed-specific timing with your vet rather than following a fixed default age.",
 			"recurrence": "one-time discussion before 6 months",
 			"trigger_age_days": null,
-			"sources": ["https://unfoldpodcast.ucdavis.edu/news/big-dogs-face-more-joint-problems-if-neutered-early"]
+			"sources": [
+				"https://unfoldpodcast.ucdavis.edu/news/big-dogs-face-more-joint-problems-if-neutered-early"
+			]
 		},
 		{
 			"id": "prevent-003",
 			"species": "dog",
 			"life_stage": "puppy",
+			"topic": "reproduction",
 			"title": "Confirm both testicles have descended by 6 months",
 			"description": "Ask your vet to check testicular descent at the puppy's routine visit and discuss next steps if one has not descended.",
 			"recurrence": "one-time check around 6 months",
 			"trigger_age_days": 180,
-			"sources": ["https://vcahospitals.com/farmington-hills/know-your-pet/testicular-tumors"]
+			"sources": [
+				"https://vcahospitals.com/farmington-hills/know-your-pet/testicular-tumors"
+			]
 		},
 		{
 			"id": "prevent-004",
 			"species": "both",
 			"life_stage": "puppy",
+			"topic": "reproduction",
 			"title": "Discuss spay timing before the first heat",
 			"description": "Discuss individual timing with your vet, especially for large-breed female dogs where risks and benefits can differ.",
 			"recurrence": "one-time discussion before the first heat",
 			"trigger_age_days": null,
-			"sources": ["https://www.acvs.org/?p=5652"]
+			"sources": [
+				"https://www.acvs.org/?p=5652"
+			]
 		}
 	]
 }

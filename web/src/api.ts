@@ -55,7 +55,12 @@ export type Condition = {
   symptom_tags?: string[]; related_care_items?: CareGuide[];
 }
 export type CareGuide = { id: string; title: string; description: string; recurrence: string | null }
-export type PreventiveCareItem = CareGuide & { sources: string[]; related_symptoms?: string[] }
+export const careTopics = ['getting_started', 'vaccinations', 'parasites', 'health_checks', 'dental', 'nutrition', 'grooming', 'behaviour', 'reproduction'] as const
+export type CareTopic = typeof careTopics[number]
+export type PreventiveCareItem = CareGuide & {
+  sources: string[]; related_symptoms?: string[]; topic?: CareTopic | string;
+  summary?: string | null; steps?: string[]; reminder_interval_days?: number | null;
+}
 export type Question = { id: string; prompt: string; options: string[]; option_labels?: string[] }
 export type TriageResult = {
   resulting_urgency: Urgency; resulting_guidance: string; matched_condition_ids: string[]; possible_causes: string[]; recommended_examinations: string[];

@@ -1,0 +1,197 @@
+{
+  "condition_entries": [],
+  "preventive_care_items": [
+    {
+      "id": "prevent-011",
+      "species": "dog",
+      "life_stage": "all",
+      "topic": "vaccinations",
+      "title": "Keep core vaccinations up to date",
+      "summary": "Vaccines protect your dog against serious infectious diseases. Your vet will tailor the schedule to your area and your dog's lifestyle.",
+      "description": "Vaccines protect your dog against serious infectious diseases. Your vet will tailor the schedule to your area and your dog's lifestyle. Puppy course: core vaccines usually start at 6–8 weeks and are repeated every 2–4 weeks until 16 weeks of age or older. Core vaccines protect against canine distemper, parvovirus and infectious hepatitis (adenovirus). Leptospirosis is recommended in many areas, and rabies is required by law in some countries and for travel. A booster at 6 or 12 months completes the puppy course. Adult boosters: some core vaccines last about 3 years, while leptospirosis usually needs a yearly booster. Your vet may also suggest non-core vaccines, such as kennel cough, depending on lifestyle. Keep your puppy away from unvaccinated dogs and places other dogs use until your vet says the course is complete. Keep the vaccination record and bring it to every vet visit, kennel stay or trip abroad.",
+      "steps": [
+        "Puppy course: core vaccines usually start at 6–8 weeks and are repeated every 2–4 weeks until 16 weeks of age or older.",
+        "Core vaccines protect against canine distemper, parvovirus and infectious hepatitis (adenovirus). Leptospirosis is recommended in many areas, and rabies is required by law in some countries and for travel.",
+        "A booster at 6 or 12 months completes the puppy course.",
+        "Adult boosters: some core vaccines last about 3 years, while leptospirosis usually needs a yearly booster. Your vet may also suggest non-core vaccines, such as kennel cough, depending on lifestyle.",
+        "Keep your puppy away from unvaccinated dogs and places other dogs use until your vet says the course is complete.",
+        "Keep the vaccination record and bring it to every vet visit, kennel stay or trip abroad."
+      ],
+      "recurrence": "puppy course from 6–8 weeks; then a yearly vaccine review, with boosters as your vet advises",
+      "reminder_interval_days": 365,
+      "trigger_age_days": null,
+      "sources": [
+        "https://wsava.org/global-guidelines/vaccination-guidelines/",
+        "https://www.rspca.org.uk/adviceandwelfare/pets/dogs/health/vaccinations"
+      ],
+      "related_symptoms": []
+    },
+    {
+      "id": "prevent-012",
+      "species": "cat",
+      "life_stage": "all",
+      "topic": "vaccinations",
+      "title": "Keep your cat's vaccinations up to date",
+      "summary": "Vaccines protect your cat against serious infectious diseases, even if they live indoors. Your vet will tailor the schedule to your area and your cat's lifestyle.",
+      "description": "Vaccines protect your cat against serious infectious diseases, even if they live indoors. Your vet will tailor the schedule to your area and your cat's lifestyle. Kitten course: core vaccines usually start at 6–8 weeks and are repeated every 2–4 weeks until 16 weeks of age or older. Core vaccines protect against feline panleukopenia (feline parvovirus), feline herpesvirus and feline calicivirus, the main causes of cat flu. Feline leukaemia virus (FeLV) vaccination is recommended for kittens and for cats that go outdoors or live with cats that do. Rabies is required in some countries and for travel. A booster at 6 or 12 months completes the kitten course. Adult boosters: your vet will recommend intervals, often every 1–3 years depending on the vaccine and your cat's risk. Keep your kitten indoors until the course is complete, and keep the vaccination record for vet visits, catteries and travel.",
+      "steps": [
+        "Kitten course: core vaccines usually start at 6–8 weeks and are repeated every 2–4 weeks until 16 weeks of age or older.",
+        "Core vaccines protect against feline panleukopenia (feline parvovirus), feline herpesvirus and feline calicivirus, the main causes of cat flu.",
+        "Feline leukaemia virus (FeLV) vaccination is recommended for kittens and for cats that go outdoors or live with cats that do. Rabies is required in some countries and for travel.",
+        "A booster at 6 or 12 months completes the kitten course.",
+        "Adult boosters: your vet will recommend intervals, often every 1–3 years depending on the vaccine and your cat's risk.",
+        "Keep your kitten indoors until the course is complete, and keep the vaccination record for vet visits, catteries and travel."
+      ],
+      "recurrence": "kitten course from 6–8 weeks; then a yearly vaccine review, with boosters as your vet advises",
+      "reminder_interval_days": 365,
+      "trigger_age_days": null,
+      "sources": [
+        "https://wsava.org/global-guidelines/vaccination-guidelines/",
+        "https://icatcare.org/articles/vaccinating-your-cat",
+        "https://www.rspca.org.uk/adviceandwelfare/pets/cats/health/vaccinations"
+      ],
+      "related_symptoms": []
+    },
+    {
+      "id": "prevent-013",
+      "species": "both",
+      "life_stage": "all",
+      "topic": "dental",
+      "title": "Brush teeth and spot dental disease early",
+      "summary": "Most dogs and cats develop dental disease as they age. Daily brushing and a yearly dental check help keep their mouth healthy and pain-free.",
+      "description": "Most dogs and cats develop dental disease as they age. Daily brushing and a yearly dental check help keep their mouth healthy and pain-free. Use a soft pet toothbrush or finger brush and a toothpaste made for pets. Never use human toothpaste: it can contain xylitol, which is toxic to dogs, and fluoride and foaming agents that should not be swallowed. Start slowly: let your pet lick the toothpaste, then touch the teeth and gums, then brush a few teeth at a time, rewarding calm behaviour. Aim to brush daily; several times a week still helps. Focus on the outer surfaces of the back teeth and the gum line. Watch for signs of dental disease: bad breath, yellow-brown tartar, red or bleeding gums, drooling, dropping food, chewing on one side, pawing at the mouth or a reduced appetite. Ask your vet to check your pet's teeth at least once a year, and book sooner if you notice any of these signs. Cleaning under the gum line needs a general anaesthetic.",
+      "steps": [
+        "Use a soft pet toothbrush or finger brush and a toothpaste made for pets. Never use human toothpaste: it can contain xylitol, which is toxic to dogs, and fluoride and foaming agents that should not be swallowed.",
+        "Start slowly: let your pet lick the toothpaste, then touch the teeth and gums, then brush a few teeth at a time, rewarding calm behaviour.",
+        "Aim to brush daily; several times a week still helps. Focus on the outer surfaces of the back teeth and the gum line.",
+        "Watch for signs of dental disease: bad breath, yellow-brown tartar, red or bleeding gums, drooling, dropping food, chewing on one side, pawing at the mouth or a reduced appetite.",
+        "Ask your vet to check your pet's teeth at least once a year, and book sooner if you notice any of these signs. Cleaning under the gum line needs a general anaesthetic."
+      ],
+      "recurrence": "brush daily; dental check at least once a year",
+      "reminder_interval_days": 1,
+      "trigger_age_days": null,
+      "sources": [
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/dental-disease-in-dogs",
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/dental-disease-in-cats",
+        "https://icatcare.org/articles/dental-disease-in-cats",
+        "https://vcahospitals.com/resources/preventive-cat/dental/true-or-false-you-can-brush-your-pet-s-teeth-with-toothpaste-made-for-people"
+      ],
+      "related_symptoms": []
+    },
+    {
+      "id": "prevent-014",
+      "species": "both",
+      "life_stage": "all",
+      "topic": "nutrition",
+      "title": "Keep your pet at a healthy weight",
+      "summary": "Extra weight shortens lives and worsens joint, skin and breathing problems. Small, regular checks keep weight on track.",
+      "description": "Extra weight shortens lives and worsens joint, skin and breathing problems. Small, regular checks keep weight on track. Learn to score body condition: at an ideal weight you can easily feel the ribs under a thin layer of fat, see a waist from above and see the belly tuck up from the side. Weigh daily food with kitchen scales instead of using a cup or guessing, and adjust from the feeding guide on the label with your vet's advice. Keep treats and extras to no more than 10% of daily calories, and reduce meals on days with more treats. Weigh your pet about once a month and note the result; ask your vet before starting a weight-loss diet. Contact your vet about unexplained weight loss or gain, especially if your pet is also drinking more or eating differently.",
+      "steps": [
+        "Learn to score body condition: at an ideal weight you can easily feel the ribs under a thin layer of fat, see a waist from above and see the belly tuck up from the side.",
+        "Weigh daily food with kitchen scales instead of using a cup or guessing, and adjust from the feeding guide on the label with your vet's advice.",
+        "Keep treats and extras to no more than 10% of daily calories, and reduce meals on days with more treats.",
+        "Weigh your pet about once a month and note the result; ask your vet before starting a weight-loss diet.",
+        "Contact your vet about unexplained weight loss or gain, especially if your pet is also drinking more or eating differently."
+      ],
+      "recurrence": "weigh and check body condition monthly; review food amounts at each vet visit",
+      "reminder_interval_days": 30,
+      "trigger_age_days": null,
+      "sources": [
+        "https://wsava.org/global-guidelines/global-nutrition-guidelines/",
+        "https://vmc.vet.osu.edu/sites/default/files/documents/wsava-bcs-chart-dogs-cats.pdf",
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/obesity-in-dogs",
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/obesity-in-cats"
+      ],
+      "related_symptoms": [
+        "increased_thirst"
+      ]
+    },
+    {
+      "id": "prevent-015",
+      "species": "both",
+      "life_stage": "senior",
+      "topic": "health_checks",
+      "title": "Book twice-yearly senior check-ups",
+      "summary": "Older pets change quickly, and many age-related diseases are easier to manage when found early.",
+      "description": "Older pets change quickly, and many age-related diseases are easier to manage when found early. From senior age, book a vet check-up every 6 months, even if your pet seems well. Cats are usually considered senior from about 10 years; dogs in the last quarter of their expected lifespan, which comes sooner in large breeds. Ask about blood and urine tests and a blood pressure check to pick up kidney, thyroid, liver and other problems early. Tell your vet if your pet is drinking or urinating more, losing weight, eating differently or has new lumps. Watch for stiffness, slowing down on walks, difficulty with stairs or jumping, or a cat no longer using high places. Note behaviour changes such as confusion, night-time restlessness, toileting accidents, or being more withdrawn or irritable. Make home easier with soft bedding, non-slip flooring, ramps and easy-to-reach food, water and litter trays.",
+      "steps": [
+        "From senior age, book a vet check-up every 6 months, even if your pet seems well. Cats are usually considered senior from about 10 years; dogs in the last quarter of their expected lifespan, which comes sooner in large breeds.",
+        "Ask about blood and urine tests and a blood pressure check to pick up kidney, thyroid, liver and other problems early.",
+        "Tell your vet if your pet is drinking or urinating more, losing weight, eating differently or has new lumps.",
+        "Watch for stiffness, slowing down on walks, difficulty with stairs or jumping, or a cat no longer using high places.",
+        "Note behaviour changes such as confusion, night-time restlessness, toileting accidents, or being more withdrawn or irritable.",
+        "Make home easier with soft bedding, non-slip flooring, ramps and easy-to-reach food, water and litter trays."
+      ],
+      "recurrence": "vet check-up every 6 months from senior age",
+      "reminder_interval_days": 182,
+      "trigger_age_days": null,
+      "sources": [
+        "https://www.aaha.org/resources/2023-aaha-senior-care-guidelines-for-dogs-and-cats/"
+      ],
+      "related_symptoms": [
+        "increased_thirst",
+        "limping",
+        "straining_to_urinate"
+      ]
+    },
+    {
+      "id": "prevent-016",
+      "species": "dog",
+      "life_stage": "puppy",
+      "topic": "getting_started",
+      "title": "Puppy essentials: socialisation, microchip and parasite control",
+      "summary": "The first months shape your puppy's health and confidence for life.",
+      "description": "The first months shape your puppy's health and confidence for life. Socialisation: the key window is roughly 3 to 14 weeks of age. Calmly introduce your puppy to different people, gentle vaccinated dogs, sounds, surfaces, car trips and handling, using treats and keeping each experience short and positive. Until vaccinations are complete, carry your puppy to see the world and invite healthy, vaccinated dogs to visit rather than using parks. Ask your vet about puppy classes. Microchip: make sure your puppy is microchipped (a legal requirement for dogs in many countries) and update the database with your details straight away, and again whenever you move or change phone number. Parasite control: puppies are usually wormed every 2 weeks at first, then monthly until 6 months; use flea and tick products suitable for your puppy's age and weight, as your vet advises. Book a first vet check soon after bringing your puppy home to start vaccinations and agree a parasite-control plan.",
+      "steps": [
+        "Socialisation: the key window is roughly 3 to 14 weeks of age. Calmly introduce your puppy to different people, gentle vaccinated dogs, sounds, surfaces, car trips and handling, using treats and keeping each experience short and positive.",
+        "Until vaccinations are complete, carry your puppy to see the world and invite healthy, vaccinated dogs to visit rather than using parks. Ask your vet about puppy classes.",
+        "Microchip: make sure your puppy is microchipped (a legal requirement for dogs in many countries) and update the database with your details straight away, and again whenever you move or change phone number.",
+        "Parasite control: puppies are usually wormed every 2 weeks at first, then monthly until 6 months; use flea and tick products suitable for your puppy's age and weight, as your vet advises.",
+        "Book a first vet check soon after bringing your puppy home to start vaccinations and agree a parasite-control plan."
+      ],
+      "recurrence": "in the first weeks at home; worming every 2 weeks at first, as your vet advises",
+      "reminder_interval_days": null,
+      "trigger_age_days": null,
+      "sources": [
+        "https://www.rspca.org.uk/adviceandwelfare/pets/dogs/puppy",
+        "https://www.rspca.org.uk/adviceandwelfare/pets/general/microchipping",
+        "https://www.pdsa.org.uk/media/12112/phh_all_o_microchipping-your-pet.pdf",
+        "https://www.esccap.org/uploads/docs/ag51r456_0778_ESCCAP_GL1__English_2026_v23.pdf"
+      ],
+      "related_symptoms": [
+        "diarrhea",
+        "scooting"
+      ]
+    },
+    {
+      "id": "prevent-017",
+      "species": "cat",
+      "life_stage": "kitten",
+      "topic": "getting_started",
+      "title": "Kitten essentials: socialisation, microchip and parasite control",
+      "summary": "The first months shape your kitten's health and confidence for life.",
+      "description": "The first months shape your kitten's health and confidence for life. Socialisation: kittens learn most between about 2 and 7 weeks of age, so choose a kitten that has been gently handled in a home. Keep up short, positive handling, play and new sights and sounds after they arrive. Get your kitten used to the carrier, being picked up and having their teeth, ears and paws touched, using treats, so vet visits and grooming are easier. Microchip: make sure your kitten is microchipped (required for cats in some countries) and keep your contact details up to date in the database. Parasite control: kittens are usually wormed every 2 weeks at first, then monthly until 6 months; use flea treatments suitable for your kitten's age and weight. Never use dog flea products on cats. Book a first vet check to start vaccinations, and ask about neutering, which is often recommended at around 4 months, before your kitten goes outdoors.",
+      "steps": [
+        "Socialisation: kittens learn most between about 2 and 7 weeks of age, so choose a kitten that has been gently handled in a home. Keep up short, positive handling, play and new sights and sounds after they arrive.",
+        "Get your kitten used to the carrier, being picked up and having their teeth, ears and paws touched, using treats, so vet visits and grooming are easier.",
+        "Microchip: make sure your kitten is microchipped (required for cats in some countries) and keep your contact details up to date in the database.",
+        "Parasite control: kittens are usually wormed every 2 weeks at first, then monthly until 6 months; use flea treatments suitable for your kitten's age and weight. Never use dog flea products on cats.",
+        "Book a first vet check to start vaccinations, and ask about neutering, which is often recommended at around 4 months, before your kitten goes outdoors."
+      ],
+      "recurrence": "in the first weeks at home; worming every 2 weeks at first, as your vet advises",
+      "reminder_interval_days": null,
+      "trigger_age_days": null,
+      "sources": [
+        "https://www.pdsa.org.uk/pet-help-and-advice/looking-after-your-pet/kittens-cats/socialising-your-kitten",
+        "https://www.rspca.org.uk/adviceandwelfare/pets/cats/kittens",
+        "https://icatcare.org/articles/neutering-your-cat",
+        "https://www.rspca.org.uk/adviceandwelfare/pets/general/microchipping",
+        "https://www.esccap.org/uploads/docs/ag51r456_0778_ESCCAP_GL1__English_2026_v23.pdf"
+      ],
+      "related_symptoms": [
+        "diarrhea",
+        "scooting"
+      ]
+    }
+  ]
+}
