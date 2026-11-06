@@ -165,7 +165,7 @@ def test_care_guides_have_topics_steps_and_reminder_intervals():
             assert len(item.description) > len(item.summary), item.id
         if item.reminder_interval_days:
             assert item.recurrence, item.id
-    assert items["prevent-013"].reminder_interval_days == 1
+    assert items["prevent-013"].reminder_interval_days == 7
     assert items["prevent-015"].reminder_interval_days == 182
     assert items["prevent-016"].reminder_interval_days is None  # one-off reminder
 
@@ -184,7 +184,7 @@ def test_care_api_returns_localized_steps_and_grouping_fields():
     client = TestClient(app)
     care = client.get("/preventive-care", params={"species": "cat", "life_stage": "senior"}, headers={"Accept-Language": "pt-PT"}).json()
     dental = next(item for item in care if item["id"] == "prevent-013")
-    assert dental["topic"] == "dental" and dental["reminder_interval_days"] == 1
+    assert dental["topic"] == "dental" and dental["reminder_interval_days"] == 7
     assert dental["title"].startswith("Escovar") and dental["summary"] and dental["steps"][0].startswith("Use uma escova")
     english = next(item for item in client.get("/preventive-care", params={"species": "cat"}).json() if item["id"] == "prevent-013")
     assert len(english["steps"]) == len(dental["steps"]) and "xylitol" in english["steps"][0]
