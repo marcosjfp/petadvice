@@ -1,0 +1,468 @@
+{
+  "condition_entries": [
+    {
+      "id": "dog-cat-tox-001",
+      "name": "Possible poisoning (toxic food, medicine or chemical)",
+      "species": "both",
+      "category": "emergency_trauma",
+      "applicable_life_stages": ["puppy", "kitten", "young_adult", "mature_adult", "senior"],
+      "environment_factors": [],
+      "breed_predispositions": [],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["ate_something_toxic"],
+      "urgency_default": "emergency_now",
+      "red_flags": [
+        {"description": "Seizures, trembling, collapse or difficulty breathing", "escalates_to": "emergency_now"},
+        {"description": "Repeated vomiting, drooling, a racing heart or restlessness after eating chocolate", "escalates_to": "emergency_now"},
+        {"description": "Weakness, wobbly walking or collapse after sugar-free gum, sweets or baking containing xylitol", "escalates_to": "emergency_now"},
+        {"description": "Bleeding from the gums or nose, blood in urine or faeces, bruising, pale gums or breathlessness, which can appear 3 to 5 days after rat poison", "escalates_to": "emergency_now"},
+        {"description": "Acting drunk, drinking a lot or vomiting after possible access to antifreeze or screen wash", "escalates_to": "emergency_now"}
+      ],
+      "home_care_guidance": null,
+      "prevention_tips": "Keep chocolate, sugar-free sweets and gum, grapes, raisins, onions, garlic and all human and pet medicines shut away, out of reach and out of handbags. Store rat and slug poison, antifreeze and garden or cleaning chemicals in sealed containers where pets cannot reach them, and mop up spills straight away. Never give your pet human painkillers. Save your vet's out-of-hours number and an animal poison helpline in your phone. If it happens: phone your vet or a poison helpline straight away, do not make your pet vomit unless a vet tells you to, and take the packaging or a sample with you.",
+      "possible_causes": [
+        "Chocolate: dark and baking chocolate and cocoa are the most dangerous; signs can take several hours to appear",
+        "Xylitol (birch sugar) and some other sweeteners in sugar-free gum, sweets, peanut butter and baking: can cause a dangerous drop in blood sugar within an hour and liver damage in dogs",
+        "Grapes, raisins, sultanas and currants, including in cakes and hot cross buns: even small amounts can cause kidney failure",
+        "Onions, garlic, leeks and chives, including powders and cooked food: damage red blood cells, often a few days later",
+        "Human medicines such as paracetamol, ibuprofen and other anti-inflammatories: a single tablet can be dangerous, and paracetamol is especially toxic to cats",
+        "Rat and mouse poison: many types stop the blood clotting, with bleeding appearing days later",
+        "Antifreeze and screen wash (ethylene glycol): sweet-tasting and quickly causes kidney failure; treatment is only effective if started within hours",
+        "Many poisons cause no signs for hours or days, so waiting to see if your pet seems unwell is not safe"
+      ],
+      "recommended_examinations": [
+        "Phone ahead so the clinic can prepare, and take the packaging, label or a sample of what was eaten",
+        "Your vet may safely make your pet vomit if it is early enough and appropriate: do not try this at home",
+        "Activated charcoal, intravenous fluids and monitoring, depending on the poison",
+        "Blood and urine tests to check the kidneys, liver, blood sugar and blood clotting",
+        "Specific antidotes where they exist, for example vitamin K after rat poison"
+      ],
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://www.aspca.org/pet-care/animal-poison-control",
+        "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets",
+        "https://www.rspca.org.uk/adviceandwelfare/pets/dogs/health/poisoning"
+      ],
+      "related_care": []
+    },
+    {
+      "id": "cat-tox-002",
+      "name": "Lily or permethrin poisoning in cats",
+      "species": "cat",
+      "category": "emergency_trauma",
+      "applicable_life_stages": ["kitten", "young_adult", "mature_adult", "senior"],
+      "environment_factors": ["indoor_only"],
+      "breed_predispositions": [],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["ate_something_toxic"],
+      "urgency_default": "emergency_now",
+      "red_flags": [
+        {"description": "Any contact with a lily, even pollen on the fur or a sip of vase water, before signs appear", "escalates_to": "emergency_now"},
+        {"description": "Vomiting, drooling, hiding or not eating after contact with a lily", "escalates_to": "emergency_now"},
+        {"description": "Peeing much more, or much less or not at all, in the days after lily contact", "escalates_to": "emergency_now"},
+        {"description": "Twitching, tremors, wobbliness or seizures after a flea or tick product, or after contact with a recently treated dog", "escalates_to": "emergency_now"}
+      ],
+      "home_care_guidance": null,
+      "prevention_tips": "Do not keep lilies (Lilium) or day lilies (Hemerocallis) in a home with a cat, and check bouquets before bringing them in. Only use flea and tick products made for cats, and keep cats away from dogs treated with permethrin products for as long as the label says. If a dog product has been put on your cat, phone your vet at once; they may advise washing it off with a mild washing-up liquid and lukewarm water, keeping your cat warm afterwards.",
+      "possible_causes": [
+        "Lilies (Lilium) and day lilies (Hemerocallis): every part is toxic to cats, including pollen groomed off the fur and the water in the vase, and can cause kidney failure within 1 to 3 days",
+        "Permethrin in spot-ons, sprays or collars made for dogs: cats cannot break it down, so a dog product put on a cat, or close contact with a recently treated dog, can cause tremors and seizures",
+        "Human painkillers, especially paracetamol, which is highly toxic to cats"
+      ],
+      "recommended_examinations": [
+        "Take the plant, flower or product packaging with you",
+        "Early decontamination by your vet, such as safe vomiting after a lily or bathing off a flea product",
+        "Intravenous fluids for at least 48 hours after lily exposure, with blood tests to monitor the kidneys",
+        "Medicines to control tremors or seizures, and careful temperature monitoring"
+      ],
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://www.aspca.org/pet-care/aspca-poison-control/toxic-and-non-toxic-plants/lily",
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/lily-poisoning-in-cats",
+        "https://icatcare.org/articles/permethrin-poisoning"
+      ],
+      "related_care": []
+    },
+    {
+      "id": "dog-appetite-001",
+      "name": "Not eating or low energy in dogs",
+      "species": "dog",
+      "category": "gastrointestinal",
+      "applicable_life_stages": ["puppy", "young_adult", "mature_adult", "senior"],
+      "environment_factors": [],
+      "breed_predispositions": [],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["not_eating_or_lethargic"],
+      "urgency_default": "vet_soon",
+      "red_flags": [
+        {"description": "Collapse, inability to stand, difficulty breathing, or pale, grey or yellow gums", "escalates_to": "emergency_now"},
+        {"description": "A swollen, tight belly with retching that brings nothing up", "escalates_to": "emergency_now"},
+        {"description": "Not eating for more than 24 hours in a puppy, or for more than 2 days in an adult dog", "escalates_to": "vet_24h"},
+        {"description": "Not eating alongside vomiting, diarrhoea or refusing water", "escalates_to": "vet_24h"}
+      ],
+      "life_stage_escalation": {"puppy": "vet_24h", "senior": "vet_24h"},
+      "home_care_guidance": null,
+      "prevention_tips": "Know what is normal for your dog: how much they eat and drink and how active they are. Keep bins, bones, toys and socks out of reach, keep vaccinations and parasite control up to date, and change food gradually over about a week.",
+      "possible_causes": [
+        "Stomach upset, often after eating something unusual, or a change of food",
+        "Dental pain or a sore mouth",
+        "Pain elsewhere, for example from the joints or back",
+        "A swallowed object blocking the gut",
+        "Infections, fever, or illness affecting the kidneys, liver or pancreas",
+        "Poisoning",
+        "Stress, heat, or a recent vaccination or medication"
+      ],
+      "recommended_examinations": [
+        "A full physical exam, including the mouth, belly and temperature",
+        "Blood and urine tests",
+        "X-rays or ultrasound of the belly if a blockage is possible"
+      ],
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://vcahospitals.com/know-your-pet/anorexia-in-dogs"
+      ],
+      "related_care": []
+    },
+    {
+      "id": "cat-appetite-001",
+      "name": "Not eating or low energy in cats (risk of fatty liver)",
+      "species": "cat",
+      "category": "gastrointestinal",
+      "applicable_life_stages": ["kitten", "young_adult", "mature_adult", "senior"],
+      "environment_factors": [],
+      "breed_predispositions": [],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["not_eating_or_lethargic"],
+      "urgency_default": "vet_soon",
+      "red_flags": [
+        {"description": "Not eating for more than 24 hours: cats can quickly develop serious liver problems (hepatic lipidosis), especially if overweight", "escalates_to": "vet_24h"},
+        {"description": "Yellow tinge to the gums, skin or the whites of the eye (jaundice)", "escalates_to": "vet_24h"},
+        {"description": "Collapse, hiding and not moving, open-mouth breathing, or pale or grey gums", "escalates_to": "emergency_now"},
+        {"description": "Straining in the litter tray with little or no urine", "escalates_to": "emergency_now"}
+      ],
+      "life_stage_escalation": {"kitten": "vet_24h", "senior": "vet_24h"},
+      "home_care_guidance": null,
+      "prevention_tips": "Notice early when your cat eats less, especially if they are overweight. Never put a cat on a strict diet or make sudden food changes: weight loss should be gradual and planned with your vet. Keep string, ribbon, thread and hair ties out of reach.",
+      "possible_causes": [
+        "Fatty liver (hepatic lipidosis), which can develop after only a few days without food",
+        "Dental disease or mouth pain",
+        "Kidney disease, pancreatitis, an overactive thyroid or other illness",
+        "A swallowed object, especially string or thread",
+        "Infections and fever",
+        "Stress, such as a house move, a new pet or a food change"
+      ],
+      "recommended_examinations": [
+        "A full physical exam, including the mouth, weight and temperature",
+        "Blood tests, including liver and kidney values",
+        "Abdominal ultrasound or X-rays",
+        "Assisted feeding, sometimes through a feeding tube, if your cat has stopped eating"
+      ],
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/hepatic-lipidosis",
+        "https://vcahospitals.com/know-your-pet/anorexia-in-cats"
+      ],
+      "related_care": []
+    },
+    {
+      "id": "dog-resp-002",
+      "name": "Coughing in dogs (kennel cough, airway or heart disease)",
+      "species": "dog",
+      "category": "respiratory",
+      "applicable_life_stages": ["puppy", "young_adult", "mature_adult", "senior"],
+      "environment_factors": ["multi_pet_household"],
+      "breed_predispositions": ["toy breeds (collapsing trachea)", "Cavalier King Charles Spaniel (heart disease)"],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["coughing"],
+      "urgency_default": "vet_soon",
+      "red_flags": [
+        {"description": "Struggling to breathe, fast breathing at rest, or blue, grey or pale gums or tongue", "escalates_to": "emergency_now"},
+        {"description": "Sudden coughing and gagging after chewing or playing, as if something is stuck", "escalates_to": "emergency_now"},
+        {"description": "Coughing up blood, or fainting", "escalates_to": "emergency_now"},
+        {"description": "Cough with tiredness, poor appetite or a fever (possible pneumonia)", "escalates_to": "vet_24h"},
+        {"description": "Cough that is worse at night or at rest in a dog with a heart murmur", "escalates_to": "vet_24h"}
+      ],
+      "home_care_guidance": null,
+      "prevention_tips": "Keep your dog's vaccinations up to date, including kennel cough if they meet other dogs, go to kennels or classes. Use a harness rather than a collar for dogs that cough, avoid smoke and dusty air, and keep your dog a healthy weight. Ask your vet to check older dogs' hearts regularly. Dogs with kennel cough are infectious, so keep them away from other dogs until your vet says otherwise.",
+      "possible_causes": [
+        "Kennel cough (infectious tracheobronchitis): a harsh, honking cough, often after contact with other dogs",
+        "Something stuck in the throat or airway, such as a grass seed or stick fragment",
+        "Heart disease causing fluid in the lungs, often with a cough at night and tiring easily",
+        "Collapsing windpipe in small breeds, often a 'goose-honk' cough when excited or pulling on the lead",
+        "Pneumonia, chronic bronchitis or lungworm"
+      ],
+      "recommended_examinations": [
+        "Listening to the heart and lungs",
+        "Chest X-rays",
+        "Heart scan (echocardiogram) if heart disease is possible",
+        "A test for lungworm, or airway samples if the cough is long-lasting"
+      ],
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://vcahospitals.com/know-your-pet/coughing-in-dogs",
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/kennel-cough"
+      ],
+      "related_care": []
+    },
+    {
+      "id": "cat-resp-002",
+      "name": "Coughing in cats (often asthma)",
+      "species": "cat",
+      "category": "respiratory",
+      "applicable_life_stages": ["kitten", "young_adult", "mature_adult", "senior"],
+      "environment_factors": [],
+      "breed_predispositions": ["Siamese"],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["coughing"],
+      "urgency_default": "vet_soon",
+      "red_flags": [
+        {"description": "Open-mouth breathing or panting, fast breathing at rest, or blue, grey or pale gums", "escalates_to": "emergency_now"},
+        {"description": "Crouching low with the neck stretched out and struggling to breathe (possible asthma attack)", "escalates_to": "emergency_now"},
+        {"description": "Coughing up blood, or collapse", "escalates_to": "emergency_now"},
+        {"description": "Cough with tiredness, not eating or a fever", "escalates_to": "vet_24h"}
+      ],
+      "home_care_guidance": null,
+      "prevention_tips": "A cough in a cat is never normal and is often mistaken for hairballs, so have it checked. Avoid smoke, scented sprays, plug-in air fresheners and dusty or scented cat litter. Keep worming up to date, including lungworm if your cat hunts. If your cat has asthma, give medicines exactly as prescribed and ask your vet for a plan for attacks.",
+      "possible_causes": [
+        "Feline asthma or chronic bronchitis: the most common reason cats cough",
+        "Hairballs, though a cat bringing up hair usually retches rather than coughs",
+        "Lungworm or other parasites",
+        "Respiratory infections",
+        "Heart disease or a growth in the chest, especially in older cats",
+        "Something inhaled, such as a grass blade"
+      ],
+      "recommended_examinations": [
+        "Listening to the chest and checking breathing rate",
+        "Chest X-rays",
+        "A faecal test for lungworm",
+        "Airway samples (bronchoalveolar lavage) in some cases"
+      ],
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://vcahospitals.com/know-your-pet/feline-asthma",
+        "https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/feline-asthma-what-you-need-know"
+      ],
+      "related_care": []
+    },
+    {
+      "id": "dog-cat-eye-001",
+      "name": "Eye problems (conjunctivitis, ulcers and injuries)",
+      "species": "both",
+      "category": "ear_eye",
+      "applicable_life_stages": ["puppy", "kitten", "young_adult", "mature_adult", "senior"],
+      "environment_factors": [],
+      "breed_predispositions": ["flat-faced (brachycephalic) breeds such as Pugs, Shih Tzus and Persians"],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["eye_problem"],
+      "urgency_default": "vet_soon",
+      "red_flags": [
+        {"description": "An eye injury, or an eyeball that is bulging or has come out of its socket", "escalates_to": "emergency_now"},
+        {"description": "An eye that suddenly turns cloudy, blue or looks bigger than the other", "escalates_to": "emergency_now"},
+        {"description": "Chemicals splashed into the eye, or sudden loss of sight", "escalates_to": "emergency_now"},
+        {"description": "Squinting, keeping the eye shut, or pawing or rubbing at it (possible ulcer)", "escalates_to": "vet_24h"},
+        {"description": "The third eyelid showing, or pupils of different sizes", "escalates_to": "vet_24h"}
+      ],
+      "home_care_guidance": null,
+      "prevention_tips": "Keep long hair trimmed away from the face, and check the eye area daily in flat-faced breeds. Do not let dogs travel with their head out of the car window. Never use human eye drops or old medicines on your pet's eye: some can make ulcers much worse. If chemicals get into the eye, rinse gently with plenty of clean, lukewarm water and phone your vet. Stop your pet rubbing the eye on the way to the vet.",
+      "possible_causes": [
+        "Conjunctivitis from allergies, infection (such as cat flu) or irritants",
+        "A scratch or ulcer on the surface of the eye",
+        "Something in the eye, such as a grass seed",
+        "Dry eye (low tear production), common in some dog breeds",
+        "Eyelid problems such as eyelids or lashes rubbing on the eye",
+        "Glaucoma (raised pressure inside the eye) or inflammation inside the eye (uveitis)"
+      ],
+      "recommended_examinations": [
+        "An eye exam with a bright light, checking under the eyelids for foreign bodies",
+        "Fluorescein stain to look for ulcers",
+        "Tear test (Schirmer tear test)",
+        "Eye pressure measurement"
+      ],
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/symptoms/eye-problems-in-dogs",
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/symptoms/eye-problems-in-cats",
+        "https://vcahospitals.com/know-your-pet/conjunctivitis-in-dogs"
+      ],
+      "related_care": []
+    },
+    {
+      "id": "dog-cat-ear-001",
+      "name": "Ear problems (infection, mites or grass seeds)",
+      "species": "both",
+      "category": "ear_eye",
+      "applicable_life_stages": ["puppy", "kitten", "young_adult", "mature_adult", "senior"],
+      "environment_factors": ["outdoor_access", "seasonal_summer"],
+      "breed_predispositions": ["dogs with floppy or hairy ears, such as Spaniels", "dogs with allergic skin disease"],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["ear_scratching_or_head_shaking"],
+      "urgency_default": "vet_soon",
+      "red_flags": [
+        {"description": "Head tilt, loss of balance, walking in circles, or flickering eye movements", "escalates_to": "vet_24h"},
+        {"description": "Sudden, violent head shaking after a walk in long grass (possible grass seed)", "escalates_to": "vet_24h"},
+        {"description": "An ear that is very painful, bleeding, or makes your pet cry when touched", "escalates_to": "vet_24h"},
+        {"description": "An ear flap swollen like a soft balloon (aural haematoma)", "escalates_to": "vet_soon"}
+      ],
+      "home_care_guidance": null,
+      "prevention_tips": "Check your pet's ears weekly and after walks in long grass, especially in summer, and keep the fur between the toes and around the ears trimmed. Only clean ears with a cleaner your vet recommends, never with cotton buds pushed into the canal, and dry them after swimming. Treat all pets in the house if ear mites are found. Ongoing ear problems are often linked to allergies, so ask your vet about the cause.",
+      "possible_causes": [
+        "Outer ear infection (otitis externa) with bacteria or yeast, often linked to allergies",
+        "Ear mites, especially in kittens, puppies and pets from multi-animal homes; very itchy, with dark, crumbly wax",
+        "A grass seed or other object in the ear canal",
+        "An aural haematoma: a blood blister in the ear flap caused by shaking",
+        "Middle or inner ear infection, polyps or growths, which can affect balance"
+      ],
+      "recommended_examinations": [
+        "Looking down the ear canal with an otoscope, sometimes under sedation",
+        "Examining a swab of ear wax under the microscope (cytology) for mites, yeast and bacteria",
+        "A full neurological check if balance is affected"
+      ],
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://vcahospitals.com/know-your-pet/ear-infections-in-dogs",
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/ear-infections-in-cats",
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/grass-seeds-in-dogs"
+      ],
+      "related_care": []
+    },
+    {
+      "id": "dog-cat-gi-003",
+      "name": "Constipation",
+      "species": "both",
+      "category": "gastrointestinal",
+      "applicable_life_stages": ["puppy", "kitten", "young_adult", "mature_adult", "senior"],
+      "environment_factors": [],
+      "breed_predispositions": [],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["constipation"],
+      "urgency_default": "vet_soon",
+      "red_flags": [
+        {"description": "Straining in the litter tray with little or no urine, especially in a male cat: a blocked bladder can look like constipation", "escalates_to": "emergency_now"},
+        {"description": "A swollen or painful belly", "escalates_to": "emergency_now"},
+        {"description": "No poo for more than 48 hours", "escalates_to": "vet_24h"},
+        {"description": "Vomiting, not eating or lethargy alongside straining", "escalates_to": "vet_24h"},
+        {"description": "Blood, string or another object visible at the bottom: do not pull it out", "escalates_to": "vet_24h"}
+      ],
+      "home_care_guidance": null,
+      "prevention_tips": "Make sure fresh water is always available (wet food and water fountains help cats drink more), keep your pet active and a healthy weight, and do not feed cooked bones. Keep litter trays clean and easy to reach for older cats with stiff joints. Groom long-haired pets regularly to reduce swallowed hair. Do not give human laxatives or enemas: some are toxic to pets.",
+      "possible_causes": [
+        "Dehydration or not drinking enough",
+        "Eating bones, hair, grass or other indigestible material",
+        "Pain when squatting, from arthritis, anal gland problems or injury",
+        "Kidney disease or megacolon (an enlarged, weak bowel), especially in older cats",
+        "A blockage in the gut, or an enlarged prostate in older male dogs",
+        "Lack of exercise or a dirty or hard-to-reach litter tray"
+      ],
+      "recommended_examinations": [
+        "A physical exam, including feeling the belly and a rectal exam",
+        "Checking the bladder, to rule out a urinary blockage",
+        "X-rays of the belly",
+        "Blood tests, especially in older cats"
+      ],
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://vcahospitals.com/know-your-pet/constipation-in-dogs",
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/constipation-in-cats"
+      ],
+      "related_care": []
+    },
+    {
+      "id": "dog-cat-heat-001",
+      "name": "Heatstroke (overheating)",
+      "species": "both",
+      "category": "emergency_trauma",
+      "applicable_life_stages": ["puppy", "kitten", "young_adult", "mature_adult", "senior"],
+      "environment_factors": ["seasonal_summer", "breed_predisposed"],
+      "breed_predispositions": ["flat-faced (brachycephalic) breeds such as Bulldogs, Pugs and Persian cats", "giant and thick-coated breeds"],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["heatstroke"],
+      "urgency_default": "emergency_now",
+      "red_flags": [
+        {"description": "Heavy panting or noisy breathing that does not settle with rest in a cool place; any panting in a cat", "escalates_to": "emergency_now"},
+        {"description": "Bright red, pale or grey gums, or thick drool", "escalates_to": "emergency_now"},
+        {"description": "Vomiting, diarrhoea, wobbliness, confusion, collapse or seizures", "escalates_to": "emergency_now"}
+      ],
+      "home_care_guidance": null,
+      "prevention_tips": "Never leave a pet in a car, conservatory or caravan on a warm day, even for a few minutes. Walk dogs in the cool early morning or late evening, avoid hot pavements, and skip exercise on hot days for flat-faced, overweight, old or heart-affected pets. Always provide shade, fresh water and a cool place to rest. First aid if it happens: move your pet into shade or a cool room, pour cool (not ice-cold) water over them, use a fan, offer small sips of water, and go to the vet straight away, keeping the car cool on the way. Do not cover your pet with a wet towel, which traps heat.",
+      "possible_causes": [
+        "Being left in a hot car, conservatory or other enclosed space",
+        "Exercise or play in warm or humid weather",
+        "No access to shade or water",
+        "Flat-faced breeds, overweight, very young or old pets, and pets with heart or airway disease overheat more easily",
+        "Heatstroke can damage the brain, kidneys, gut and blood clotting even when a pet seems to recover"
+      ],
+      "recommended_examinations": [
+        "Temperature monitoring while your pet is cooled safely",
+        "Intravenous fluids and oxygen",
+        "Blood tests for organ damage and blood clotting",
+        "Monitoring in hospital for at least 24 hours, because complications can appear later"
+      ],
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://www.rspca.org.uk/adviceandwelfare/pets/dogs/health/heatstroke",
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/heatstroke-in-cats",
+        "https://vcahospitals.com/know-your-pet/heat-stroke-in-dogs"
+      ],
+      "related_care": []
+    },
+    {
+      "id": "dog-gi-gdv-001",
+      "name": "Bloat and twisted stomach (GDV)",
+      "species": "dog",
+      "category": "emergency_trauma",
+      "applicable_life_stages": ["puppy", "young_adult", "mature_adult", "senior"],
+      "environment_factors": ["breed_predisposed"],
+      "breed_predispositions": ["Great Dane", "German Shepherd", "Standard Poodle", "Weimaraner", "Irish Setter", "Dobermann", "St Bernard", "Akita", "Basset Hound", "other large, deep-chested breeds"],
+      "applicable_sex": [],
+      "applicable_neuter_status": [],
+      "symptom_tags": ["swollen_belly_retching"],
+      "urgency_default": "emergency_now",
+      "red_flags": [
+        {"description": "Retching or trying to vomit but bringing nothing up, or only froth", "escalates_to": "emergency_now"},
+        {"description": "A swollen, tight or drum-like belly", "escalates_to": "emergency_now"},
+        {"description": "Restlessness, pacing, drooling, pale gums, fast breathing, weakness or collapse", "escalates_to": "emergency_now"}
+      ],
+      "home_care_guidance": null,
+      "prevention_tips": "For large, deep-chested dogs: feed two or three smaller meals a day instead of one large meal, avoid exercise for about an hour before and after eating, slow down fast eaters, and do not use raised food bowls unless your vet advises them. Ask your vet about a preventive gastropexy (stomach-tacking) operation, often done at the same time as neutering. Know where your nearest out-of-hours vet is.",
+      "possible_causes": [
+        "Gastric dilatation: the stomach fills with gas, food or fluid",
+        "Volvulus: the swollen stomach twists, cutting off its blood supply and that of the spleen; this can kill within hours",
+        "Higher risk in large, deep-chested breeds, older dogs, dogs eating one large meal a day or eating quickly, and dogs with a close relative who had bloat"
+      ],
+      "recommended_examinations": [
+        "Emergency X-rays to check whether the stomach has twisted",
+        "Releasing gas from the stomach, intravenous fluids and pain relief",
+        "Emergency surgery to untwist the stomach and fix it in place (gastropexy)",
+        "Heart rhythm monitoring after treatment"
+      ],
+      "vet_reviewed_by": null,
+      "last_reviewed_date": null,
+      "sources": [
+        "https://vcahospitals.com/know-your-pet/gastric-dilatation-and-volvulus-in-dogs",
+        "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/symptoms/bloat-swollen-belly-in-dogs"
+      ],
+      "related_care": []
+    }
+  ],
+  "preventive_care_items": []
+}

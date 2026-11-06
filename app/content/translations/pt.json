@@ -190,6 +190,265 @@
         "Exame físico para excluir dor ou doença por trás da mudança de comportamento",
         "Análise à urina, se o gato urina fora da caixa de areia"
       ]
+    },
+    "dog-cat-tox-001": {
+      "name": "Possível envenenamento (alimento, medicamento ou químico tóxico)",
+      "red_flags": [
+        "Convulsões, tremores, colapso ou dificuldade em respirar",
+        "Vómitos repetidos, salivação, coração muito acelerado ou agitação depois de comer chocolate",
+        "Fraqueza, andar cambaleante ou colapso depois de pastilhas sem açúcar, doces ou bolos com xilitol",
+        "Sangramento das gengivas ou do nariz, sangue na urina ou nas fezes, nódoas negras, gengivas pálidas ou falta de ar, que podem surgir 3 a 5 dias depois de veneno para ratos",
+        "Parecer embriagado, beber muita água ou vomitar depois de possível acesso a anticongelante ou líquido do limpa-para-brisas"
+      ],
+      "prevention_tips": "Guarde chocolate, doces e pastilhas sem açúcar, uvas, passas, cebola, alho e todos os medicamentos, humanos e veterinários, fechados e fora do alcance, incluindo dentro de malas. Guarde veneno para ratos e caracóis, anticongelante e produtos de jardim ou de limpeza em recipientes fechados onde os animais não cheguem, e limpe logo qualquer derrame. Nunca dê analgésicos humanos ao seu animal. Guarde no telemóvel o número de urgência do seu veterinário e de uma linha de apoio para intoxicações animais. Se acontecer: telefone logo ao veterinário ou a uma linha de apoio, não provoque o vómito a menos que um veterinário o indique, e leve a embalagem ou uma amostra.",
+      "possible_causes": [
+        "Chocolate: o chocolate negro, o de culinária e o cacau são os mais perigosos; os sinais podem demorar várias horas a aparecer",
+        "Xilitol (açúcar de bétula) e outros adoçantes em pastilhas e doces sem açúcar, manteiga de amendoim e bolos: podem causar uma descida perigosa do açúcar no sangue em menos de uma hora e lesões no fígado em cães",
+        "Uvas, passas e corintos, também em bolos: mesmo pequenas quantidades podem causar insuficiência renal",
+        "Cebola, alho, alho-francês e cebolinho, incluindo em pó e em comida cozinhada: danificam os glóbulos vermelhos, muitas vezes alguns dias depois",
+        "Medicamentos humanos como paracetamol, ibuprofeno e outros anti-inflamatórios: um único comprimido pode ser perigoso, e o paracetamol é especialmente tóxico para gatos",
+        "Veneno para ratos e ratazanas: muitos tipos impedem a coagulação do sangue e o sangramento aparece dias depois",
+        "Anticongelante e líquido do limpa-para-brisas (etilenoglicol): tem sabor doce e causa rapidamente insuficiência renal; o tratamento só é eficaz se começar dentro de poucas horas",
+        "Muitos venenos não causam sinais durante horas ou dias, por isso não é seguro esperar para ver se o animal fica mal"
+      ],
+      "recommended_examinations": [
+        "Telefone antes para a clínica se preparar e leve a embalagem, o rótulo ou uma amostra do que foi ingerido",
+        "O veterinário pode provocar o vómito em segurança se ainda for cedo e for adequado: não tente fazê-lo em casa",
+        "Carvão ativado, soro intravenoso e vigilância, consoante o veneno",
+        "Análises ao sangue e à urina para avaliar os rins, o fígado, o açúcar no sangue e a coagulação",
+        "Antídotos específicos quando existem, por exemplo vitamina K depois de veneno para ratos"
+      ]
+    },
+    "cat-tox-002": {
+      "name": "Intoxicação por lírios ou permetrina em gatos",
+      "red_flags": [
+        "Qualquer contacto com um lírio, mesmo pólen no pelo ou um gole de água da jarra, antes de surgirem sinais",
+        "Vómitos, salivação, esconder-se ou não comer depois de contacto com um lírio",
+        "Urinar muito mais, ou muito menos ou nada, nos dias seguintes ao contacto com um lírio",
+        "Espasmos, tremores, falta de equilíbrio ou convulsões depois de um produto contra pulgas ou carraças, ou de contacto com um cão tratado recentemente"
+      ],
+      "prevention_tips": "Não tenha lírios (Lilium) nem hemerocales (Hemerocallis) numa casa com gatos e verifique os ramos de flores antes de os trazer para casa. Use apenas produtos contra pulgas e carraças próprios para gatos e mantenha os gatos afastados de cães tratados com produtos com permetrina durante o tempo indicado no rótulo. Se aplicou um produto para cães no seu gato, telefone de imediato ao veterinário; ele pode aconselhar a lavar o produto com detergente da loiça suave e água morna, mantendo depois o gato quente.",
+      "possible_causes": [
+        "Lírios (Lilium) e hemerocales (Hemerocallis): todas as partes são tóxicas para gatos, incluindo o pólen que lambem do pelo e a água da jarra, e podem causar insuficiência renal em 1 a 3 dias",
+        "Permetrina em pipetas, sprays ou coleiras para cães: os gatos não a conseguem eliminar, por isso um produto para cães aplicado num gato, ou o contacto próximo com um cão tratado recentemente, pode causar tremores e convulsões",
+        "Analgésicos humanos, sobretudo o paracetamol, que é muito tóxico para gatos"
+      ],
+      "recommended_examinations": [
+        "Leve consigo a planta, a flor ou a embalagem do produto",
+        "Descontaminação precoce pelo veterinário, como provocar o vómito em segurança depois de um lírio ou dar banho para retirar um produto antiparasitário",
+        "Soro intravenoso durante pelo menos 48 horas depois da exposição a lírios, com análises ao sangue para vigiar os rins",
+        "Medicamentos para controlar tremores ou convulsões e vigilância cuidadosa da temperatura"
+      ]
+    },
+    "dog-appetite-001": {
+      "name": "Cão que não come ou está sem energia",
+      "red_flags": [
+        "Colapso, incapacidade de se levantar, dificuldade em respirar, ou gengivas pálidas, acinzentadas ou amareladas",
+        "Barriga inchada e tensa com tentativas de vomitar sem sair nada",
+        "Não comer há mais de 24 horas num cachorro, ou há mais de 2 dias num cão adulto",
+        "Não comer e ao mesmo tempo vomitar, ter diarreia ou recusar água"
+      ],
+      "prevention_tips": "Conheça o que é normal para o seu cão: quanto come e bebe e quão ativo é. Mantenha o lixo, ossos, brinquedos e meias fora do alcance, mantenha as vacinas e a desparasitação em dia e mude a comida de forma gradual ao longo de cerca de uma semana.",
+      "possible_causes": [
+        "Problema de estômago, muitas vezes depois de comer algo invulgar, ou mudança de comida",
+        "Dor de dentes ou boca dorida",
+        "Dor noutro local, por exemplo nas articulações ou na coluna",
+        "Um objeto engolido que bloqueia o intestino",
+        "Infeções, febre ou doença dos rins, do fígado ou do pâncreas",
+        "Envenenamento",
+        "Stress, calor, ou uma vacina ou medicamento recente"
+      ],
+      "recommended_examinations": [
+        "Um exame físico completo, incluindo a boca, a barriga e a temperatura",
+        "Análises ao sangue e à urina",
+        "Raio-X ou ecografia da barriga se for possível um bloqueio"
+      ]
+    },
+    "cat-appetite-001": {
+      "name": "Gato que não come ou está sem energia (risco de fígado gordo)",
+      "red_flags": [
+        "Não comer há mais de 24 horas: os gatos podem desenvolver rapidamente problemas graves no fígado (lipidose hepática), sobretudo se tiverem excesso de peso",
+        "Tom amarelado nas gengivas, na pele ou no branco do olho (icterícia)",
+        "Colapso, esconder-se sem se mexer, respirar de boca aberta, ou gengivas pálidas ou acinzentadas",
+        "Esforço na caixa de areia com pouca ou nenhuma urina"
+      ],
+      "prevention_tips": "Repare cedo quando o seu gato come menos, sobretudo se tiver excesso de peso. Nunca ponha um gato numa dieta rigorosa nem faça mudanças bruscas de comida: a perda de peso deve ser gradual e planeada com o veterinário. Mantenha fios, fitas, linhas e elásticos de cabelo fora do alcance.",
+      "possible_causes": [
+        "Fígado gordo (lipidose hepática), que pode surgir após apenas alguns dias sem comer",
+        "Doença dentária ou dor na boca",
+        "Doença renal, pancreatite, hipertiroidismo ou outra doença",
+        "Um objeto engolido, sobretudo fios ou linhas",
+        "Infeções e febre",
+        "Stress, como uma mudança de casa, um novo animal ou uma mudança de comida"
+      ],
+      "recommended_examinations": [
+        "Um exame físico completo, incluindo a boca, o peso e a temperatura",
+        "Análises ao sangue, incluindo valores do fígado e dos rins",
+        "Ecografia ou raio-X do abdómen",
+        "Alimentação assistida, por vezes através de uma sonda, se o gato deixou de comer"
+      ]
+    },
+    "dog-resp-002": {
+      "name": "Tosse em cães (tosse do canil, doença das vias respiratórias ou do coração)",
+      "red_flags": [
+        "Dificuldade em respirar, respiração rápida em repouso, ou gengivas ou língua azuladas, acinzentadas ou pálidas",
+        "Tosse e engasgos súbitos depois de mastigar ou brincar, como se algo estivesse preso",
+        "Tossir sangue ou desmaiar",
+        "Tosse com cansaço, falta de apetite ou febre (possível pneumonia)",
+        "Tosse pior à noite ou em repouso num cão com sopro no coração"
+      ],
+      "prevention_tips": "Mantenha as vacinas do seu cão em dia, incluindo a da tosse do canil se convive com outros cães, vai para hotéis caninos ou aulas. Use um peitoral em vez de coleira em cães que tossem, evite fumo e ar com pó e mantenha o seu cão com um peso saudável. Peça ao veterinário para verificar regularmente o coração de cães mais velhos. Os cães com tosse do canil são contagiosos, por isso mantenha-os afastados de outros cães até o veterinário indicar o contrário.",
+      "possible_causes": [
+        "Tosse do canil (traqueobronquite infecciosa): tosse áspera, como um grasnido, muitas vezes depois de contacto com outros cães",
+        "Algo preso na garganta ou nas vias respiratórias, como uma espiga ou um pedaço de pau",
+        "Doença cardíaca que causa líquido nos pulmões, muitas vezes com tosse à noite e cansaço fácil",
+        "Colapso da traqueia em raças pequenas, muitas vezes com tosse tipo 'grasnido de ganso' quando excitados ou a puxar pela trela",
+        "Pneumonia, bronquite crónica ou parasitas pulmonares"
+      ],
+      "recommended_examinations": [
+        "Auscultação do coração e dos pulmões",
+        "Raio-X do tórax",
+        "Ecografia do coração (ecocardiograma) se for possível doença cardíaca",
+        "Um teste para parasitas pulmonares ou amostras das vias respiratórias se a tosse for prolongada"
+      ]
+    },
+    "cat-resp-002": {
+      "name": "Tosse em gatos (muitas vezes asma)",
+      "red_flags": [
+        "Respirar de boca aberta ou ofegar, respiração rápida em repouso, ou gengivas azuladas, acinzentadas ou pálidas",
+        "Agachado, com o pescoço esticado e a esforçar-se para respirar (possível crise de asma)",
+        "Tossir sangue ou colapso",
+        "Tosse com cansaço, sem comer ou com febre"
+      ],
+      "prevention_tips": "A tosse num gato nunca é normal e é muitas vezes confundida com bolas de pelo, por isso deve ser avaliada. Evite fumo, sprays perfumados, ambientadores de tomada e areias com pó ou perfume. Mantenha a desparasitação em dia, incluindo contra parasitas pulmonares se o seu gato caça. Se o seu gato tem asma, dê os medicamentos exatamente como foram receitados e peça ao veterinário um plano para as crises.",
+      "possible_causes": [
+        "Asma felina ou bronquite crónica: a causa mais comum de tosse em gatos",
+        "Bolas de pelo, embora um gato que expele pelo normalmente faça esforço de vómito em vez de tossir",
+        "Parasitas pulmonares ou outros parasitas",
+        "Infeções respiratórias",
+        "Doença cardíaca ou uma massa no tórax, sobretudo em gatos mais velhos",
+        "Algo inalado, como uma folha de erva"
+      ],
+      "recommended_examinations": [
+        "Auscultação do tórax e avaliação da frequência respiratória",
+        "Raio-X do tórax",
+        "Análise às fezes para parasitas pulmonares",
+        "Amostras das vias respiratórias (lavado broncoalveolar) em alguns casos"
+      ]
+    },
+    "dog-cat-eye-001": {
+      "name": "Problemas nos olhos (conjuntivite, úlceras e lesões)",
+      "red_flags": [
+        "Uma lesão no olho, ou um globo ocular saliente ou fora da órbita",
+        "Um olho que fica de repente turvo, azulado ou parece maior do que o outro",
+        "Químicos que salpicaram para o olho, ou perda súbita de visão",
+        "Semicerrar ou manter o olho fechado, ou coçá-lo com a pata ou esfregá-lo (possível úlcera)",
+        "A terceira pálpebra visível, ou pupilas de tamanhos diferentes"
+      ],
+      "prevention_tips": "Mantenha o pelo comprido aparado longe da cara e verifique diariamente a zona dos olhos em raças de focinho achatado. Não deixe os cães viajar com a cabeça fora da janela do carro. Nunca use gotas para os olhos humanas nem medicamentos antigos no olho do seu animal: algumas podem agravar muito as úlceras. Se entrarem químicos no olho, lave suavemente com bastante água limpa e morna e telefone ao veterinário. Impeça o seu animal de esfregar o olho a caminho do veterinário.",
+      "possible_causes": [
+        "Conjuntivite por alergias, infeção (como a gripe felina) ou irritantes",
+        "Um arranhão ou úlcera na superfície do olho",
+        "Algo dentro do olho, como uma espiga",
+        "Olho seco (pouca produção de lágrimas), comum em algumas raças de cão",
+        "Problemas nas pálpebras, como pálpebras ou pestanas a roçar no olho",
+        "Glaucoma (pressão elevada dentro do olho) ou inflamação dentro do olho (uveíte)"
+      ],
+      "recommended_examinations": [
+        "Um exame ao olho com luz forte, verificando por baixo das pálpebras se há corpos estranhos",
+        "Teste de fluoresceína para procurar úlceras",
+        "Teste de lágrima (teste de Schirmer)",
+        "Medição da pressão ocular"
+      ]
+    },
+    "dog-cat-ear-001": {
+      "name": "Problemas nos ouvidos (infeção, ácaros ou espigas)",
+      "red_flags": [
+        "Cabeça inclinada, perda de equilíbrio, andar em círculos, ou movimentos oculares rápidos",
+        "Abanar a cabeça de forma súbita e violenta depois de um passeio em erva alta (possível espiga)",
+        "Um ouvido muito doloroso, a sangrar, ou que faz o animal gemer quando lhe tocam",
+        "Uma orelha inchada como um balão mole (oto-hematoma)"
+      ],
+      "prevention_tips": "Verifique as orelhas do seu animal todas as semanas e depois de passeios em erva alta, sobretudo no verão, e mantenha aparado o pelo entre os dedos e à volta das orelhas. Limpe os ouvidos apenas com um produto recomendado pelo veterinário, nunca com cotonetes introduzidos no canal, e seque-os depois de nadar. Se forem encontrados ácaros, trate todos os animais da casa. Problemas de ouvidos recorrentes estão muitas vezes ligados a alergias, por isso fale com o veterinário sobre a causa.",
+      "possible_causes": [
+        "Infeção do ouvido externo (otite externa) por bactérias ou leveduras, muitas vezes ligada a alergias",
+        "Ácaros dos ouvidos, sobretudo em gatinhos, cachorros e animais de casas com vários animais; causam muita comichão e cera escura e granulosa",
+        "Uma espiga ou outro objeto no canal auditivo",
+        "Oto-hematoma: uma bolha de sangue na orelha causada por abanar a cabeça",
+        "Infeção do ouvido médio ou interno, pólipos ou massas, que podem afetar o equilíbrio"
+      ],
+      "recommended_examinations": [
+        "Observação do canal auditivo com otoscópio, por vezes com sedação",
+        "Análise ao microscópio de uma zaragatoa da cera (citologia) para procurar ácaros, leveduras e bactérias",
+        "Um exame neurológico completo se o equilíbrio estiver afetado"
+      ]
+    },
+    "dog-cat-gi-003": {
+      "name": "Obstipação (prisão de ventre)",
+      "red_flags": [
+        "Esforço na caixa de areia com pouca ou nenhuma urina, sobretudo num gato macho: uma bexiga bloqueada pode parecer prisão de ventre",
+        "Barriga inchada ou dolorosa",
+        "Sem fazer cocó há mais de 48 horas",
+        "Vómitos, falta de apetite ou letargia juntamente com o esforço",
+        "Sangue, um fio ou outro objeto visível no ânus: não o puxe"
+      ],
+      "prevention_tips": "Garanta que há sempre água fresca disponível (comida húmida e fontes de água ajudam os gatos a beber mais), mantenha o seu animal ativo e com um peso saudável e não dê ossos cozinhados. Mantenha as caixas de areia limpas e de fácil acesso para gatos mais velhos com articulações rígidas. Escove regularmente os animais de pelo comprido para reduzir o pelo engolido. Não dê laxantes nem clisteres humanos: alguns são tóxicos para animais.",
+      "possible_causes": [
+        "Desidratação ou beber pouca água",
+        "Comer ossos, pelo, erva ou outro material não digerível",
+        "Dor ao agachar, por artrite, problemas nas glândulas anais ou lesão",
+        "Doença renal ou megacólon (intestino grosso dilatado e fraco), sobretudo em gatos mais velhos",
+        "Um bloqueio no intestino, ou aumento da próstata em cães machos mais velhos",
+        "Falta de exercício ou uma caixa de areia suja ou de difícil acesso"
+      ],
+      "recommended_examinations": [
+        "Um exame físico, incluindo palpação da barriga e exame retal",
+        "Verificação da bexiga, para excluir um bloqueio urinário",
+        "Raio-X da barriga",
+        "Análises ao sangue, sobretudo em gatos mais velhos"
+      ]
+    },
+    "dog-cat-heat-001": {
+      "name": "Golpe de calor (sobreaquecimento)",
+      "red_flags": [
+        "Ofegar intenso ou respiração ruidosa que não acalma com descanso num local fresco; qualquer ofegar num gato",
+        "Gengivas vermelho-vivo, pálidas ou acinzentadas, ou baba espessa",
+        "Vómitos, diarreia, falta de equilíbrio, confusão, colapso ou convulsões"
+      ],
+      "prevention_tips": "Nunca deixe um animal num carro, marquise ou caravana num dia quente, nem por poucos minutos. Passeie os cães de manhã cedo ou ao fim do dia, quando está fresco, evite pavimentos quentes e não faça exercício nos dias quentes com animais de focinho achatado, com excesso de peso, idosos ou com doença cardíaca. Garanta sempre sombra, água fresca e um local fresco para descansar. Primeiros socorros se acontecer: leve o animal para a sombra ou para uma divisão fresca, molhe-o com água fresca (não gelada), use uma ventoinha, ofereça pequenos goles de água e vá logo ao veterinário, mantendo o carro fresco no caminho. Não cubra o animal com uma toalha molhada, porque retém o calor.",
+      "possible_causes": [
+        "Ficar fechado num carro quente, numa marquise ou noutro espaço fechado",
+        "Exercício ou brincadeira com tempo quente ou húmido",
+        "Sem acesso a sombra ou água",
+        "Raças de focinho achatado, animais com excesso de peso, muito jovens ou idosos e animais com doença cardíaca ou respiratória aquecem mais facilmente",
+        "O golpe de calor pode lesionar o cérebro, os rins, o intestino e a coagulação, mesmo quando o animal parece recuperar"
+      ],
+      "recommended_examinations": [
+        "Vigilância da temperatura enquanto o animal é arrefecido em segurança",
+        "Soro intravenoso e oxigénio",
+        "Análises ao sangue para lesões de órgãos e coagulação",
+        "Vigilância no hospital durante pelo menos 24 horas, porque as complicações podem surgir mais tarde"
+      ]
+    },
+    "dog-gi-gdv-001": {
+      "name": "Dilatação e torção gástrica (DTG)",
+      "red_flags": [
+        "Tentar vomitar sem sair nada, ou apenas espuma",
+        "Barriga inchada, tensa ou dura como um tambor",
+        "Inquietação, andar de um lado para o outro, salivação, gengivas pálidas, respiração rápida, fraqueza ou colapso"
+      ],
+      "prevention_tips": "Em cães grandes de peito fundo: dê duas ou três refeições mais pequenas por dia em vez de uma grande, evite exercício cerca de uma hora antes e depois de comer, abrande os cães que comem depressa e não use comedouros elevados a menos que o veterinário os aconselhe. Pergunte ao veterinário sobre uma gastropexia preventiva (fixação do estômago), muitas vezes feita ao mesmo tempo que a esterilização. Saiba onde fica o veterinário de urgência mais próximo.",
+      "possible_causes": [
+        "Dilatação gástrica: o estômago enche-se de gás, comida ou líquido",
+        "Torção: o estômago dilatado roda sobre si próprio, cortando a irrigação sanguínea do estômago e do baço; pode matar em poucas horas",
+        "Risco maior em raças grandes de peito fundo, cães mais velhos, cães que comem uma única refeição grande por dia ou comem depressa, e cães com familiares próximos que tiveram dilatação gástrica"
+      ],
+      "recommended_examinations": [
+        "Raio-X de urgência para ver se o estômago está torcido",
+        "Libertação do gás do estômago, soro intravenoso e alívio da dor",
+        "Cirurgia de urgência para destorcer o estômago e fixá-lo no lugar (gastropexia)",
+        "Vigilância do ritmo cardíaco depois do tratamento"
+      ]
     }
   },
   "preventive_care": {
@@ -263,6 +522,33 @@
     "q-scooting-003": {"prompt": "A pele junto ao rabo está inchada, vermelha, a sangrar ou com mau cheiro?", "options": ["Não", "Sim"]},
     "q-stress-001": {"prompt": "O seu gato faz esforço na caixa de areia, urina fora dela, ou há sangue na urina?", "options": ["Não", "Urina fora da caixa ou sangue na urina", "Esforço com pouca ou nenhuma urina"]},
     "q-stress-002": {"prompt": "O seu gato não comeu nada há mais de 24 horas?", "options": ["Não", "Sim"]},
-    "q-stress-003": {"prompt": "A mudança começou de repente, com sinais de dor, esconder-se sem se mexer, ou deixar de se lavar?", "options": ["Não", "Sim"]}
+    "q-stress-003": {"prompt": "A mudança começou de repente, com sinais de dor, esconder-se sem se mexer, ou deixar de se lavar?", "options": ["Não", "Sim"]},
+    "q-toxic-001": {"prompt": "Telefone já ao veterinário ou a uma linha de apoio para intoxicações animais. Não provoque o vómito a menos que um veterinário o indique, e guarde a embalagem ou uma amostra. O que é que o seu animal comeu, lambeu ou tocou?", "options": ["Chocolate, pastilhas sem açúcar ou doces", "Uvas, passas, cebola ou alho", "Medicamento humano", "Veneno para ratos ou caracóis, ou anticongelante", "Um lírio: qualquer parte, pólen ou água da jarra", "Um produto contra pulgas ou carraças para cães", "Outra coisa ou não sei"]},
+    "q-toxic-002": {"prompt": "O seu animal mostra agora algum sinal, como vómitos, salivação, tremores, falta de equilíbrio, convulsões, colapso ou dificuldade em respirar? Muitos venenos não causam sinais no início.", "options": ["Ainda sem sinais", "Mostra sinais"]},
+    "q-toxic-003": {"prompt": "Quando aconteceu? Diga-o também ao veterinário ou à linha de apoio.", "options": ["Nas últimas 2 horas", "Há mais de 2 horas", "Não sei"]},
+    "q-appetite-001": {"prompt": "O seu animal está caído, não se consegue levantar, tem dificuldade em respirar, ou as gengivas estão pálidas, acinzentadas ou amareladas?", "options": ["Não", "Sim"]},
+    "q-appetite-002": {"prompt": "Há quanto tempo o seu animal come pouco ou nada? Nos gatos, mais de 24 horas sem comer pode prejudicar rapidamente o fígado.", "options": ["Menos de 24 horas", "Entre 24 e 48 horas", "Mais de 48 horas"]},
+    "q-appetite-003": {"prompt": "O seu animal também está a vomitar, com diarreia, a recusar água, ou a fazer esforço na caixa de areia?", "options": ["Não", "Vómitos, diarreia ou recusa de água", "Esforço para urinar com pouca ou nenhuma urina"]},
+    "q-appetite-004": {"prompt": "O seu animal pode ter comido algo tóxico ou engolido um objeto, como um brinquedo, um osso ou um fio, ou a barriga está inchada ou dolorosa?", "options": ["Não", "Sim"]},
+    "q-cough-001": {"prompt": "O seu animal tem dificuldade em respirar, respira depressa ou de boca aberta em repouso, ou as gengivas ou a língua estão azuladas, acinzentadas ou pálidas?", "options": ["Não", "Sim"]},
+    "q-cough-002": {"prompt": "A tosse começou de repente enquanto comia, mastigava ou brincava, com engasgos, a passar a pata pela boca ou a babar, como se algo estivesse preso?", "options": ["Não", "Sim"]},
+    "q-cough-003": {"prompt": "Há quanto tempo dura a tosse e como está o seu animal de resto?", "options": ["Menos de uma semana, de resto bem", "Mais de uma semana, ou a piorar", "Cansado, sem comer ou com febre", "Tosse com sangue, ou desmaiou"]},
+    "q-cough-004": {"prompt": "O seu animal tem um sopro ou doença cardíaca conhecida, ou a tosse é pior à noite ou em repouso?", "options": ["Não ou não sei", "Sim"]},
+    "q-eye-001": {"prompt": "O olho sofreu uma lesão, está saliente, fora da órbita, ou ficou de repente turvo ou azulado?", "options": ["Não", "Lesionado, saliente ou fora da órbita", "De repente turvo ou azulado"]},
+    "q-eye-002": {"prompt": "Salpicou alguma coisa para o olho, ou o seu animal choca contra as coisas como se não visse? Se entraram químicos, lave suavemente com bastante água limpa e morna.", "options": ["Não", "Sim"]},
+    "q-eye-003": {"prompt": "O seu animal semicerra ou mantém o olho fechado, ou coça-o com a pata ou esfrega-o?", "options": ["Não", "Sim"]},
+    "q-eye-004": {"prompt": "Que mais nota?", "options": ["Apenas lacrimejo transparente ou ligeira vermelhidão", "Corrimento amarelo ou verde, ou olho vermelho e dorido", "Terceira pálpebra visível, ou pupilas de tamanhos diferentes"]},
+    "q-ear-001": {"prompt": "O seu animal tem a cabeça inclinada, perdeu o equilíbrio, anda em círculos, ou tem movimentos oculares rápidos?", "options": ["Não", "Sim"]},
+    "q-ear-002": {"prompt": "Começou de repente a abanar a cabeça com força, por exemplo depois de um passeio em erva alta, com a cabeça inclinada para um lado?", "options": ["Não", "Sim"]},
+    "q-ear-003": {"prompt": "Como está o ouvido à vista e ao toque?", "options": ["Parece normal", "Corrimento, cera escura, mau cheiro ou orelha inchada", "Muito doloroso, a sangrar, ou geme quando lhe tocam"]},
+    "q-constipation-001": {"prompt": "Primeiro confirme que é mesmo das fezes: o seu animal está a urinar normalmente? Fazer esforço com pouca ou nenhuma urina, sobretudo num gato macho, é uma urgência (veja a verificação 'Esforço para urinar').", "options": ["Urina normalmente", "Pouca ou nenhuma urina, ou não tenho a certeza"]},
+    "q-constipation-002": {"prompt": "Há quanto tempo o seu animal fez cocó normal pela última vez?", "options": ["Menos de 48 horas", "Mais de 48 horas"]},
+    "q-constipation-003": {"prompt": "O seu animal também está a vomitar, sem comer ou letárgico, ou a barriga está inchada ou dói ao toque?", "options": ["Não", "Vómitos, sem comer ou letárgico", "Barriga inchada ou dolorosa"]},
+    "q-constipation-004": {"prompt": "O seu animal pode ter engolido ossos, um brinquedo, um fio ou tecido, ou há sangue ou algo visível no ânus? Não puxe nada.", "options": ["Não", "Sim"]},
+    "q-heat-001": {"prompt": "Comece já os primeiros socorros e vá logo ao veterinário: leve o animal para a sombra ou para uma divisão fresca, molhe-o com água fresca (não gelada), use uma ventoinha e ofereça pequenos goles de água. O seu animal está caído, sem equilíbrio, confuso, a vomitar ou com convulsões?", "options": ["Não", "Sim"]},
+    "q-heat-002": {"prompt": "O seu animal continua a ofegar muito ou a respirar com ruído, ou as gengivas estão vermelho-vivo, pálidas ou acinzentadas? Qualquer ofegar num gato é um sinal de alerta.", "options": ["Não, está a acalmar", "Sim"]},
+    "q-heat-003": {"prompt": "O seu animal é de uma raça de focinho achatado, tem excesso de peso, é muito jovem ou idoso, ou tem uma doença cardíaca ou respiratória? Continue a arrefecê-lo a caminho do veterinário.", "options": ["Não", "Sim ou não sei"]},
+    "q-bloat-001": {"prompt": "Uma barriga inchada com tentativas de vomitar pode ser uma dilatação gástrica, que pode matar em poucas horas: telefone e vá já ao veterinário aberto mais próximo. O seu cão tenta vomitar mas não sai nada, ou apenas espuma?", "options": ["Não", "Sim"]},
+    "q-bloat-002": {"prompt": "A barriga está inchada ou tensa, ou o seu cão está inquieto, a babar, pálido, fraco ou a cair?", "options": ["Não", "Sim"]}
   }
 }
