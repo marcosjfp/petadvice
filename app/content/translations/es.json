@@ -190,6 +190,265 @@
         "Exploración física para descartar dolor o enfermedad detrás del cambio de comportamiento",
         "Análisis de orina, si tu gato orina fuera del arenero"
       ]
+    },
+    "dog-cat-tox-001": {
+      "name": "Posible intoxicación (alimento, medicamento o producto químico tóxico)",
+      "red_flags": [
+        "Convulsiones, temblores, colapso o dificultad para respirar",
+        "Vómitos repetidos, babeo, corazón muy acelerado o inquietud después de comer chocolate",
+        "Debilidad, andar tambaleante o colapso después de chicles sin azúcar, caramelos o repostería con xilitol",
+        "Sangrado de encías o nariz, sangre en la orina o las heces, moratones, encías pálidas o falta de aire, que pueden aparecer de 3 a 5 días después de veneno para ratas",
+        "Parecer borracho, beber mucha agua o vomitar después de un posible acceso a anticongelante o líquido limpiaparabrisas"
+      ],
+      "prevention_tips": "Guarda el chocolate, los caramelos y chicles sin azúcar, las uvas, las pasas, la cebolla, el ajo y todos los medicamentos, humanos y veterinarios, cerrados y fuera de su alcance, también dentro de los bolsos. Guarda el veneno para ratas y caracoles, el anticongelante y los productos de jardín o limpieza en recipientes cerrados donde los animales no lleguen, y limpia enseguida cualquier derrame. Nunca le des analgésicos humanos a tu mascota. Guarda en el móvil el número de urgencias de tu veterinario y el de un servicio de información toxicológica veterinaria. Si ocurre: llama enseguida al veterinario o a ese servicio, no provoques el vómito salvo que un veterinario te lo indique y lleva el envase o una muestra.",
+      "possible_causes": [
+        "Chocolate: el negro, el de repostería y el cacao son los más peligrosos; los signos pueden tardar varias horas en aparecer",
+        "Xilitol (azúcar de abedul) y otros edulcorantes en chicles y caramelos sin azúcar, crema de cacahuete y repostería: pueden provocar una bajada peligrosa del azúcar en sangre en menos de una hora y daño hepático en perros",
+        "Uvas, pasas y pasas de Corinto, también en bizcochos: incluso pequeñas cantidades pueden causar insuficiencia renal",
+        "Cebolla, ajo, puerro y cebollino, también en polvo y en comida cocinada: dañan los glóbulos rojos, a menudo unos días después",
+        "Medicamentos humanos como paracetamol, ibuprofeno y otros antiinflamatorios: un solo comprimido puede ser peligroso, y el paracetamol es especialmente tóxico para los gatos",
+        "Veneno para ratas y ratones: muchos tipos impiden la coagulación y el sangrado aparece días después",
+        "Anticongelante y líquido limpiaparabrisas (etilenglicol): tiene sabor dulce y provoca rápidamente insuficiencia renal; el tratamiento solo es eficaz si empieza en pocas horas",
+        "Muchos venenos no causan signos durante horas o días, así que no es seguro esperar a ver si tu mascota se encuentra mal"
+      ],
+      "recommended_examinations": [
+        "Llama antes para que la clínica se prepare y lleva el envase, la etiqueta o una muestra de lo que ha ingerido",
+        "Tu veterinario puede provocar el vómito de forma segura si todavía es pronto y está indicado: no lo intentes en casa",
+        "Carbón activado, sueroterapia intravenosa y vigilancia, según el tóxico",
+        "Análisis de sangre y orina para valorar los riñones, el hígado, el azúcar en sangre y la coagulación",
+        "Antídotos específicos cuando existen, por ejemplo vitamina K tras un veneno para ratas"
+      ]
+    },
+    "cat-tox-002": {
+      "name": "Intoxicación por lirios o permetrina en gatos",
+      "red_flags": [
+        "Cualquier contacto con un lirio, incluso polen en el pelo o un sorbo del agua del jarrón, antes de que aparezcan signos",
+        "Vómitos, babeo, esconderse o no comer tras el contacto con un lirio",
+        "Orinar mucho más, o mucho menos o nada, en los días siguientes al contacto con un lirio",
+        "Espasmos, temblores, falta de equilibrio o convulsiones tras un antiparasitario contra pulgas o garrapatas, o tras el contacto con un perro tratado recientemente"
+      ],
+      "prevention_tips": "No tengas lirios (Lilium) ni hemerocalis (Hemerocallis) en una casa con gatos, y revisa los ramos de flores antes de meterlos en casa. Usa solo antiparasitarios contra pulgas y garrapatas para gatos, y mantén a los gatos alejados de los perros tratados con productos con permetrina durante el tiempo que indique la etiqueta. Si le has puesto a tu gato un producto para perros, llama de inmediato al veterinario; puede aconsejarte lavarlo con lavavajillas suave y agua tibia, y mantener después al gato abrigado.",
+      "possible_causes": [
+        "Lirios (Lilium) y hemerocalis (Hemerocallis): todas las partes son tóxicas para los gatos, incluido el polen que se lamen del pelo y el agua del jarrón, y pueden causar insuficiencia renal en 1 a 3 días",
+        "Permetrina en pipetas, sprays o collares para perros: los gatos no pueden eliminarla, así que un producto para perros aplicado a un gato, o el contacto estrecho con un perro tratado recientemente, puede causar temblores y convulsiones",
+        "Analgésicos humanos, sobre todo el paracetamol, que es muy tóxico para los gatos"
+      ],
+      "recommended_examinations": [
+        "Lleva la planta, la flor o el envase del producto",
+        "Descontaminación temprana por el veterinario, como provocar el vómito de forma segura tras un lirio o bañar al gato para retirar un antiparasitario",
+        "Sueroterapia intravenosa durante al menos 48 horas tras la exposición a lirios, con análisis de sangre para vigilar los riñones",
+        "Medicamentos para controlar los temblores o las convulsiones y control cuidadoso de la temperatura"
+      ]
+    },
+    "dog-appetite-001": {
+      "name": "Perro que no come o está sin energía",
+      "red_flags": [
+        "Colapso, incapacidad para levantarse, dificultad para respirar, o encías pálidas, grisáceas o amarillentas",
+        "Barriga hinchada y tensa con arcadas sin expulsar nada",
+        "No comer durante más de 24 horas en un cachorro, o durante más de 2 días en un perro adulto",
+        "No comer y además vomitar, tener diarrea o rechazar el agua"
+      ],
+      "prevention_tips": "Conoce lo que es normal para tu perro: cuánto come y bebe y lo activo que es. Mantén la basura, los huesos, los juguetes y los calcetines fuera de su alcance, lleva al día las vacunas y la desparasitación, y cambia la comida poco a poco a lo largo de una semana.",
+      "possible_causes": [
+        "Malestar de estómago, a menudo tras comer algo inusual, o un cambio de comida",
+        "Dolor dental o boca dolorida",
+        "Dolor en otra zona, por ejemplo en las articulaciones o la espalda",
+        "Un objeto tragado que obstruye el intestino",
+        "Infecciones, fiebre o enfermedad de los riñones, el hígado o el páncreas",
+        "Intoxicación",
+        "Estrés, calor, o una vacuna o medicamento reciente"
+      ],
+      "recommended_examinations": [
+        "Una exploración física completa, incluida la boca, la barriga y la temperatura",
+        "Análisis de sangre y orina",
+        "Radiografías o ecografía de la barriga si es posible una obstrucción"
+      ]
+    },
+    "cat-appetite-001": {
+      "name": "Gato que no come o está sin energía (riesgo de hígado graso)",
+      "red_flags": [
+        "No comer durante más de 24 horas: los gatos pueden desarrollar rápidamente problemas hepáticos graves (lipidosis hepática), sobre todo si tienen sobrepeso",
+        "Tono amarillento en las encías, la piel o el blanco del ojo (ictericia)",
+        "Colapso, esconderse sin moverse, respirar con la boca abierta, o encías pálidas o grisáceas",
+        "Esfuerzo en el arenero con poca o ninguna orina"
+      ],
+      "prevention_tips": "Fíjate pronto en si tu gato come menos, sobre todo si tiene sobrepeso. Nunca pongas a un gato a dieta estricta ni hagas cambios bruscos de comida: la pérdida de peso debe ser gradual y planificada con tu veterinario. Mantén cuerdas, cintas, hilos y gomas del pelo fuera de su alcance.",
+      "possible_causes": [
+        "Hígado graso (lipidosis hepática), que puede aparecer tras solo unos días sin comer",
+        "Enfermedad dental o dolor en la boca",
+        "Enfermedad renal, pancreatitis, hipertiroidismo u otra enfermedad",
+        "Un objeto tragado, sobre todo cuerdas o hilos",
+        "Infecciones y fiebre",
+        "Estrés, como una mudanza, una nueva mascota o un cambio de comida"
+      ],
+      "recommended_examinations": [
+        "Una exploración física completa, incluida la boca, el peso y la temperatura",
+        "Análisis de sangre, incluidos valores hepáticos y renales",
+        "Ecografía o radiografías del abdomen",
+        "Alimentación asistida, a veces con una sonda, si tu gato ha dejado de comer"
+      ]
+    },
+    "dog-resp-002": {
+      "name": "Tos en perros (tos de las perreras, enfermedad respiratoria o cardíaca)",
+      "red_flags": [
+        "Dificultad para respirar, respiración rápida en reposo, o encías o lengua azuladas, grisáceas o pálidas",
+        "Tos y arcadas repentinas tras masticar o jugar, como si tuviera algo atascado",
+        "Toser sangre o desmayarse",
+        "Tos con cansancio, falta de apetito o fiebre (posible neumonía)",
+        "Tos que empeora por la noche o en reposo en un perro con soplo cardíaco"
+      ],
+      "prevention_tips": "Mantén al día las vacunas de tu perro, incluida la de la tos de las perreras si se relaciona con otros perros, va a residencias o a clases. Usa arnés en lugar de collar en perros que tosen, evita el humo y el aire con polvo y mantén a tu perro en un peso saludable. Pide a tu veterinario que revise con regularidad el corazón de los perros mayores. Los perros con tos de las perreras son contagiosos, así que mantenlos alejados de otros perros hasta que el veterinario diga lo contrario.",
+      "possible_causes": [
+        "Tos de las perreras (traqueobronquitis infecciosa): tos áspera, como un graznido, a menudo tras el contacto con otros perros",
+        "Algo atascado en la garganta o las vías respiratorias, como una espiga o un trozo de palo",
+        "Enfermedad cardíaca que provoca líquido en los pulmones, a menudo con tos por la noche y cansancio fácil",
+        "Colapso traqueal en razas pequeñas, a menudo con tos tipo 'graznido de ganso' al excitarse o tirar de la correa",
+        "Neumonía, bronquitis crónica o parásitos pulmonares"
+      ],
+      "recommended_examinations": [
+        "Auscultación del corazón y los pulmones",
+        "Radiografías de tórax",
+        "Ecografía del corazón (ecocardiograma) si es posible una enfermedad cardíaca",
+        "Una prueba de parásitos pulmonares o muestras de las vías respiratorias si la tos es persistente"
+      ]
+    },
+    "cat-resp-002": {
+      "name": "Tos en gatos (a menudo asma)",
+      "red_flags": [
+        "Respirar con la boca abierta o jadear, respiración rápida en reposo, o encías azuladas, grisáceas o pálidas",
+        "Agachado, con el cuello estirado y esforzándose para respirar (posible crisis de asma)",
+        "Toser sangre o colapso",
+        "Tos con cansancio, sin comer o con fiebre"
+      ],
+      "prevention_tips": "La tos en un gato nunca es normal y a menudo se confunde con bolas de pelo, así que haz que la revisen. Evita el humo, los sprays perfumados, los ambientadores de enchufe y las arenas con polvo o perfume. Lleva al día la desparasitación, incluidos los parásitos pulmonares si tu gato caza. Si tu gato tiene asma, dale los medicamentos exactamente como te los hayan recetado y pide a tu veterinario un plan para las crisis.",
+      "possible_causes": [
+        "Asma felina o bronquitis crónica: la causa más frecuente de tos en gatos",
+        "Bolas de pelo, aunque un gato que expulsa pelo suele tener arcadas en lugar de toser",
+        "Parásitos pulmonares u otros parásitos",
+        "Infecciones respiratorias",
+        "Enfermedad cardíaca o una masa en el tórax, sobre todo en gatos mayores",
+        "Algo inhalado, como una brizna de hierba"
+      ],
+      "recommended_examinations": [
+        "Auscultación del tórax y control de la frecuencia respiratoria",
+        "Radiografías de tórax",
+        "Análisis de heces para parásitos pulmonares",
+        "Muestras de las vías respiratorias (lavado broncoalveolar) en algunos casos"
+      ]
+    },
+    "dog-cat-eye-001": {
+      "name": "Problemas en los ojos (conjuntivitis, úlceras y lesiones)",
+      "red_flags": [
+        "Una lesión en el ojo, o un globo ocular saliente o fuera de su órbita",
+        "Un ojo que de repente se vuelve turbio, azulado o parece más grande que el otro",
+        "Productos químicos que han salpicado en el ojo, o pérdida repentina de la vista",
+        "Entrecerrar o mantener el ojo cerrado, o frotárselo con la pata o contra objetos (posible úlcera)",
+        "El tercer párpado visible, o pupilas de distinto tamaño"
+      ],
+      "prevention_tips": "Mantén el pelo largo recortado lejos de la cara y revisa a diario la zona de los ojos en las razas de hocico chato. No dejes que los perros viajen con la cabeza fuera de la ventanilla del coche. Nunca uses colirios humanos ni medicamentos antiguos en el ojo de tu mascota: algunos pueden empeorar mucho las úlceras. Si entran productos químicos en el ojo, lávalo con suavidad con abundante agua limpia y tibia y llama a tu veterinario. Evita que tu mascota se frote el ojo de camino al veterinario.",
+      "possible_causes": [
+        "Conjuntivitis por alergias, infección (como la gripe felina) o irritantes",
+        "Un arañazo o úlcera en la superficie del ojo",
+        "Algo dentro del ojo, como una espiga",
+        "Ojo seco (poca producción de lágrimas), frecuente en algunas razas de perro",
+        "Problemas en los párpados, como párpados o pestañas que rozan el ojo",
+        "Glaucoma (presión alta dentro del ojo) o inflamación dentro del ojo (uveítis)"
+      ],
+      "recommended_examinations": [
+        "Una exploración del ojo con luz intensa, revisando bajo los párpados si hay cuerpos extraños",
+        "Tinción con fluoresceína para buscar úlceras",
+        "Prueba de lágrima (test de Schirmer)",
+        "Medición de la presión ocular"
+      ]
+    },
+    "dog-cat-ear-001": {
+      "name": "Problemas de oídos (infección, ácaros o espigas)",
+      "red_flags": [
+        "Cabeza ladeada, pérdida de equilibrio, andar en círculos, o movimientos rápidos de los ojos",
+        "Sacudidas de cabeza repentinas y violentas tras un paseo por hierba alta (posible espiga)",
+        "Un oído muy doloroso, que sangra, o que hace que tu mascota se queje al tocarlo",
+        "Una oreja hinchada como un globo blando (otohematoma)"
+      ],
+      "prevention_tips": "Revisa las orejas de tu mascota cada semana y después de pasear por hierba alta, sobre todo en verano, y mantén recortado el pelo entre los dedos y alrededor de las orejas. Limpia los oídos solo con un limpiador que recomiende tu veterinario, nunca con bastoncillos dentro del conducto, y sécalos después de nadar. Si aparecen ácaros, trata a todos los animales de la casa. Los problemas de oído recurrentes suelen estar relacionados con alergias, así que consulta a tu veterinario sobre la causa.",
+      "possible_causes": [
+        "Infección del oído externo (otitis externa) por bacterias o levaduras, a menudo relacionada con alergias",
+        "Ácaros de los oídos, sobre todo en gatitos, cachorros y animales de casas con varias mascotas; pican mucho y producen cera oscura y granulosa",
+        "Una espiga u otro objeto en el conducto auditivo",
+        "Otohematoma: una ampolla de sangre en la oreja causada por las sacudidas",
+        "Infección del oído medio o interno, pólipos o masas, que pueden afectar al equilibrio"
+      ],
+      "recommended_examinations": [
+        "Observación del conducto auditivo con otoscopio, a veces con sedación",
+        "Examen al microscopio de una muestra de cera (citología) para buscar ácaros, levaduras y bacterias",
+        "Una exploración neurológica completa si el equilibrio está afectado"
+      ]
+    },
+    "dog-cat-gi-003": {
+      "name": "Estreñimiento",
+      "red_flags": [
+        "Esfuerzo en el arenero con poca o ninguna orina, sobre todo en un gato macho: una vejiga obstruida puede parecer estreñimiento",
+        "Barriga hinchada o dolorosa",
+        "Sin hacer caca durante más de 48 horas",
+        "Vómitos, falta de apetito o letargo junto con el esfuerzo",
+        "Sangre, un hilo u otro objeto visible en el ano: no tires de él"
+      ],
+      "prevention_tips": "Asegúrate de que siempre haya agua fresca (la comida húmeda y las fuentes de agua ayudan a los gatos a beber más), mantén a tu mascota activa y en un peso saludable y no le des huesos cocinados. Mantén los areneros limpios y fáciles de alcanzar para los gatos mayores con las articulaciones rígidas. Cepilla con regularidad a las mascotas de pelo largo para reducir el pelo que tragan. No uses laxantes ni enemas humanos: algunos son tóxicos para los animales.",
+      "possible_causes": [
+        "Deshidratación o beber poca agua",
+        "Comer huesos, pelo, hierba u otro material no digerible",
+        "Dolor al agacharse, por artrosis, problemas en las glándulas anales o una lesión",
+        "Enfermedad renal o megacolon (intestino grueso dilatado y débil), sobre todo en gatos mayores",
+        "Una obstrucción intestinal, o una próstata agrandada en perros machos mayores",
+        "Falta de ejercicio o un arenero sucio o difícil de alcanzar"
+      ],
+      "recommended_examinations": [
+        "Una exploración física, incluida la palpación de la barriga y un tacto rectal",
+        "Comprobación de la vejiga, para descartar una obstrucción urinaria",
+        "Radiografías de la barriga",
+        "Análisis de sangre, sobre todo en gatos mayores"
+      ]
+    },
+    "dog-cat-heat-001": {
+      "name": "Golpe de calor (sobrecalentamiento)",
+      "red_flags": [
+        "Jadeo intenso o respiración ruidosa que no se calma al descansar en un lugar fresco; cualquier jadeo en un gato",
+        "Encías rojo intenso, pálidas o grisáceas, o baba espesa",
+        "Vómitos, diarrea, falta de equilibrio, desorientación, colapso o convulsiones"
+      ],
+      "prevention_tips": "Nunca dejes a una mascota en un coche, una galería acristalada o una caravana en un día caluroso, ni siquiera unos minutos. Pasea a los perros a primera hora de la mañana o a última de la tarde, cuando hace fresco, evita el pavimento caliente y no hagas ejercicio en días de calor con mascotas de hocico chato, con sobrepeso, mayores o con problemas cardíacos. Ofrece siempre sombra, agua fresca y un lugar fresco para descansar. Primeros auxilios si ocurre: lleva a tu mascota a la sombra o a una habitación fresca, mójala con agua fresca (no helada), usa un ventilador, ofrécele pequeños sorbos de agua y ve enseguida al veterinario, manteniendo el coche fresco por el camino. No la tapes con una toalla mojada, porque retiene el calor.",
+      "possible_causes": [
+        "Quedarse en un coche caliente, una galería acristalada u otro espacio cerrado",
+        "Ejercicio o juego con tiempo caluroso o húmedo",
+        "Sin acceso a sombra ni agua",
+        "Las razas de hocico chato, las mascotas con sobrepeso, muy jóvenes o mayores, y las que tienen enfermedades cardíacas o respiratorias se sobrecalientan con más facilidad",
+        "El golpe de calor puede dañar el cerebro, los riñones, el intestino y la coagulación aunque la mascota parezca recuperarse"
+      ],
+      "recommended_examinations": [
+        "Control de la temperatura mientras se enfría a tu mascota de forma segura",
+        "Sueroterapia intravenosa y oxígeno",
+        "Análisis de sangre para detectar daño en órganos y problemas de coagulación",
+        "Vigilancia en el hospital durante al menos 24 horas, porque las complicaciones pueden aparecer más tarde"
+      ]
+    },
+    "dog-gi-gdv-001": {
+      "name": "Dilatación y torsión de estómago (DTG)",
+      "red_flags": [
+        "Arcadas o intentos de vomitar sin expulsar nada, o solo espuma",
+        "Barriga hinchada, tensa o dura como un tambor",
+        "Inquietud, dar vueltas sin parar, babeo, encías pálidas, respiración rápida, debilidad o colapso"
+      ],
+      "prevention_tips": "En perros grandes de pecho profundo: dales dos o tres comidas más pequeñas al día en lugar de una grande, evita el ejercicio durante una hora antes y después de comer, frena a los que comen deprisa y no uses comederos elevados salvo que tu veterinario lo aconseje. Pregunta a tu veterinario por una gastropexia preventiva (fijación del estómago), que a menudo se hace junto con la castración o esterilización. Ten localizado el veterinario de urgencias más cercano.",
+      "possible_causes": [
+        "Dilatación gástrica: el estómago se llena de gas, comida o líquido",
+        "Torsión: el estómago dilatado gira sobre sí mismo y corta su riego sanguíneo y el del bazo; puede causar la muerte en pocas horas",
+        "Más riesgo en razas grandes de pecho profundo, perros mayores, perros que hacen una sola comida grande al día o comen deprisa, y perros con familiares cercanos que la han sufrido"
+      ],
+      "recommended_examinations": [
+        "Radiografías urgentes para ver si el estómago está girado",
+        "Liberación del gas del estómago, sueroterapia intravenosa y analgesia",
+        "Cirugía urgente para devolver el estómago a su posición y fijarlo (gastropexia)",
+        "Control del ritmo cardíaco después del tratamiento"
+      ]
     }
   },
   "preventive_care": {
@@ -412,6 +671,33 @@
     "q-scooting-003": {"prompt": "¿La piel junto al trasero está hinchada, roja, sangra o huele mal?", "options": ["No", "Sí"]},
     "q-stress-001": {"prompt": "¿Tu gato hace esfuerzo en el arenero, orina fuera de él, o hay sangre en la orina?", "options": ["No", "Orina fuera del arenero o sangre en la orina", "Esfuerzo con poca o ninguna orina"]},
     "q-stress-002": {"prompt": "¿Tu gato lleva más de 24 horas sin comer nada?", "options": ["No", "Sí"]},
-    "q-stress-003": {"prompt": "¿El cambio empezó de repente, con signos de dolor, esconderse sin moverse, o dejar de acicalarse?", "options": ["No", "Sí"]}
+    "q-stress-003": {"prompt": "¿El cambio empezó de repente, con signos de dolor, esconderse sin moverse, o dejar de acicalarse?", "options": ["No", "Sí"]},
+    "q-toxic-001": {"prompt": "Llama ya a tu veterinario o a un servicio de información toxicológica veterinaria. No provoques el vómito salvo que un veterinario te lo indique, y guarda el envase o una muestra. ¿Qué ha comido, lamido o tocado tu mascota?", "options": ["Chocolate, chicles sin azúcar o caramelos", "Uvas, pasas, cebolla o ajo", "Un medicamento humano", "Veneno para ratas o caracoles, o anticongelante", "Un lirio: cualquier parte, polen o agua del jarrón", "Un antiparasitario contra pulgas o garrapatas para perros", "Otra cosa o no lo sé"]},
+    "q-toxic-002": {"prompt": "¿Tu mascota muestra ahora algún signo, como vómitos, babeo, temblores, falta de equilibrio, convulsiones, colapso o dificultad para respirar? Muchos venenos no causan signos al principio.", "options": ["Aún sin signos", "Muestra signos"]},
+    "q-toxic-003": {"prompt": "¿Cuándo ocurrió? Díselo también al veterinario o al servicio toxicológico.", "options": ["En las últimas 2 horas", "Hace más de 2 horas", "No lo sé"]},
+    "q-appetite-001": {"prompt": "¿Tu mascota está desplomada, no puede levantarse, le cuesta respirar, o tiene las encías pálidas, grisáceas o amarillentas?", "options": ["No", "Sí"]},
+    "q-appetite-002": {"prompt": "¿Cuánto tiempo lleva tu mascota comiendo poco o nada? En los gatos, más de 24 horas sin comer puede dañar rápidamente el hígado.", "options": ["Menos de 24 horas", "Entre 24 y 48 horas", "Más de 48 horas"]},
+    "q-appetite-003": {"prompt": "¿Tu mascota además vomita, tiene diarrea, rechaza el agua o hace esfuerzos en el arenero?", "options": ["No", "Vómitos, diarrea o rechaza el agua", "Esfuerzo para orinar con poca o ninguna orina"]},
+    "q-appetite-004": {"prompt": "¿Puede haber comido algo tóxico o tragado un objeto, como un juguete, un hueso o una cuerda, o tiene la barriga hinchada o dolorida?", "options": ["No", "Sí"]},
+    "q-cough-001": {"prompt": "¿A tu mascota le cuesta respirar, respira deprisa o con la boca abierta en reposo, o tiene las encías o la lengua azuladas, grisáceas o pálidas?", "options": ["No", "Sí"]},
+    "q-cough-002": {"prompt": "¿La tos empezó de repente mientras comía, masticaba o jugaba, con arcadas, tocándose la boca con la pata o babeando, como si tuviera algo atascado?", "options": ["No", "Sí"]},
+    "q-cough-003": {"prompt": "¿Cuánto tiempo lleva con tos y cómo está tu mascota por lo demás?", "options": ["Menos de una semana, por lo demás bien", "Más de una semana, o va a peor", "Cansada, sin comer o con fiebre", "Tose sangre, o se ha desmayado"]},
+    "q-cough-004": {"prompt": "¿Tu mascota tiene un soplo o una enfermedad cardíaca conocida, o la tos empeora por la noche o en reposo?", "options": ["No o no lo sé", "Sí"]},
+    "q-eye-001": {"prompt": "¿El ojo ha sufrido una lesión, está saliente, fuera de su órbita, o se ha vuelto de repente turbio o azulado?", "options": ["No", "Lesionado, saliente o fuera de la órbita", "De repente turbio o azulado"]},
+    "q-eye-002": {"prompt": "¿Le ha salpicado algo en el ojo, o tu mascota choca con las cosas como si no viera? Si han entrado productos químicos, lávalo con suavidad con abundante agua limpia y tibia.", "options": ["No", "Sí"]},
+    "q-eye-003": {"prompt": "¿Tu mascota entrecierra o mantiene el ojo cerrado, o se lo frota con la pata o contra objetos?", "options": ["No", "Sí"]},
+    "q-eye-004": {"prompt": "¿Qué más notas?", "options": ["Solo lagrimeo transparente o un leve enrojecimiento", "Legaña amarilla o verde, o un ojo rojo y dolorido", "Tercer párpado visible, o pupilas de distinto tamaño"]},
+    "q-ear-001": {"prompt": "¿Tu mascota tiene la cabeza ladeada, ha perdido el equilibrio, anda en círculos o tiene movimientos rápidos de los ojos?", "options": ["No", "Sí"]},
+    "q-ear-002": {"prompt": "¿Empezó de repente a sacudir la cabeza con fuerza, por ejemplo tras un paseo por hierba alta, con la cabeza ladeada hacia un lado?", "options": ["No", "Sí"]},
+    "q-ear-003": {"prompt": "¿Cómo se ve y se nota el oído?", "options": ["Parece normal", "Secreción, cera oscura, mal olor u oreja hinchada", "Muy doloroso, sangra, o se queja al tocarlo"]},
+    "q-constipation-001": {"prompt": "Primero comprueba que de verdad es caca: ¿tu mascota orina con normalidad? Hacer esfuerzos con poca o ninguna orina, sobre todo en un gato macho, es una urgencia (consulta la revisión 'Esfuerzo para orinar').", "options": ["Orina con normalidad", "Poca o ninguna orina, o no estoy seguro"]},
+    "q-constipation-002": {"prompt": "¿Cuánto hace que tu mascota hizo una caca normal por última vez?", "options": ["Menos de 48 horas", "Más de 48 horas"]},
+    "q-constipation-003": {"prompt": "¿Tu mascota además vomita, no come o está decaída, o tiene la barriga hinchada o le duele al tocarla?", "options": ["No", "Vómitos, no come o está decaída", "Barriga hinchada o dolorosa"]},
+    "q-constipation-004": {"prompt": "¿Puede haber tragado huesos, un juguete, una cuerda o tela, o hay sangre o algo visible en el ano? No tires de nada.", "options": ["No", "Sí"]},
+    "q-heat-001": {"prompt": "Empieza ya los primeros auxilios y ve enseguida al veterinario: lleva a tu mascota a la sombra o a una habitación fresca, mójala con agua fresca (no helada), usa un ventilador y ofrécele pequeños sorbos de agua. ¿Está desplomada, sin equilibrio, desorientada, vomitando o con convulsiones?", "options": ["No", "Sí"]},
+    "q-heat-002": {"prompt": "¿Tu mascota sigue jadeando mucho o respirando con ruido, o tiene las encías rojo intenso, pálidas o grisáceas? Cualquier jadeo en un gato es una señal de alarma.", "options": ["No, se está calmando", "Sí"]},
+    "q-heat-003": {"prompt": "¿Tu mascota es de una raza de hocico chato, tiene sobrepeso, es muy joven o mayor, o tiene una enfermedad cardíaca o respiratoria? Sigue enfriándola de camino al veterinario.", "options": ["No", "Sí o no lo sé"]},
+    "q-bloat-001": {"prompt": "Una barriga hinchada con arcadas puede ser una dilatación de estómago, que puede causar la muerte en pocas horas: llama y ve ya al veterinario abierto más cercano. ¿Tu perro intenta vomitar pero no expulsa nada, o solo espuma?", "options": ["No", "Sí"]},
+    "q-bloat-002": {"prompt": "¿La barriga está hinchada o tensa, o tu perro está inquieto, babea, está pálido, débil o se desploma?", "options": ["No", "Sí"]}
   }
 }

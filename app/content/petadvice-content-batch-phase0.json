@@ -70,14 +70,14 @@
 			"breed_predispositions": [],
 			"applicable_sex": ["male"],
 			"applicable_neuter_status": ["intact"],
-			"symptom_tags": ["straining_to_defecate", "difficulty_urinating", "blood_in_urine", "blood_in_semen", "abdominal_pain"],
+			"symptom_tags": ["straining_to_defecate", "constipation", "difficulty_urinating", "blood_in_urine", "blood_in_semen", "abdominal_pain"],
 			"urgency_default": "vet_soon",
 			"red_flags": [{"description": "Fever with a painful abdomen", "escalates_to": "emergency_now"}],
 			"home_care_guidance": null,
 			"prevention_tips": "Discuss urinary or reproductive changes in an intact male with your vet.",
 			"vet_reviewed_by": null,
 			"last_reviewed_date": null,
-			"sources": ["REVIEW REQUIRED: replace with a primary clinical or guideline source before shipping"]
+			"sources": ["https://vcahospitals.com/know-your-pet/prostatic-disease-in-dogs", "https://www.merckvetmanual.com/reproductive-system/prostatic-diseases-in-small-animals/prostatic-diseases-in-small-animals"]
 		},
 		{
 			"id": "cat-urinary-001",

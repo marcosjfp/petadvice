@@ -28,6 +28,8 @@ const en = {
   symptoms: {
     straining_to_urinate: 'Straining to urinate', vomiting: 'Vomiting', diarrhea: 'Diarrhea', limping: 'Limping after exercise', reverse_sneezing: 'Reverse sneezing',
     scratching: 'Scratching or fleas', scooting: 'Scooting or worms in stool', nervous_or_stressed: 'Nervous or stressed', increased_thirst: 'Drinking more than usual', vaginal_discharge: 'Unexpected discharge',
+    ate_something_toxic: 'Ate or touched something toxic', swollen_belly_retching: 'Swollen belly or retching (bloat)', heatstroke: 'Overheating or heatstroke', not_eating_or_lethargic: 'Not eating or low energy',
+    coughing: 'Coughing', eye_problem: 'Eye problem', ear_scratching_or_head_shaking: 'Ear scratching or head shaking', constipation: 'Constipation',
   } as Record<string, string>,
   app: {
     loadingAccount: 'Loading your account…', loadErrorTitle: 'We could not load your account.', loadErrorDetail: 'Check your connection and try again.',
@@ -198,6 +200,8 @@ const pt: Messages = {
   symptoms: {
     straining_to_urinate: 'Esforço para urinar', vomiting: 'Vómitos', diarrhea: 'Diarreia', limping: 'Coxeio depois do exercício', reverse_sneezing: 'Espirro invertido',
     scratching: 'Comichão ou pulgas', scooting: 'Arrasta o rabo ou vermes nas fezes', nervous_or_stressed: 'Nervoso ou stressado', increased_thirst: 'Bebe mais do que o habitual', vaginal_discharge: 'Corrimento inesperado',
+    ate_something_toxic: 'Comeu ou tocou em algo tóxico', swollen_belly_retching: 'Barriga inchada ou tenta vomitar (dilatação)', heatstroke: 'Sobreaquecimento ou golpe de calor', not_eating_or_lethargic: 'Não come ou está sem energia',
+    coughing: 'Tosse', eye_problem: 'Problema nos olhos', ear_scratching_or_head_shaking: 'Coça as orelhas ou abana a cabeça', constipation: 'Prisão de ventre',
   },
   app: {
     loadingAccount: 'A carregar a sua conta…', loadErrorTitle: 'Não foi possível carregar a sua conta.', loadErrorDetail: 'Verifique a ligação e tente novamente.',
@@ -394,6 +398,8 @@ const es: Messages = {
   symptoms: {
     straining_to_urinate: 'Esfuerzo para orinar', vomiting: 'Vómitos', diarrhea: 'Diarrea', limping: 'Cojera después del ejercicio', reverse_sneezing: 'Estornudo inverso',
     scratching: 'Picor o pulgas', scooting: 'Arrastra el trasero o lombrices en las heces', nervous_or_stressed: 'Nervioso o estresado', increased_thirst: 'Bebe más de lo normal', vaginal_discharge: 'Flujo inesperado',
+    ate_something_toxic: 'Ha comido o tocado algo tóxico', swollen_belly_retching: 'Barriga hinchada o arcadas (dilatación)', heatstroke: 'Sobrecalentamiento o golpe de calor', not_eating_or_lethargic: 'No come o está sin energía',
+    coughing: 'Tos', eye_problem: 'Problema en los ojos', ear_scratching_or_head_shaking: 'Se rasca las orejas o sacude la cabeza', constipation: 'Estreñimiento',
   },
   app: {
     loadingAccount: 'Cargando tu cuenta…', loadErrorTitle: 'No hemos podido cargar tu cuenta.', loadErrorDetail: 'Comprueba tu conexión e inténtalo de nuevo.',

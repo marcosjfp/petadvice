@@ -158,5 +158,229 @@
     "options": ["No", "Yes"],
     "escalate_if": {"Yes": "vet_soon"},
     "next_question_by_answer": {}
+  },
+  {
+    "id": "q-toxic-001",
+    "prompt": "Phone your vet or an animal poison helpline now. Do not make your pet vomit unless a vet tells you to, and keep the packaging or a sample. What did your pet eat, lick or touch?",
+    "symptom_tag": "ate_something_toxic",
+    "options": ["Chocolate, sugar-free gum or sweets", "Grapes, raisins, onion or garlic", "Human medicine", "Rat or slug poison, or antifreeze", "A lily: any part, pollen or vase water", "A dog flea or tick product", "Something else or not sure"],
+    "escalate_if": {"Chocolate, sugar-free gum or sweets": "emergency_now", "Grapes, raisins, onion or garlic": "emergency_now", "Human medicine": "emergency_now", "Rat or slug poison, or antifreeze": "emergency_now", "A lily: any part, pollen or vase water": "emergency_now", "A dog flea or tick product": "emergency_now", "Something else or not sure": "emergency_now"},
+    "is_entry_point": true,
+    "next_question_by_answer": {"Chocolate, sugar-free gum or sweets": "q-toxic-002", "Grapes, raisins, onion or garlic": "q-toxic-002", "Human medicine": "q-toxic-002", "Rat or slug poison, or antifreeze": "q-toxic-002", "A lily: any part, pollen or vase water": "q-toxic-002", "A dog flea or tick product": "q-toxic-002", "Something else or not sure": "q-toxic-002"}
+  },
+  {
+    "id": "q-toxic-002",
+    "prompt": "Is your pet showing any signs now, such as vomiting, drooling, trembling, wobbliness, seizures, collapse or difficulty breathing? Many poisons cause no signs at first.",
+    "symptom_tag": "ate_something_toxic",
+    "options": ["No signs yet", "Showing signs"],
+    "escalate_if": {"No signs yet": "emergency_now", "Showing signs": "emergency_now"},
+    "next_question_by_answer": {"No signs yet": "q-toxic-003", "Showing signs": "q-toxic-003"}
+  },
+  {
+    "id": "q-toxic-003",
+    "prompt": "When did it happen? Tell the vet or helpline this too.",
+    "symptom_tag": "ate_something_toxic",
+    "options": ["Within the last 2 hours", "More than 2 hours ago", "Not sure"],
+    "escalate_if": {},
+    "next_question_by_answer": {}
+  },
+  {
+    "id": "q-appetite-001",
+    "prompt": "Is your pet collapsed, unable to stand, struggling to breathe, or are the gums pale, grey or yellow?",
+    "symptom_tag": "not_eating_or_lethargic",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "emergency_now"},
+    "is_entry_point": true,
+    "next_question_by_answer": {"No": "q-appetite-002"}
+  },
+  {
+    "id": "q-appetite-002",
+    "prompt": "How long has your pet eaten little or nothing? In cats, more than 24 hours without food can quickly harm the liver.",
+    "symptom_tag": "not_eating_or_lethargic",
+    "options": ["Less than 24 hours", "24 to 48 hours", "More than 48 hours"],
+    "escalate_if": {"24 to 48 hours": "vet_24h", "More than 48 hours": "vet_24h"},
+    "next_question_by_answer": {"Less than 24 hours": "q-appetite-003", "24 to 48 hours": "q-appetite-003", "More than 48 hours": "q-appetite-003"}
+  },
+  {
+    "id": "q-appetite-003",
+    "prompt": "Is your pet also vomiting, having diarrhoea, refusing water, or straining in the litter tray?",
+    "symptom_tag": "not_eating_or_lethargic",
+    "options": ["No", "Vomiting, diarrhoea or refusing water", "Straining to pee with little or no urine"],
+    "escalate_if": {"Vomiting, diarrhoea or refusing water": "vet_24h", "Straining to pee with little or no urine": "emergency_now"},
+    "next_question_by_answer": {"No": "q-appetite-004", "Vomiting, diarrhoea or refusing water": "q-appetite-004"}
+  },
+  {
+    "id": "q-appetite-004",
+    "prompt": "Could your pet have eaten something toxic or swallowed an object such as a toy, bone or string, or is the belly swollen or painful?",
+    "symptom_tag": "not_eating_or_lethargic",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "emergency_now"},
+    "next_question_by_answer": {}
+  },
+  {
+    "id": "q-cough-001",
+    "prompt": "Is your pet struggling to breathe, breathing fast or with an open mouth at rest, or are the gums or tongue blue, grey or pale?",
+    "symptom_tag": "coughing",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "emergency_now"},
+    "is_entry_point": true,
+    "next_question_by_answer": {"No": "q-cough-002"}
+  },
+  {
+    "id": "q-cough-002",
+    "prompt": "Did the cough start suddenly while eating, chewing or playing, with gagging, pawing at the mouth or drooling, as if something is stuck?",
+    "symptom_tag": "coughing",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "emergency_now"},
+    "next_question_by_answer": {"No": "q-cough-003"}
+  },
+  {
+    "id": "q-cough-003",
+    "prompt": "How long has the cough lasted, and how is your pet otherwise?",
+    "symptom_tag": "coughing",
+    "options": ["Under a week, otherwise well", "Over a week, or getting worse", "Tired, not eating or feverish", "Coughing up blood, or has fainted"],
+    "escalate_if": {"Over a week, or getting worse": "vet_soon", "Tired, not eating or feverish": "vet_24h", "Coughing up blood, or has fainted": "emergency_now"},
+    "next_question_by_answer": {"Under a week, otherwise well": "q-cough-004", "Over a week, or getting worse": "q-cough-004", "Tired, not eating or feverish": "q-cough-004"}
+  },
+  {
+    "id": "q-cough-004",
+    "prompt": "Does your pet have a known heart murmur or heart disease, or is the cough worse at night or at rest?",
+    "symptom_tag": "coughing",
+    "options": ["No or not known", "Yes"],
+    "escalate_if": {"Yes": "vet_24h"},
+    "next_question_by_answer": {}
+  },
+  {
+    "id": "q-eye-001",
+    "prompt": "Has the eye been injured, or is it bulging, out of its socket, or suddenly cloudy or blue?",
+    "symptom_tag": "eye_problem",
+    "options": ["No", "Injured, bulging or out of the socket", "Suddenly cloudy or blue"],
+    "escalate_if": {"Injured, bulging or out of the socket": "emergency_now", "Suddenly cloudy or blue": "emergency_now"},
+    "is_entry_point": true,
+    "next_question_by_answer": {"No": "q-eye-002"}
+  },
+  {
+    "id": "q-eye-002",
+    "prompt": "Has anything splashed into the eye, or is your pet bumping into things as if unable to see? If chemicals got in, rinse gently with plenty of clean, lukewarm water.",
+    "symptom_tag": "eye_problem",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "emergency_now"},
+    "next_question_by_answer": {"No": "q-eye-003"}
+  },
+  {
+    "id": "q-eye-003",
+    "prompt": "Is your pet squinting, keeping the eye closed, or pawing or rubbing at it?",
+    "symptom_tag": "eye_problem",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "vet_24h"},
+    "next_question_by_answer": {"No": "q-eye-004", "Yes": "q-eye-004"}
+  },
+  {
+    "id": "q-eye-004",
+    "prompt": "What else do you notice?",
+    "symptom_tag": "eye_problem",
+    "options": ["Mild clear watering or slight redness only", "Yellow or green discharge, or a red, sore eye", "Third eyelid showing, or pupils of different sizes"],
+    "escalate_if": {"Yellow or green discharge, or a red, sore eye": "vet_soon", "Third eyelid showing, or pupils of different sizes": "vet_24h"},
+    "next_question_by_answer": {}
+  },
+  {
+    "id": "q-ear-001",
+    "prompt": "Does your pet have a head tilt, loss of balance, walking in circles, or flickering eye movements?",
+    "symptom_tag": "ear_scratching_or_head_shaking",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "vet_24h"},
+    "is_entry_point": true,
+    "next_question_by_answer": {"No": "q-ear-002", "Yes": "q-ear-002"}
+  },
+  {
+    "id": "q-ear-002",
+    "prompt": "Did violent head shaking start suddenly, for example after a walk in long grass, with the head held to one side?",
+    "symptom_tag": "ear_scratching_or_head_shaking",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "vet_24h"},
+    "next_question_by_answer": {"No": "q-ear-003", "Yes": "q-ear-003"}
+  },
+  {
+    "id": "q-ear-003",
+    "prompt": "How does the ear look and feel?",
+    "symptom_tag": "ear_scratching_or_head_shaking",
+    "options": ["Looks normal", "Discharge, dark wax, smell, or a swollen ear flap", "Very painful, bleeding, or crying when touched"],
+    "escalate_if": {"Discharge, dark wax, smell, or a swollen ear flap": "vet_soon", "Very painful, bleeding, or crying when touched": "vet_24h"},
+    "next_question_by_answer": {}
+  },
+  {
+    "id": "q-constipation-001",
+    "prompt": "First check it is really poo: is your pet passing urine normally? Straining with little or no urine, especially in a male cat, is an emergency (see the 'Straining to urinate' check).",
+    "symptom_tag": "constipation",
+    "options": ["Passing urine normally", "Little or no urine, or unsure"],
+    "escalate_if": {"Little or no urine, or unsure": "emergency_now"},
+    "is_entry_point": true,
+    "next_question_by_answer": {"Passing urine normally": "q-constipation-002"}
+  },
+  {
+    "id": "q-constipation-002",
+    "prompt": "How long since your pet last passed a normal poo?",
+    "symptom_tag": "constipation",
+    "options": ["Less than 48 hours", "More than 48 hours"],
+    "escalate_if": {"More than 48 hours": "vet_24h"},
+    "next_question_by_answer": {"Less than 48 hours": "q-constipation-003", "More than 48 hours": "q-constipation-003"}
+  },
+  {
+    "id": "q-constipation-003",
+    "prompt": "Is your pet also vomiting, not eating or lethargic, or is the belly swollen or painful to touch?",
+    "symptom_tag": "constipation",
+    "options": ["No", "Vomiting, not eating or lethargic", "Swollen or painful belly"],
+    "escalate_if": {"Vomiting, not eating or lethargic": "vet_24h", "Swollen or painful belly": "emergency_now"},
+    "next_question_by_answer": {"No": "q-constipation-004", "Vomiting, not eating or lethargic": "q-constipation-004"}
+  },
+  {
+    "id": "q-constipation-004",
+    "prompt": "Could your pet have swallowed bones, a toy, string or fabric, or is there blood or something visible at the bottom? Do not pull anything out.",
+    "symptom_tag": "constipation",
+    "options": ["No", "Yes"],
+    "escalate_if": {"Yes": "vet_24h"},
+    "next_question_by_answer": {}
+  },
+  {
+    "id": "q-heat-001",
+    "prompt": "Start first aid now and go to a vet straight away: move your pet into shade or a cool room, pour cool (not ice-cold) water over them, use a fan, and offer small sips of water. Is your pet collapsed, wobbly, confused, vomiting or having a seizure?",
+    "symptom_tag": "heatstroke",
+    "options": ["No", "Yes"],
+    "escalate_if": {"No": "emergency_now", "Yes": "emergency_now"},
+    "is_entry_point": true,
+    "next_question_by_answer": {"No": "q-heat-002", "Yes": "q-heat-002"}
+  },
+  {
+    "id": "q-heat-002",
+    "prompt": "Is your pet still panting heavily or breathing noisily, or are the gums bright red, pale or grey? Any panting in a cat is a warning sign.",
+    "symptom_tag": "heatstroke",
+    "options": ["No, settling", "Yes"],
+    "escalate_if": {"Yes": "emergency_now"},
+    "next_question_by_answer": {"No, settling": "q-heat-003", "Yes": "q-heat-003"}
+  },
+  {
+    "id": "q-heat-003",
+    "prompt": "Is your pet a flat-faced breed, overweight, very young or old, or does it have a heart or breathing condition? Keep cooling on the way to the vet.",
+    "symptom_tag": "heatstroke",
+    "options": ["No", "Yes or not sure"],
+    "escalate_if": {"Yes or not sure": "emergency_now"},
+    "next_question_by_answer": {}
+  },
+  {
+    "id": "q-bloat-001",
+    "prompt": "A swollen belly with retching can be bloat, which can kill within hours: phone and go to the nearest open vet now. Is your dog trying to vomit but bringing nothing up, or only froth?",
+    "symptom_tag": "swollen_belly_retching",
+    "options": ["No", "Yes"],
+    "escalate_if": {"No": "emergency_now", "Yes": "emergency_now"},
+    "is_entry_point": true,
+    "next_question_by_answer": {"No": "q-bloat-002", "Yes": "q-bloat-002"}
+  },
+  {
+    "id": "q-bloat-002",
+    "prompt": "Is the belly swollen or tight, or is your dog restless, drooling, pale, weak or collapsing?",
+    "symptom_tag": "swollen_belly_retching",
+    "options": ["No", "Yes"],
+    "escalate_if": {"No": "emergency_now", "Yes": "emergency_now"},
+    "next_question_by_answer": {}
   }
 ]
