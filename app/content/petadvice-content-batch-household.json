@@ -101,6 +101,7 @@
       ],
       "recurrence": "vacuum every day or two and wash bedding weekly until no fleas are seen for several weeks",
       "reminder_interval_days": 7,
+      "reminder_occurrences": 8,
       "trigger_age_days": null,
       "sources": [
         "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/fleas-on-cats",

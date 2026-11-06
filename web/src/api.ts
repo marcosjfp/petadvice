@@ -59,7 +59,7 @@ export const careTopics = ['getting_started', 'vaccinations', 'parasites', 'heal
 export type CareTopic = typeof careTopics[number]
 export type PreventiveCareItem = CareGuide & {
   sources: string[]; related_symptoms?: string[]; topic?: CareTopic | string;
-  summary?: string | null; steps?: string[]; reminder_interval_days?: number | null;
+  summary?: string | null; steps?: string[]; reminder_interval_days?: number | null; reminder_occurrences?: number | null;
 }
 export type Question = { id: string; prompt: string; options: string[]; option_labels?: string[] }
 export type TriageResult = {

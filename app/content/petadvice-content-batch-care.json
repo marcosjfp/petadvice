@@ -68,7 +68,7 @@
         "Ask your vet to check your pet's teeth at least once a year, and book sooner if you notice any of these signs. Cleaning under the gum line needs a general anaesthetic."
       ],
       "recurrence": "brush daily; dental check at least once a year",
-      "reminder_interval_days": 1,
+      "reminder_interval_days": 7,
       "trigger_age_days": null,
       "sources": [
         "https://www.pdsa.org.uk/pet-help-and-advice/pet-health-hub/conditions/dental-disease-in-dogs",

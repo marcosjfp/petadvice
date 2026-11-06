@@ -78,3 +78,8 @@ test('helpers produce safe file names and a next-day local start', () => {
   const next = tomorrow(new Date(2026, 11, 31, 22, 30))
   expect([next.getFullYear(), next.getMonth(), next.getDate(), next.getHours()]).toEqual([2027, 0, 1, 0])
 })
+
+test('a limited reminder series ends after its occurrence count', () => {
+  expect(recurrenceRule(7, 8)).toBe('RRULE:FREQ=WEEKLY;COUNT=8')
+  expect(recurrenceRule(182, null)).toBe('RRULE:FREQ=MONTHLY;INTERVAL=6')
+})

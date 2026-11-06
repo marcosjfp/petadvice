@@ -422,7 +422,7 @@ function Care({ pet, species = pet?.species ?? 'dog', onStartCheck }: { pet?: Pe
     const steps = item.steps ?? []
     const body = steps.length ? [item.summary ?? '', ...steps.map((step, index) => `${index + 1}. ${step}`)] : [item.description]
     const description = [...body, item.recurrence ? c.timing(item.recurrence) : '', c.reminderFooter].filter(Boolean).join('\n')
-    const ics = buildCareReminderIcs({ id: item.id, title: c.reminderTitle(item.title, pet?.name), description, intervalDays: item.reminder_interval_days, start: tomorrow() })
+    const ics = buildCareReminderIcs({ id: item.id, title: c.reminderTitle(item.title, pet?.name), description, intervalDays: item.reminder_interval_days, occurrences: item.reminder_occurrences, start: tomorrow() })
     downloadFile(ics, reminderFileName(item.id), 'text/calendar;charset=utf-8')
     setReminderStatus(c.reminderAdded(item.title))
   }

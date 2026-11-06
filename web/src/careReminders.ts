@@ -7,6 +7,8 @@ export type CareReminder = {
   description: string
   /** Repeat every N days; null or undefined creates a single event. */
   intervalDays?: number | null
+  /** Stop after this many occurrences; null or undefined repeats indefinitely. */
+  occurrences?: number | null
   /** First occurrence (all-day, in the user's local calendar). */
   start: Date
 }
@@ -41,10 +43,11 @@ export function foldIcsLine(line: string): string {
 }
 
 /** Map a day interval to the most natural RRULE: daily, weekly, monthly or yearly. */
-export function recurrenceRule(intervalDays: number): string {
+export function recurrenceRule(intervalDays: number, occurrences?: number | null): string {
   const days = Math.round(intervalDays)
   if (!Number.isFinite(days) || days < 1) throw new RangeError('Reminder interval must be at least one day')
-  const withInterval = (frequency: string, count: number) => `RRULE:FREQ=${frequency}${count > 1 ? `;INTERVAL=${count}` : ''}`
+  const limit = occurrences && occurrences >= 1 ? `;COUNT=${Math.round(occurrences)}` : ''
+  const withInterval = (frequency: string, count: number) => `RRULE:FREQ=${frequency}${count > 1 ? `;INTERVAL=${count}` : ''}${limit}`
   if (days % 365 === 0) return withInterval('YEARLY', days / 365)
   // Prefer months when the interval is within two days of a whole number of months (30, 91, 182…).
   const months = Math.round(days / AVERAGE_MONTH_DAYS)
@@ -79,7 +82,7 @@ export function buildCareReminderIcs(reminder: CareReminder, now = new Date(), u
     `DTSTAMP:${formatUtc(now)}`,
     `DTSTART;VALUE=DATE:${formatDate(reminder.start)}`,
     `DTEND;VALUE=DATE:${formatDate(end)}`,
-    ...(reminder.intervalDays ? [recurrenceRule(reminder.intervalDays)] : []),
+    ...(reminder.intervalDays ? [recurrenceRule(reminder.intervalDays, reminder.occurrences)] : []),
     `SUMMARY:${escapeIcsText(reminder.title)}`,
     `DESCRIPTION:${escapeIcsText(reminder.description)}`,
     'TRANSP:TRANSPARENT',

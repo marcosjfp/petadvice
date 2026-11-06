@@ -233,6 +233,7 @@ class PreventiveCareItem(BaseModel):
     steps: list[str] = PydanticField(default_factory=list)
     recurrence: Optional[str] = None
     reminder_interval_days: Optional[int] = PydanticField(default=None, ge=1, le=3650)
+    reminder_occurrences: Optional[int] = PydanticField(default=None, ge=1, le=520)
     trigger_age_days: Optional[int] = None
     sources: list[str] = PydanticField(default_factory=list)
     related_symptoms: list[str] = PydanticField(default_factory=list)
