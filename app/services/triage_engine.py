@@ -1,11 +1,14 @@
 import json
+from collections.abc import Iterable
+from datetime import date, timedelta
+from functools import lru_cache
 
 from sqlalchemy import update
 from sqlmodel import Session
 
 from app.content.loader import content_library
 from app.i18n import DEFAULT_LANGUAGE, message
-from app.models.schema import ConditionEntry, NeuterStatus, Pet, RedFlag, RelatedCare, ReportPet, RecordedAnswer, ResultReason, TriageAnswerRequest, TriageQuestion, TriageResult, TriageSession, UrgencyLevel
+from app.models.schema import ConditionEntry, GuestContext, NeuterStatus, Pet, RelatedCare, ReportPet, RecordedAnswer, ResultReason, TriageAnswerRequest, TriageQuestion, TriageResult, TriageSession, UrgencyLevel, WatchSign
 from app.services.life_stage_calculator import calculate_life_stage
 from app.services.auth import as_utc, utcnow
 
@@ -24,6 +27,41 @@ class UnsupportedSymptomError(Exception):
 
 class IncompleteSessionError(Exception):
     pass
+
+
+# Representative ages for the guest age groups. They sit well inside the
+# puppy/kitten and senior ranges for every breed size, so calculate_life_stage
+# gives the intended stage. A guest "adult" matches every adult stage.
+_GUEST_AGE_YEARS = {'young': 0.25, 'adult': 4.0, 'senior': 13.0}
+_ADULT_STAGES = frozenset({'young_adult', 'mature_adult'})
+
+
+def apply_guest_context(pet: Pet, context: GuestContext | None) -> Pet:
+    """Store optional guest details on the throwaway guest pet. "Not sure" stays None."""
+    if context is None:
+        return pet
+    if context.age_group:
+        pet.date_of_birth = date.today() - timedelta(days=round(_GUEST_AGE_YEARS[context.age_group] * 365.25))
+    pet.sex = context.sex
+    pet.neutered = context.neutered
+    return pet
+
+
+def guest_age_group(pet: Pet) -> str | None:
+    """The age group a guest chose; None for saved pets and guests who were not sure."""
+    if pet.owner_id is not None or pet.date_of_birth is None:
+        return None
+    stage = calculate_life_stage(pet)
+    return 'young' if stage in ('puppy', 'kitten') else 'senior' if stage == 'senior' else 'adult'
+
+
+def _scope_life_stages(pet: Pet) -> set[str] | None:
+    life_stage = calculate_life_stage(pet)
+    if life_stage is None:
+        return None
+    if guest_age_group(pet) == 'adult':
+        return set(_ADULT_STAGES)
+    return {life_stage}
 
 
 def _entry_question(symptom_tag: str) -> TriageQuestion | None:
@@ -46,21 +84,51 @@ def start_session(db: Session, pet: Pet, symptom_tag: str) -> tuple[TriageSessio
     return session, first_question
 
 
-def _pet_matches_condition_scope(pet: Pet, condition: ConditionEntry) -> bool:
+def _missing_scope_details(pet: Pet, condition: ConditionEntry) -> list[str] | None:
+    """None if the pet is known to be out of scope, else the unknown details the scope needs."""
     if condition.species not in (pet.species, condition.species.both):
-        return False
-    life_stage = calculate_life_stage(pet)
-    if condition.applicable_life_stages and life_stage and life_stage not in condition.applicable_life_stages:
-        return False
-    if condition.applicable_sex and (pet.sex is None or pet.sex not in condition.applicable_sex):
-        return False
+        return None
+    stages = _scope_life_stages(pet)
+    if condition.applicable_life_stages and stages and not stages & set(condition.applicable_life_stages):
+        return None
+    missing = []
+    if condition.applicable_sex:
+        if pet.sex is None:
+            missing.append('sex')
+        elif pet.sex not in condition.applicable_sex:
+            return None
     if condition.applicable_neuter_status:
         if pet.neutered is None:
-            return False
-        status = NeuterStatus.neutered if pet.neutered else NeuterStatus.intact
-        if status not in condition.applicable_neuter_status:
-            return False
-    return True
+            missing.append('neutered')
+        elif (NeuterStatus.neutered if pet.neutered else NeuterStatus.intact) not in condition.applicable_neuter_status:
+            return None
+    return missing
+
+
+def _pet_matches_condition_scope(pet: Pet, condition: ConditionEntry) -> bool:
+    return _missing_scope_details(pet, condition) == []
+
+
+def _life_stage_escalation(pet: Pet, condition: ConditionEntry) -> tuple[str, UrgencyLevel] | None:
+    options = [(stage, condition.life_stage_escalation[stage]) for stage in sorted(_scope_life_stages(pet) or ()) if stage in condition.life_stage_escalation]
+    return max(options, key=lambda item: item[1].rank, default=None)
+
+
+@lru_cache(maxsize=1024)
+def _longest_path(question_id: str, version: str | None) -> int:
+    # The question graph is validated as acyclic when content loads.
+    question = content_library.question_by_id(question_id)
+    if question is None:
+        return 0
+    return 1 + max((_longest_path(next_id, version) for next_id in set(question.next_question_by_answer.values())), default=0)
+
+
+def progress(session: TriageSession) -> dict | None:
+    """Step number of the current question and the most questions the check can need."""
+    if session.current_question_id is None:
+        return None
+    answered = len(json.loads(session.answers_json))
+    return {'step': answered + 1, 'max_steps': answered + _longest_path(session.current_question_id, content_library.version)}
 
 
 def answer_question(db: Session, session_id: str, req: TriageAnswerRequest) -> tuple[TriageSession, TriageQuestion | None, bool]:
@@ -93,6 +161,39 @@ def answer_question(db: Session, session_id: str, req: TriageAnswerRequest) -> t
     db.commit()
     db.refresh(session)
     return session, next_question, next_question is None
+
+
+def go_back(db: Session, session_id: str, current_question_id: str) -> tuple[TriageSession, TriageQuestion]:
+    """Return to the previously answered question and drop its answer.
+
+    Only an unfinished check can be rewound, and only from the question the
+    client is showing, so a stale tab cannot undo a newer answer.
+    """
+    session = db.get(TriageSession, session_id)
+    if session is None:
+        raise UnknownSessionError(session_id)
+    answers = json.loads(session.answers_json)
+    if session.result_snapshot is not None or session.current_question_id is None or session.current_question_id != current_question_id or not answers:
+        raise InvalidAnswerError(current_question_id)
+    previous_id = list(answers)[-1]  # JSON keeps the order the answers were given.
+    previous = content_library.question_by_id(previous_id)
+    if previous is None or previous.symptom_tag != session.symptom_entry_point:
+        raise InvalidAnswerError(current_question_id)
+    del answers[previous_id]
+    changed = db.execute(
+        update(TriageSession).where(
+            TriageSession.id == session_id,
+            TriageSession.current_question_id == current_question_id,
+            TriageSession.answers_json == session.answers_json,
+            TriageSession.result_snapshot.is_(None),
+        ).values(answers_json=json.dumps(answers), current_question_id=previous_id)
+    )
+    if changed.rowcount != 1:
+        db.rollback()
+        raise InvalidAnswerError(current_question_id)
+    db.commit()
+    db.refresh(session)
+    return session, previous
 
 
 def compute_result(db: Session, session_id: str, language: str = DEFAULT_LANGUAGE) -> TriageResult:
@@ -132,12 +233,14 @@ def compute_result(db: Session, session_id: str, language: str = DEFAULT_LANGUAG
     if session.resulting_urgency and session.resulting_urgency.rank > urgency.rank:
         urgency = session.resulting_urgency
     life_stage = calculate_life_stage(pet)
+    age_group = guest_age_group(pet)
     for condition in candidates:
-        escalation = condition.life_stage_escalation.get(life_stage) if life_stage else None
+        escalation = _life_stage_escalation(pet, condition)
         if escalation:
-            reasons.append(ResultReason(kind='life_stage', detail=message(language, 'reason.life_stage', name=localized[condition.id].name, life_stage=message(language, f'life_stage.{life_stage}')), urgency=escalation))
-        if escalation and escalation.rank > urgency.rank:
-            urgency = escalation
+            stage, level = escalation
+            reasons.append(ResultReason(kind='life_stage', detail=message(language, 'reason.life_stage', name=localized[condition.id].name, life_stage=message(language, f'life_stage.{stage}')), urgency=level))
+            if level.rank > urgency.rank:
+                urgency = level
     answers = json.loads(session.answers_json)
 
     for question in content_library.questions_for_symptom(session.symptom_entry_point):
@@ -148,17 +251,15 @@ def compute_result(db: Session, session_id: str, language: str = DEFAULT_LANGUAG
             if escalation.rank > urgency.rank:
                 urgency = escalation
 
-    triggered_flags: list[RedFlag] = []
+    # Red flags are not matched against answer text: substring matching made
+    # "Yes" match "sunken eyes" and "Once" match "once or twice a month".
+    # Answer-based escalation comes from the questions' escalate_if rules; the
+    # red flags are returned as signs to watch for.
+    watch_for: dict[str, WatchSign] = {}
     for condition in candidates:
         for flag in condition.red_flags:
-            if any(
-                len(answer.strip()) > 2 and answer.lower() in flag.description.lower()
-                for answer in answers.values()
-            ):
-                triggered_flags.append(flag)
-                reasons.append(ResultReason(kind='red_flag', detail=message(language, 'reason.red_flag', flag=content_library.localize_flag(condition, flag, language)), urgency=flag.escalates_to))
-                if flag.escalates_to.rank > urgency.rank:
-                    urgency = flag.escalates_to
+            text = content_library.localize_flag(condition, flag, language)
+            watch_for.setdefault(text, WatchSign(description=text, urgency=flag.escalates_to))
 
     guidance = _build_guidance(urgency, [localized[item.id] for item in candidates], language)
     result = TriageResult(
@@ -166,17 +267,64 @@ def compute_result(db: Session, session_id: str, language: str = DEFAULT_LANGUAG
         resulting_urgency=urgency,
         resulting_guidance=guidance,
         matched_condition_ids=[item.id for item in candidates],
-        possible_causes=sorted({cause for condition in localized.values() for cause in condition.possible_causes}),
-        recommended_examinations=sorted({exam for condition in localized.values() for exam in condition.recommended_examinations}),
+        possible_causes=_ordered_unique(cause for condition in localized.values() for cause in condition.possible_causes),
+        recommended_examinations=_ordered_unique(exam for condition in localized.values() for exam in condition.recommended_examinations),
         reasons=[reason for reason in reasons if reason.urgency == urgency],
         answers=[_recorded_answer(key, value, language) for key, value in answers.items()],
-        pet=ReportPet(name=pet.name, species=pet.species, date_of_birth=pet.date_of_birth, life_stage=life_stage, sex=pet.sex, neutered=pet.neutered, breed_size=pet.breed_size),
+        # A guest's birth date is only a stand-in for the age group they chose.
+        pet=ReportPet(
+            name=pet.name, species=pet.species, date_of_birth=None if age_group else pet.date_of_birth,
+            life_stage=None if age_group == 'adult' else life_stage, age_group=age_group,
+            sex=pet.sex, neutered=pet.neutered, breed_size=pet.breed_size,
+        ),
         started_at=as_utc(session.started_at), recorded_at=utcnow(), symptom=session.symptom_entry_point,
         sources=sorted({source for condition in candidates for source in condition.sources}),
         related_care=_related_care(candidates, pet.species.value, language),
         content_version=content_library.version, language=language,
+        # Most urgent signs first; the sort is stable, so authored order is kept within a level.
+        watch_for=sorted(watch_for.values(), key=lambda item: -item.urgency.rank),
+        recheck_advice=message(language, 'recheck.monitor_home') if urgency == UrgencyLevel.monitor_home else None,
+        context_notes=_context_notes(pet, matched, life_stage, language),
     )
     return _save_snapshot(db, session, result)
+
+
+def _ordered_unique(items: Iterable[str]) -> list[str]:
+    return list(dict.fromkeys(items))
+
+
+def _context_notes(pet: Pet, matched: list[ConditionEntry], life_stage: str | None, language: str) -> list[ResultReason]:
+    """Name guidance that was not used only because a pet detail is unknown.
+
+    The urgency is never lowered for unknown details; these notes tell the
+    owner which detail would change the advice.
+    """
+    notes = []
+    for condition in matched:
+        missing = _missing_scope_details(pet, condition)
+        if missing is None:
+            continue
+        name = content_library.localize_condition(condition, language).name
+        if missing:
+            scope = [message(language, f'scope.{sex.value}') for sex in condition.applicable_sex]
+            scope += [message(language, f'scope.{status.value}') for status in condition.applicable_neuter_status]
+            notes.append(ResultReason(kind='missing_context', urgency=condition.urgency_default, detail=message(
+                language, 'reason.missing_context', name=name, scope=', '.join(scope),
+                details=message(language, 'detail.join').join(message(language, f'detail.{item}') for item in missing),
+                urgency=message(language, f'urgency.{condition.urgency_default.value}'),
+            )))
+        elif life_stage is None and condition.life_stage_escalation:
+            by_level: dict[UrgencyLevel, list[str]] = {}
+            other_species_stage = 'kitten' if pet.species.value == 'dog' else 'puppy'
+            for stage, level in condition.life_stage_escalation.items():
+                if level.rank > condition.urgency_default.rank and stage != other_species_stage:
+                    by_level.setdefault(level, []).append(message(language, f'life_stage.{stage}'))
+            for level, stages in sorted(by_level.items(), key=lambda item: -item[0].rank):
+                notes.append(ResultReason(kind='missing_life_stage', urgency=level, detail=message(
+                    language, 'reason.missing_life_stage', name=name, life_stages=message(language, 'list.or').join(stages),
+                    urgency=message(language, f'urgency.{level.value}'),
+                )))
+    return notes
 
 
 def _save_snapshot(db: Session, session: TriageSession, result: TriageResult) -> TriageResult:

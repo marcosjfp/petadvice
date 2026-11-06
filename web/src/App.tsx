@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { api, ApiError, type Condition, type Owner, type Privacy, type Pet, type Question, type Species, type TriageResult, type PreventiveCareItem } from './api'
+import { api, ApiError, type Condition, type GuestContext, type Owner, type Privacy, type Pet, type Progress, type Question, type Species, type TriageResult, type PreventiveCareItem } from './api'
 import AccountLink from './AccountLink'
 import CheckResult from './CheckResult'
 import CheckHistory from './CheckHistory'
@@ -44,6 +44,8 @@ function App() {
   const [showQuickCheck, setShowQuickCheck] = useState(false)
   const [publicView, setPublicView] = useState<'library' | 'care' | null>(null)
   const [checkRequest, setCheckRequest] = useState<{ symptom: string; species: Species; id: number } | null>(null)
+  const [guestCheck, setGuestCheck] = useState<CheckState>('idle')
+  const [confirmLeave, setConfirmLeave] = useState(false)
   const [load, setLoad] = useState(0)
   const [petsLoaded, setPetsLoaded] = useState(false)
   const [loadError, setLoadError] = useState('')
@@ -122,7 +124,11 @@ function App() {
   if (auth === 'error' || loadError) return <Shell><h1>{t.app.loadErrorTitle}</h1><ErrorNotice message={loadError || t.app.loadErrorDetail} /><button className="primary" onClick={retryLoad}>{t.common.tryAgain}</button><Emergency /></Shell>
   if (auth === 'guest') {
     if (showAuth) return <AuthPanel onBack={() => setShowAuth(false)} onAuthenticated={() => { setShowAuth(false); setShowQuickCheck(false); retryLoad() }} />
-    if (showQuickCheck) return <Shell onBack={() => { setShowQuickCheck(false); setCheckRequest(null) }}><Triage key={checkRequest?.id} pet={null} initialSymptom={checkRequest?.symptom} initialSpecies={checkRequest?.species} onLogin={guestOnlyPreview ? undefined : () => setShowAuth(true)} /><Emergency /></Shell>
+    if (showQuickCheck) {
+      // Guest checks are not saved, so leaving a started one asks first.
+      const leave = () => { setConfirmLeave(false); setGuestCheck('idle'); setShowQuickCheck(false); setCheckRequest(null) }
+      return <Shell onBack={() => guestCheck === 'idle' ? leave() : setConfirmLeave(true)}>{confirmLeave && guestCheck !== 'idle' && <LeaveCheckConfirm state={guestCheck} onLeave={leave} onStay={() => setConfirmLeave(false)} />}<Triage key={checkRequest?.id} pet={null} initialSymptom={checkRequest?.symptom} initialSpecies={checkRequest?.species} onLogin={guestOnlyPreview ? undefined : () => setShowAuth(true)} onCheckStateChange={setGuestCheck} /><Emergency /></Shell>
+    }
     if (publicView) return <PublicEducation initialView={publicView} onBack={() => setPublicView(null)} onStartCheck={startCheck} />
     return <PublicLanding onBrowse={setPublicView} onQuickCheck={() => { setCheckRequest(null); setShowQuickCheck(true) }} onLogin={guestOnlyPreview ? undefined : () => setShowAuth(true)} />
   }
@@ -243,43 +249,70 @@ function AuthPanel({ onBack, onAuthenticated }: { onBack: () => void; onAuthenti
 
 type StartCheck = (symptom: string, species: Species) => void
 
-function Triage({ pet, onLogin, initialSymptom, initialSpecies }: { pet: Pet | null; onLogin?: () => void; initialSymptom?: string; initialSpecies?: Species }) {
+export type CheckState = 'idle' | 'in_progress' | 'result'
+// Long prompts read better at a smaller heading size.
+const LONG_PROMPT = 70
+
+function Triage({ pet, onLogin, initialSymptom, initialSpecies, onCheckStateChange }: { pet: Pet | null; onLogin?: () => void; initialSymptom?: string; initialSpecies?: Species; onCheckStateChange?: (state: CheckState) => void }) {
   const [symptom, setSymptom] = useState(initialSymptom ?? '')
   const [species, setSpecies] = useState<Species>(initialSpecies ?? 'dog')
+  const [context, setContext] = useState<{ age_group: string; sex: string; neutered: string }>({ age_group: '', sex: '', neutered: '' })
   const [question, setQuestion] = useState<Question | null>(null)
+  const [progress, setProgress] = useState<Progress | null>(null)
   const [session, setSession] = useState('')
   const [guestToken, setGuestToken] = useState<string | null>(null)
   const [expiresAt, setExpiresAt] = useState<string | null>(null)
   const [complete, setComplete] = useState(false)
   const [result, setResult] = useState<TriageResult | null>(null)
+  const [goingBack, setGoingBack] = useState(false)
   const { busy, error, run, setError } = useRequest()
   const { t } = useI18n()
   const tr = t.triage
+  const g = t.guest
   const heading = useRef<HTMLHeadingElement>(null)
-  useEffect(() => { if (question || complete) heading.current?.focus() }, [question, complete, result])
+  // Each new question starts at the top with its heading focused for screen readers.
+  useEffect(() => { if (question || complete) { window.scrollTo?.(0, 0); heading.current?.focus() } }, [question, complete])
+  const checkState: CheckState = result ? 'result' : session ? 'in_progress' : 'idle'
+  useEffect(() => { onCheckStateChange?.(checkState) }, [checkState, onCheckStateChange])
   const activeSpecies = pet?.species ?? species
   async function finish(sessionId: string, token = guestToken) {
-    setQuestion(null); setComplete(true)
+    setQuestion(null); setProgress(null); setComplete(true)
     setResult(await api.result(sessionId, token))
+  }
+  function guestContext(): GuestContext {
+    return {
+      age_group: (context.age_group || null) as GuestContext['age_group'],
+      sex: (context.sex || null) as GuestContext['sex'],
+      neutered: context.neutered === '' ? null : context.neutered === 'yes',
+    }
   }
   function begin() {
     void run(async () => {
-      const started = await api.startTriage(pet?.id ?? null, symptom, activeSpecies)
+      const started = pet ? await api.startTriage(pet.id, symptom, activeSpecies) : await api.startTriage(null, symptom, activeSpecies, guestContext())
       setSession(started.session_id)
       setGuestToken(started.guest_token ?? null); setExpiresAt(started.expires_at ?? null)
       if (started.flow_complete) await finish(started.session_id, started.guest_token ?? null)
-      else setQuestion(started.next_question)
+      else { setQuestion(started.next_question); setProgress(started.progress ?? null) }
     })
   }
   function answer(value: string) {
     if (!question) return
+    setGoingBack(false)
     void run(async () => {
       const next = await api.answer(session, question.id, value, guestToken)
       if (next.flow_complete) await finish(session)
-      else setQuestion(next.next_question)
+      else { setQuestion(next.next_question); setProgress(next.progress ?? null) }
     })
   }
-  function restart() { setResult(null); setSession(''); setGuestToken(null); setExpiresAt(null); setQuestion(null); setComplete(false); setError('') }
+  function previous() {
+    if (!question) return
+    setGoingBack(true)
+    void run(async () => {
+      const back = await api.back(session, question.id, guestToken)
+      setQuestion(back.next_question); setProgress(back.progress ?? null)
+    })
+  }
+  function restart() { setResult(null); setSession(''); setGuestToken(null); setExpiresAt(null); setQuestion(null); setProgress(null); setComplete(false); setError('') }
   const guestControls = guestToken ? <GuestControls session={session} token={guestToken} expiresAt={expiresAt} disabled={busy} onDeleted={restart} /> : null
   if (result) return <CheckResult result={result} petName={pet?.name}>
     {onLogin && <button className="primary" onClick={onLogin}>{tr.createAccountCta}</button>}
@@ -287,10 +320,15 @@ function Triage({ pet, onLogin, initialSymptom, initialSpecies }: { pet: Pet | n
     {guestControls}
   </CheckResult>
   if (complete) return <section className="panel"><h1 ref={heading} tabIndex={-1}>{tr.complete}</h1><p role="status">{busy ? tr.loadingGuidance : tr.guidanceNotLoaded}</p><ErrorNotice message={error} /><button className="primary" disabled={busy} onClick={() => void run(async () => { setResult(await api.result(session, guestToken)) })}>{tr.retryGuidance}</button>{guestControls}</section>
-  if (question) return <section className="question" aria-busy={busy}><div className="progress">{tr.checkFor(pet?.name ?? tr.yourSpecies(t.speciesLower[species]))} <span>{tr.adaptive}</span></div><h1 ref={heading} tabIndex={-1}>{question.prompt}</h1><div className="options">{question.options.map((option, index) => <button disabled={busy} className="option" onClick={() => answer(option)} key={option}>{question.option_labels?.[index] ?? option}<span aria-hidden="true">→</span></button>)}</div><p role="status">{busy ? tr.savingAnswer : ''}</p><ErrorNotice message={error} /><button className="secondary" disabled={busy} onClick={restart}>{tr.restart}</button>{guestControls}</section>
+  if (question) return <section className="question" aria-busy={busy}><div className="progress">{tr.checkFor(pet?.name ?? tr.yourSpecies(t.speciesLower[species]))} <span>{progress ? tr.questionStep(progress.step, progress.max_steps) : tr.adaptive}</span></div><h1 ref={heading} tabIndex={-1} className={question.prompt.length > LONG_PROMPT ? 'long-prompt' : undefined}>{question.prompt}</h1><div className="options">{question.options.map((option, index) => <button disabled={busy} className="option" onClick={() => answer(option)} key={option}>{question.option_labels?.[index] ?? option}<span aria-hidden="true">→</span></button>)}</div><p role="status">{busy ? goingBack ? tr.goingBack : tr.savingAnswer : ''}</p><ErrorNotice message={error} /><div className="question-actions">{(progress?.step ?? 1) > 1 && <button className="secondary" disabled={busy} onClick={previous}><span aria-hidden="true">← </span>{tr.previous}</button>}<button className="secondary" disabled={busy} onClick={restart}>{tr.restart}</button></div></section>
   return <section className="panel" aria-busy={busy}><p className="eyebrow">{tr.eyebrow}</p><h1>{tr.title}</h1><p className="muted">{pet ? tr.checkingFor(pet.name) : ''}{tr.choose}</p>
     {!pet && <label className="guest-species">{tr.whoFor}<select disabled={busy} value={species} onChange={(event) => { setSpecies(event.target.value as Species); setSymptom(''); setError('') }}><option value="dog">{t.species.dog}</option><option value="cat">{t.species.cat}</option></select></label>}
     <div className="symptoms">{checkSymptoms.filter((item) => !item.only || item.only === activeSpecies).map((item) => <button disabled={busy} aria-pressed={symptom === item.value} className={symptom === item.value ? 'selected' : ''} onClick={() => setSymptom(item.value)} key={item.value}>{t.symptoms[item.value]}<span aria-hidden="true">＋</span></button>)}</div>
+    {!pet && <fieldset className="guest-context" disabled={busy}><legend>{g.contextTitle}</legend><p className="muted">{g.contextHint}</p>
+      <label>{g.age}<select value={context.age_group} onChange={(event) => setContext({ ...context, age_group: event.target.value })}><option value="">{g.notSure}</option><option value="young">{g.young(species)}</option><option value="adult">{g.adult}</option><option value="senior">{g.senior}</option></select></label>
+      <label>{g.sex}<select value={context.sex} onChange={(event) => setContext({ ...context, sex: event.target.value })}><option value="">{g.notSure}</option><option value="female">{g.female}</option><option value="male">{g.male}</option></select></label>
+      <label>{g.neutered}<select value={context.neutered} onChange={(event) => setContext({ ...context, neutered: event.target.value })}><option value="">{g.notSure}</option><option value="yes">{t.common.yes}</option><option value="no">{t.common.no}</option></select></label>
+    </fieldset>}
     <button className="primary wide" disabled={!symptom || busy} onClick={begin}>{busy ? tr.starting : tr.continue}</button><ErrorNotice message={error} />
     <p className="fine-print">{tr.finePrint}</p>
     {!pet && <PrivacyNotice />}
@@ -302,7 +340,16 @@ function GuestControls({ session, token, expiresAt, disabled, onDeleted }: { ses
   const [status, setStatus] = useState('')
   const { t } = useI18n()
   const g = t.guest
-  return <div className="guest-controls"><p className="fine-print">{expiresAt ? g.expires(formatDate(expiresAt)) : ''}{g.closingLoses}</p><button className="secondary" disabled={disabled || busy} onClick={() => void run(async () => { downloadJson(await api.exportCheck(session, token), 'petadvice-guest-check.json'); setStatus(g.downloaded) })}>{g.download}</button><button className="secondary" disabled={disabled || busy} onClick={() => void run(async () => { await api.deleteGuestCheck(session, token); onDeleted() })}>{g.delete}</button><p role="status">{status}</p><ErrorNotice message={error} /></div>
+  // The readable summary is downloaded from the result; this is the raw guest record.
+  return <div className="guest-controls"><p className="fine-print">{expiresAt ? g.expires(formatDate(expiresAt)) : ''}{g.closingLoses}</p><div className="guest-actions"><button className="secondary" disabled={disabled || busy} onClick={() => void run(async () => { await api.deleteGuestCheck(session, token); onDeleted() })}>{g.delete}</button><button className="link-button" disabled={disabled || busy} onClick={() => void run(async () => { downloadJson(await api.exportCheck(session, token), 'petadvice-guest-check.json'); setStatus(g.downloaded) })}>{g.download}</button></div><p role="status">{status}</p><ErrorNotice message={error} /></div>
+}
+
+function LeaveCheckConfirm({ state, onLeave, onStay }: { state: CheckState; onLeave: () => void; onStay: () => void }) {
+  const { t } = useI18n()
+  const g = t.guest
+  const stay = useRef<HTMLButtonElement>(null)
+  useEffect(() => { window.scrollTo?.(0, 0); stay.current?.focus() }, [])
+  return <section className="leave-confirm" role="alertdialog" aria-labelledby="leave-check-title" aria-describedby="leave-check-body"><h2 id="leave-check-title">{g.leaveTitle}</h2><p id="leave-check-body">{state === 'result' ? g.leaveResultBody : g.leaveBody}</p><div className="leave-actions"><button ref={stay} className="primary" onClick={onStay}>{g.stay}</button><button className="secondary" onClick={onLeave}>{g.leave}</button></div></section>
 }
 
 function Sources({ sources }: { sources: string[] }) {

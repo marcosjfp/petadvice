@@ -82,6 +82,7 @@
       "applicable_neuter_status": [],
       "symptom_tags": ["diarrhea", "loose_stool"],
       "urgency_default": "monitor_home",
+      "life_stage_escalation": {"puppy": "vet_soon", "kitten": "vet_soon", "senior": "vet_soon"},
       "red_flags": [
         {"description": "Puppy or kitten, senior pet, or a pet with a known chronic illness", "escalates_to": "vet_soon"},
         {"description": "Blood in the stool, or black/tarry stool", "escalates_to": "vet_24h"},
@@ -223,6 +224,7 @@
       "applicable_neuter_status": [],
       "symptom_tags": ["limping", "favoring_a_leg"],
       "urgency_default": "monitor_home",
+      "life_stage_escalation": {"puppy": "vet_soon"},
       "red_flags": [
         {"description": "Puppy limping", "escalates_to": "vet_soon"},
         {"description": "Not putting any weight on the leg at all", "escalates_to": "vet_24h"},

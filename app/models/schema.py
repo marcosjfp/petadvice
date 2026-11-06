@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from datetime import date, datetime, timezone
 from enum import Enum
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, EmailStr, Field as PydanticField, field_validator
 from sqlalchemy import JSON, Column, Index, Enum as SAEnum
@@ -252,10 +252,22 @@ class PetCreate(BaseModel):
         return value
 
 
+GuestAgeGroup = Literal["young", "adult", "senior"]
+
+
+class GuestContext(BaseModel):
+    """Optional details a guest can give. None means "not sure" and keeps the cautious default."""
+    age_group: Optional[GuestAgeGroup] = None
+    sex: Optional[Sex] = None
+    neutered: Optional[bool] = None
+
+
 class TriageStartRequest(BaseModel):
     pet_id: Optional[str] = None
     symptom_tag: str = PydanticField(min_length=1, max_length=100)
     species: Species = Species.dog
+    # Used only for guest checks (pet_id is null); ignored for saved pets.
+    guest_context: Optional[GuestContext] = None
 
     @field_validator("species")
     @classmethod
@@ -268,6 +280,11 @@ class TriageStartRequest(BaseModel):
 class TriageAnswerRequest(BaseModel):
     question_id: str
     answer: str
+
+
+class TriageBackRequest(BaseModel):
+    # The question currently shown; the rewind only applies if it is still current.
+    question_id: str
 
 
 class ResultReason(BaseModel):
@@ -287,6 +304,8 @@ class ReportPet(BaseModel):
     species: Species
     date_of_birth: Optional[date] = None
     life_stage: Optional[str] = None
+    # Set only for guest checks: the age group the guest chose (young/adult/senior).
+    age_group: Optional[str] = None
     sex: Optional[Sex] = None
     neutered: Optional[bool] = None
     breed_size: Optional[BreedSize] = None
@@ -297,6 +316,11 @@ class RelatedCare(BaseModel):
     title: str
     description: str
     recurrence: Optional[str] = None
+
+
+class WatchSign(BaseModel):
+    description: str
+    urgency: UrgencyLevel
 
 
 class TriageResult(BaseModel):
@@ -317,6 +341,10 @@ class TriageResult(BaseModel):
     content_version: Optional[str] = None
     language: Optional[str] = None
     historical: bool = False
+    # Added later: defaults keep older snapshots valid.
+    watch_for: list[WatchSign] = PydanticField(default_factory=list)
+    recheck_advice: Optional[str] = None
+    context_notes: list[ResultReason] = PydanticField(default_factory=list)
 
 
 class OwnerLogin(BaseModel):

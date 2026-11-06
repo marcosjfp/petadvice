@@ -12,3 +12,12 @@ test('downloaded report escapes stored text and has no executable scripts or ext
   expect(html).toContain('Emergency veterinary care now')
   expect(html).toContain('test-version')
 })
+
+test('downloaded report includes signs to watch for, re-check advice and context notes in the recorded language', () => {
+  const html = reportHtml({ resulting_urgency: 'monitor_home', resulting_guidance: 'Vigila.', possible_causes: ['Primero', 'Segundo'], recommended_examinations: [], matched_condition_ids: [], language: 'es', watch_for: [{ description: 'Sangre en el <vómito>', urgency: 'emergency_now' }], recheck_advice: 'Si no mejora en 24-48 horas, contacta con tu veterinario.', context_notes: [{ kind: 'missing_context', detail: 'No se indicó el sexo.', urgency: 'emergency_now' }] })
+  expect(html).toContain('Vigila estos signos')
+  expect(html).toContain('Sangre en el &lt;vómito&gt; — Urgencia veterinaria ya')
+  expect(html).toContain('Si no mejora en 24-48 horas')
+  expect(html).toContain('No se indicó el sexo.')
+  expect(html.indexOf('Primero')).toBeLessThan(html.indexOf('Segundo'))
+})
