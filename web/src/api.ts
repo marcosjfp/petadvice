@@ -60,13 +60,19 @@ export type Question = { id: string; prompt: string; options: string[]; option_l
 export type TriageResult = {
   resulting_urgency: Urgency; resulting_guidance: string; matched_condition_ids: string[]; possible_causes: string[]; recommended_examinations: string[];
   session_id?: string; symptom?: string; started_at?: string | null; recorded_at?: string | null; historical?: boolean; content_version?: string | null; language?: string | null;
-  pet?: { name: string; species: Species; date_of_birth: string | null; life_stage: string | null; sex: string | null; neutered: boolean | null; breed_size: string | null } | null;
+  pet?: { name: string; species: Species; date_of_birth: string | null; life_stage: string | null; age_group?: GuestAgeGroup | null; sex: string | null; neutered: boolean | null; breed_size: string | null } | null;
   reasons?: { kind: string; detail: string; urgency: Urgency }[];
   answers?: { question_id: string; prompt: string; answer: string }[]; sources?: string[]; related_care?: CareGuide[];
+  // Added later; older saved checks do not have these.
+  watch_for?: { description: string; urgency: Urgency }[]; recheck_advice?: string | null; context_notes?: { kind: string; detail: string; urgency: Urgency }[];
 }
 export type CheckHistory = { checks: { session_id: string; started_at: string; symptom: string; complete: boolean; urgency: Urgency | null }[]; next_cursor: string | null }
-export type TriageStart = { session_id: string; next_question: Question | null; flow_complete: boolean; guest_token?: string | null; expires_at?: string | null }
-export type TriageAnswer = { next_question: Question | null; flow_complete: boolean }
+export type GuestAgeGroup = 'young' | 'adult' | 'senior'
+// null means "not sure"; the check then keeps its cautious default.
+export type GuestContext = { age_group: GuestAgeGroup | null; sex: 'female' | 'male' | null; neutered: boolean | null }
+export type Progress = { step: number; max_steps: number }
+export type TriageStart = { session_id: string; next_question: Question | null; flow_complete: boolean; guest_token?: string | null; expires_at?: string | null; progress?: Progress | null }
+export type TriageAnswer = { next_question: Question | null; flow_complete: boolean; progress?: Progress | null }
 export type Owner = { id: string; email: string; email_verified_at?: string | null; email_verification_required?: boolean }
 export type Privacy = { status: string; operator: string | null; contact: string | null; policy_url: string | null; policy_version: string; guest_retention_hours: number; account_retention: string; backup_retention: string }
 const guestHeaders = (token?: string | null) => token ? { 'X-Guest-Token': token } : undefined
@@ -89,8 +95,9 @@ export const api = {
   listPets: () => request<Pet[]>('/pets'),
   listConditions: (species: Species) => request<Condition[]>(`/conditions?${new URLSearchParams({ species })}`),
   listPreventive: (species: Species, lifeStage?: string | null) => request<PreventiveCareItem[]>(`/preventive-care?${new URLSearchParams({ species, ...(lifeStage ? { life_stage: lifeStage } : {}) })}`),
-  startTriage: (petId: string | null, symptom: string, species: Species = 'dog') => request<TriageStart>('/triage/start', { method: 'POST', body: JSON.stringify({ pet_id: petId, symptom_tag: symptom, species }) }),
+  startTriage: (petId: string | null, symptom: string, species: Species = 'dog', guestContext?: GuestContext) => request<TriageStart>('/triage/start', { method: 'POST', body: JSON.stringify({ pet_id: petId, symptom_tag: symptom, species, ...(guestContext ? { guest_context: guestContext } : {}) }) }),
   answer: (sessionId: string, questionId: string, answer: string, guestToken?: string | null) => request<TriageAnswer>(`/triage/${encodeURIComponent(sessionId)}/answer`, { method: 'POST', headers: guestHeaders(guestToken), body: JSON.stringify({ question_id: questionId, answer }) }),
+  back: (sessionId: string, currentQuestionId: string, guestToken?: string | null) => request<TriageAnswer>(`/triage/${encodeURIComponent(sessionId)}/back`, { method: 'POST', headers: guestHeaders(guestToken), body: JSON.stringify({ question_id: currentQuestionId }) }),
   result: (sessionId: string, guestToken?: string | null) => request<TriageResult>(`/triage/${encodeURIComponent(sessionId)}/result`, { headers: guestHeaders(guestToken) }),
   history: (petId: string, before?: string) => request<CheckHistory>(`/triage/history/${encodeURIComponent(petId)}${before ? `?${new URLSearchParams({ before })}` : ''}`),
   exportCheck: (sessionId: string, guestToken: string) => request<unknown>(`/triage/${encodeURIComponent(sessionId)}/export`, { headers: guestHeaders(guestToken) }),

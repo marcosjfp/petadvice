@@ -7,7 +7,7 @@ from sqlmodel import Session, select
 from app.content.loader import content_library
 from app.db import get_session
 from app.i18n import request_language
-from app.models.schema import GuestAccess, Owner, Pet, TriageAnswerRequest, TriageSession, TriageStartRequest
+from app.models.schema import GuestAccess, Owner, Pet, TriageAnswerRequest, TriageBackRequest, TriageSession, TriageStartRequest
 from app.services import triage_engine
 from app.services.auth import as_utc, get_current_owner, get_optional_owner, utcnow, verify_auth_origin
 from app.services.account_actions import token_hash
@@ -73,7 +73,7 @@ def start_triage(
     if payload.pet_id is None:
         if current_owner is not None:
             raise HTTPException(status_code=422, detail="pet_id is required for an account check")
-        pet = Pet(name="Guest pet", species=payload.species)
+        pet = triage_engine.apply_guest_context(Pet(name="Guest pet", species=payload.species), payload.guest_context)
         db.add(pet)
         db.commit()
         db.refresh(pet)
@@ -91,7 +91,7 @@ def start_triage(
         expires_at = utcnow() + timedelta(hours=get_settings().guest_retention_hours)
         db.add(GuestAccess(session_id=session.id, token_hash=token_hash(guest_token), expires_at=expires_at))
         db.commit()
-    return {"session_id": session.id, "next_question": content_library.present_question(first_question, request_language(request)), "flow_complete": first_question is None, 'guest_token': guest_token, 'expires_at': expires_at}
+    return {"session_id": session.id, "next_question": content_library.present_question(first_question, request_language(request)), "flow_complete": first_question is None, 'guest_token': guest_token, 'expires_at': expires_at, 'progress': triage_engine.progress(session)}
 
 
 @router.post("/{session_id}/answer", dependencies=[Depends(limit_requests('triage-answer', '120/minute'))])
@@ -104,12 +104,31 @@ def answer_triage(
 ):
     _verify_session_ownership(db, session_id, current_owner, request)
     try:
-        _, next_question, flow_complete = triage_engine.answer_question(db, session_id, payload)
+        session, next_question, flow_complete = triage_engine.answer_question(db, session_id, payload)
     except triage_engine.UnknownSessionError:
         raise HTTPException(status_code=404, detail="Triage session not found")
     except triage_engine.InvalidAnswerError:
         raise HTTPException(status_code=422, detail="Answer is not valid for this question")
-    return {"next_question": content_library.present_question(next_question, request_language(request)), "flow_complete": flow_complete}
+    return {"next_question": content_library.present_question(next_question, request_language(request)), "flow_complete": flow_complete, 'progress': triage_engine.progress(session)}
+
+
+@router.post("/{session_id}/back", dependencies=[Depends(limit_requests('triage-answer', '120/minute'))])
+def go_back_triage(
+    session_id: str,
+    payload: TriageBackRequest,
+    request: Request,
+    current_owner: Owner | None = Depends(get_optional_owner),
+    db: Session = Depends(get_session),
+):
+    """Return to the previous question of an unfinished check, discarding its answer."""
+    _verify_session_ownership(db, session_id, current_owner, request)
+    try:
+        session, question = triage_engine.go_back(db, session_id, payload.question_id)
+    except triage_engine.UnknownSessionError:
+        raise HTTPException(status_code=404, detail="Triage session not found")
+    except triage_engine.InvalidAnswerError:
+        raise HTTPException(status_code=409, detail="This check cannot go back from here")
+    return {"next_question": content_library.present_question(question, request_language(request)), "flow_complete": False, 'progress': triage_engine.progress(session)}
 
 
 @router.get("/{session_id}/result")

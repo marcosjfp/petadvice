@@ -88,10 +88,17 @@ const en = {
     eyebrow: 'A calmer next step', title: 'What have you noticed?', checkingFor: (name: string) => `Checking symptoms for ${name}. `,
     choose: 'Choose the closest match. This check gives urgency guidance, not a diagnosis.', whoFor: 'Who is this check for?', starting: 'Starting your check…', continue: 'Continue',
     finePrint: 'Cannot find the symptom? Contact your veterinary practice. Breathing trouble or collapse needs emergency care immediately.',
+    questionStep: (step: number, total?: number | null) => total ? `Question ${step} of ${total}` : `Question ${step}`,
+    previous: 'Previous question', goingBack: 'Going back…',
   },
   guest: {
-    expires: (date: string) => `This guest check expires ${date}. `, closingLoses: 'Closing this page loses access. Download a copy to keep it.',
-    download: 'Download this guest check', downloaded: 'Your guest check has been downloaded.', delete: 'Delete this guest check',
+    expires: (date: string) => `This guest check expires ${date}. `, closingLoses: 'Closing this page loses access. Download the summary to keep it.',
+    download: 'Download raw data (JSON)', downloaded: 'The raw data file has been downloaded.', delete: 'Delete this guest check',
+    contextTitle: 'About your pet (optional)', contextHint: 'Some guidance depends on age, sex or spay/neuter status. Choose “Not sure” if you do not know.',
+    age: 'Age', young: (species: string): string => species === 'cat' ? 'Kitten' : 'Puppy', adult: 'Adult', senior: 'Senior', notSure: 'Not sure',
+    sex: 'Sex', female: 'Female', male: 'Male', neutered: 'Spayed or neutered',
+    leaveTitle: 'Leave this check?', leaveBody: 'Guest checks are not saved. If you leave now, the answers and guidance for this check will be lost.',
+    leaveResultBody: 'This guest check is not saved. Download the summary first if you want to keep it.', leave: 'Leave this check', stay: 'Stay on this check',
   },
   library: {
     eyebrow: 'Reference library', title: 'Plain-language starting points', muted: 'Information for conversations with your vet. Beta content awaits veterinary review.',
@@ -125,6 +132,7 @@ const en = {
     howDecided: 'How this was decided', answers: 'Your recorded answers', noAnswers: 'No questionnaire answers were recorded.',
     careGuides: 'Care guides for this situation', causes: 'Possible causes to discuss with your vet', exams: 'Your vet may want to check', sources: 'Sources recorded with this check',
     contentVersion: (version: string) => `Content version: ${version}`, contentVersionMissing: 'Not recorded for this older check',
+    watchFor: 'Watch for these signs — contact a vet if…', contextNotes: 'Details that could change this guidance', adult: 'adult', technicalInfo: 'Technical information',
     print: 'Print / save PDF', downloadSummary: 'Download summary', summaryStays: 'The downloaded summary stays on your device. Share it only with someone you choose.',
     explanationGap: 'The original rule explanations were not recorded for this check.',
     historicalNotice: 'This is a saved check, not a new assessment. Older checks may not include the original pet context, sources or question wording.',
@@ -232,10 +240,17 @@ const pt: Messages = {
     eyebrow: 'Um próximo passo com mais calma', title: 'O que notou?', checkingFor: (name) => `A verificar sintomas de ${name}. `,
     choose: 'Escolha a opção mais próxima. Esta verificação indica a urgência, não faz um diagnóstico.', whoFor: 'Para quem é esta verificação?', starting: 'A iniciar a verificação…', continue: 'Continuar',
     finePrint: 'Não encontra o sintoma? Contacte o seu veterinário. Dificuldade em respirar ou colapso precisam de urgência imediata.',
+    questionStep: (step, total) => total ? `Pergunta ${step} de ${total}` : `Pergunta ${step}`,
+    previous: 'Pergunta anterior', goingBack: 'A voltar atrás…',
   },
   guest: {
-    expires: (date) => `Esta verificação de convidado expira a ${date}. `, closingLoses: 'Fechar esta página faz perder o acesso. Descarregue uma cópia para a guardar.',
-    download: 'Descarregar esta verificação', downloaded: 'A sua verificação de convidado foi descarregada.', delete: 'Apagar esta verificação',
+    expires: (date) => `Esta verificação de convidado expira a ${date}. `, closingLoses: 'Fechar esta página faz perder o acesso. Descarregue o resumo para o guardar.',
+    download: 'Descarregar dados em bruto (JSON)', downloaded: 'O ficheiro de dados em bruto foi descarregado.', delete: 'Apagar esta verificação',
+    contextTitle: 'Sobre o seu animal (opcional)', contextHint: 'Algumas orientações dependem da idade, do sexo ou da esterilização. Escolha «Não sei» se não souber.',
+    age: 'Idade', young: (species) => species === 'cat' ? 'Gatinho' : 'Cachorro', adult: 'Adulto', senior: 'Sénior', notSure: 'Não sei',
+    sex: 'Sexo', female: 'Fêmea', male: 'Macho', neutered: 'Esterilizado ou castrado',
+    leaveTitle: 'Sair desta verificação?', leaveBody: 'As verificações de convidado não são guardadas. Se sair agora, as respostas e orientações desta verificação perdem-se.',
+    leaveResultBody: 'Esta verificação de convidado não está guardada. Descarregue primeiro o resumo se a quiser manter.', leave: 'Sair desta verificação', stay: 'Continuar nesta verificação',
   },
   library: {
     eyebrow: 'Biblioteca de referência', title: 'Pontos de partida em linguagem simples', muted: 'Informação para conversar com o seu veterinário. O conteúdo beta aguarda revisão veterinária.',
@@ -269,6 +284,7 @@ const pt: Messages = {
     howDecided: 'Como foi decidido', answers: 'As suas respostas registadas', noAnswers: 'Não foram registadas respostas ao questionário.',
     careGuides: 'Guias de cuidados para esta situação', causes: 'Causas possíveis para falar com o veterinário', exams: 'O veterinário pode querer verificar', sources: 'Fontes registadas com esta verificação',
     contentVersion: (version) => `Versão do conteúdo: ${version}`, contentVersionMissing: 'Não registada nesta verificação mais antiga',
+    watchFor: 'Esteja atento a estes sinais — contacte um veterinário se…', contextNotes: 'Dados que podem mudar esta orientação', adult: 'adulto', technicalInfo: 'Informação técnica',
     print: 'Imprimir / guardar PDF', downloadSummary: 'Descarregar resumo', summaryStays: 'O resumo descarregado fica no seu dispositivo. Partilhe-o apenas com quem escolher.',
     explanationGap: 'As explicações originais das regras não foram registadas nesta verificação.',
     historicalNotice: 'Esta é uma verificação guardada, não uma nova avaliação. As verificações mais antigas podem não incluir o contexto original do animal, as fontes ou o texto das perguntas.',
@@ -308,6 +324,7 @@ const pt: Messages = {
     'Triage session not found': 'Verificação não encontrada',
     'Complete the remaining questions before viewing guidance': 'Responda às perguntas que faltam antes de ver as orientações',
     'Answer is not valid for this question': 'A resposta não é válida para esta pergunta',
+    'This check cannot go back from here': 'Esta verificação não pode voltar atrás a partir daqui',
     'This symptom is not supported. Contact your veterinary practice for guidance.': 'Este sintoma não é suportado. Contacte o seu veterinário para orientação.',
     'An unexpected error occurred. Try again shortly.': 'Ocorreu um erro inesperado. Tente novamente daqui a pouco.',
     'Date of birth cannot be in the future': 'A data de nascimento não pode ser no futuro',
@@ -399,10 +416,17 @@ const es: Messages = {
     eyebrow: 'Un siguiente paso con más calma', title: '¿Qué has notado?', checkingFor: (name) => `Revisando síntomas de ${name}. `,
     choose: 'Elige la opción más parecida. Esta revisión orienta sobre la urgencia, no es un diagnóstico.', whoFor: '¿Para quién es esta revisión?', starting: 'Iniciando la revisión…', continue: 'Continuar',
     finePrint: '¿No encuentras el síntoma? Contacta con tu clínica veterinaria. La dificultad para respirar o un colapso necesitan urgencias de inmediato.',
+    questionStep: (step, total) => total ? `Pregunta ${step} de ${total}` : `Pregunta ${step}`,
+    previous: 'Pregunta anterior', goingBack: 'Volviendo atrás…',
   },
   guest: {
-    expires: (date) => `Esta revisión de invitado caduca el ${date}. `, closingLoses: 'Si cierras esta página, pierdes el acceso. Descarga una copia para conservarla.',
-    download: 'Descargar esta revisión', downloaded: 'Se ha descargado tu revisión de invitado.', delete: 'Eliminar esta revisión',
+    expires: (date) => `Esta revisión de invitado caduca el ${date}. `, closingLoses: 'Si cierras esta página, pierdes el acceso. Descarga el resumen para conservarla.',
+    download: 'Descargar datos en bruto (JSON)', downloaded: 'Se ha descargado el archivo de datos en bruto.', delete: 'Eliminar esta revisión',
+    contextTitle: 'Sobre tu mascota (opcional)', contextHint: 'Parte de la orientación depende de la edad, el sexo o la esterilización. Elige «No lo sé» si no lo sabes.',
+    age: 'Edad', young: (species) => species === 'cat' ? 'Gatito' : 'Cachorro', adult: 'Adulto', senior: 'Sénior', notSure: 'No lo sé',
+    sex: 'Sexo', female: 'Hembra', male: 'Macho', neutered: 'Esterilizado o castrado',
+    leaveTitle: '¿Salir de esta revisión?', leaveBody: 'Las revisiones de invitado no se guardan. Si sales ahora, se perderán las respuestas y la orientación de esta revisión.',
+    leaveResultBody: 'Esta revisión de invitado no está guardada. Descarga primero el resumen si quieres conservarla.', leave: 'Salir de esta revisión', stay: 'Seguir en esta revisión',
   },
   library: {
     eyebrow: 'Biblioteca de consulta', title: 'Puntos de partida en lenguaje sencillo', muted: 'Información para hablar con tu veterinario. El contenido beta está pendiente de revisión veterinaria.',
@@ -436,6 +460,7 @@ const es: Messages = {
     howDecided: 'Cómo se ha decidido', answers: 'Tus respuestas registradas', noAnswers: 'No se registraron respuestas al cuestionario.',
     careGuides: 'Guías de cuidados para esta situación', causes: 'Posibles causas para comentar con tu veterinario', exams: 'Tu veterinario puede querer revisar', sources: 'Fuentes registradas con esta revisión',
     contentVersion: (version) => `Versión del contenido: ${version}`, contentVersionMissing: 'No registrada en esta revisión antigua',
+    watchFor: 'Vigila estos signos — contacta con un veterinario si…', contextNotes: 'Datos que pueden cambiar esta orientación', adult: 'adulto', technicalInfo: 'Información técnica',
     print: 'Imprimir / guardar PDF', downloadSummary: 'Descargar resumen', summaryStays: 'El resumen descargado se queda en tu dispositivo. Compártelo solo con quien tú elijas.',
     explanationGap: 'Las explicaciones originales de las reglas no se registraron en esta revisión.',
     historicalNotice: 'Esta es una revisión guardada, no una nueva valoración. Las revisiones antiguas pueden no incluir el contexto original de la mascota, las fuentes o el texto de las preguntas.',
@@ -475,6 +500,7 @@ const es: Messages = {
     'Triage session not found': 'Revisión no encontrada',
     'Complete the remaining questions before viewing guidance': 'Responde a las preguntas que faltan antes de ver la orientación',
     'Answer is not valid for this question': 'La respuesta no es válida para esta pregunta',
+    'This check cannot go back from here': 'Esta revisión no puede volver atrás desde aquí',
     'This symptom is not supported. Contact your veterinary practice for guidance.': 'Este síntoma no está disponible. Contacta con tu clínica veterinaria para que te oriente.',
     'An unexpected error occurred. Try again shortly.': 'Se ha producido un error inesperado. Inténtalo en un momento.',
     'Date of birth cannot be in the future': 'La fecha de nacimiento no puede ser futura',
@@ -525,7 +551,8 @@ export function translations(language: Language = current): Messages { return me
 
 export function serverText(text: string): string { return messages[current].server[text] ?? text }
 
-export function formatDate(value: string): string { return new Date(value).toLocaleString(dateLocales[current]) }
+// Date and time to the minute; seconds add noise to reports and expiry notices.
+export function formatDate(value: string): string { return new Date(value).toLocaleString(dateLocales[current], { dateStyle: 'medium', timeStyle: 'short' }) }
 
 export function readable(value: string) { return value.replaceAll('_', ' ') }
 

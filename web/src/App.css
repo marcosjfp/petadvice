@@ -269,3 +269,26 @@ header > .language-switch + .header-actions, header > .language-switch + .cancel
 .update-notice button { border: 0; border-radius: 999px; padding: 8px 14px; background: #fff; color: var(--green); -webkit-text-fill-color: var(--green); font: inherit; font-weight: 700; cursor: pointer; }
 .update-notice .update-dismiss { padding: 4px 10px; background: transparent; color: #fff; -webkit-text-fill-color: #fff; font-size: 20px; line-height: 1; }
 @media print { .update-notice { display: none; } }
+
+/* Symptom check: guest context, question navigation, result follow-ups */
+.guest-context { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px 16px; margin: 24px 0 0; padding: 18px; border: 1px solid var(--line); border-radius: 10px; }
+.guest-context legend { font-weight: 700; padding: 0 6px; }
+.guest-context .muted { grid-column: 1 / -1; margin: 0; font-size: 14px; }
+.guest-context label { display: grid; gap: 7px; color: var(--muted); font-size: 13px; font-weight: 700; }
+.guest-context select { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 6px; background: white; color: var(--ink); }
+.question h1.long-prompt { font-size: 30px; line-height: 1.15; }
+@media (max-width: 650px) { .question h1.long-prompt { font-size: 25px; } }
+.question-actions, .guest-actions, .leave-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 25px; }
+.question-actions .secondary, .guest-actions .secondary, .leave-actions .secondary { margin-top: 0; }
+.link-button { border: 0; background: none; padding: 8px 4px; color: var(--green); text-decoration: underline; font: inherit; font-size: 14px; cursor: pointer; }
+.link-button:disabled { opacity: .5; cursor: not-allowed; }
+.report-controls > button + button { margin-left: 12px; }
+.watch-for ul, .context-notes ul { padding-left: 1.2em; }
+.watch-for li, .context-notes li { margin-bottom: 6px; }
+.context-notes { padding: 18px 22px; border: 1px solid #e9c08a; border-radius: 12px; background: #fff8ec; }
+.technical-info { margin-top: 12px; color: var(--muted); font-size: 13px; }
+.technical-info summary { cursor: pointer; }
+.leave-confirm { margin: 20px 0; padding: 20px 22px; border: 2px solid var(--coral); border-radius: 12px; background: #fff; }
+.leave-confirm h2 { margin: 0 0 8px; font-size: 1.5rem; }
+@media (max-width: 650px) { .report-controls > button + button { margin-left: 0; margin-top: 12px; } }
+@media print { .technical-info:not([open]) { display: none; } }

@@ -8,7 +8,7 @@ import { setLanguage } from './i18n'
 vi.mock('./api', async (importOriginal) => {
   const original = await importOriginal<typeof import('./api')>()
   return { ...original, api: {
-    history: vi.fn(), getMe: vi.fn(), listPets: vi.fn(), startTriage: vi.fn(), answer: vi.fn(), result: vi.fn(),
+    history: vi.fn(), getMe: vi.fn(), listPets: vi.fn(), startTriage: vi.fn(), answer: vi.fn(), back: vi.fn(), result: vi.fn(),
     listPreventive: vi.fn(), listConditions: vi.fn(), createPet: vi.fn(), logout: vi.fn(),
     login: vi.fn(), signup: vi.fn(), exportMyData: vi.fn(), deleteMyAccount: vi.fn(),
     privacy: vi.fn(), forgotPassword: vi.fn(), resendVerification: vi.fn(), verifyEmail: vi.fn(), resetPassword: vi.fn(), reauthenticate: vi.fn(), logoutAll: vi.fn(), exportCheck: vi.fn(), deleteGuestCheck: vi.fn(),
@@ -22,6 +22,7 @@ beforeEach(() => {
   setLanguage('en')
   vi.unstubAllEnvs()
   vi.resetAllMocks()
+  vi.spyOn(window, 'scrollTo').mockImplementation(() => {})  // Not implemented by jsdom.
   vi.mocked(api.history).mockResolvedValue({ checks: [], next_cursor: null })
   vi.mocked(api.getMe).mockResolvedValue({ id: 'owner', email: 'test@example.com' })
   vi.mocked(api.listPets).mockResolvedValue(pets)
@@ -292,7 +293,7 @@ test('guests can go from a Learn entry to a check and see related care guides in
   expect(screen.getByText('Treat a flea infestation in your home')).toBeVisible()
   await user.click(screen.getByRole('button', { name: /Start a check: Scratching or fleas/ }))
   await user.click(await screen.findByRole('button', { name: 'Continue' }))
-  expect(api.startTriage).toHaveBeenCalledWith(null, 'scratching', 'dog')
+  expect(api.startTriage).toHaveBeenCalledWith(null, 'scratching', 'dog', { age_group: null, sex: null, neutered: null })
   expect(await screen.findByRole('heading', { name: 'Care guides for this situation' })).toBeInTheDocument()
   await user.click(screen.getByText('Treat a flea infestation in your home'))
   expect(screen.getByText('Vacuum daily.')).toBeVisible()
