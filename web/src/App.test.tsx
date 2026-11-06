@@ -9,7 +9,7 @@ vi.mock('./api', async (importOriginal) => {
   const original = await importOriginal<typeof import('./api')>()
   return { ...original, api: {
     history: vi.fn(), getMe: vi.fn(), listPets: vi.fn(), startTriage: vi.fn(), answer: vi.fn(), result: vi.fn(),
-    listPreventive: vi.fn(), listConditions: vi.fn(), createPet: vi.fn(), logout: vi.fn(),
+    listPreventive: vi.fn(), listConditions: vi.fn(), createPet: vi.fn(), updatePet: vi.fn(), deletePet: vi.fn(), logout: vi.fn(),
     login: vi.fn(), signup: vi.fn(), exportMyData: vi.fn(), deleteMyAccount: vi.fn(),
     privacy: vi.fn(), forgotPassword: vi.fn(), resendVerification: vi.fn(), verifyEmail: vi.fn(), resetPassword: vi.fn(), reauthenticate: vi.fn(), logoutAll: vi.fn(), exportCheck: vi.fn(), deleteGuestCheck: vi.fn(),
   } }
@@ -22,6 +22,8 @@ beforeEach(() => {
   setLanguage('en')
   vi.unstubAllEnvs()
   vi.resetAllMocks()
+  localStorage.removeItem('petadvice_signed_in_hint')
+  vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
   vi.mocked(api.history).mockResolvedValue({ checks: [], next_cursor: null })
   vi.mocked(api.getMe).mockResolvedValue({ id: 'owner', email: 'test@example.com' })
   vi.mocked(api.listPets).mockResolvedValue(pets)
@@ -296,4 +298,108 @@ test('guests can go from a Learn entry to a check and see related care guides in
   expect(await screen.findByRole('heading', { name: 'Care guides for this situation' })).toBeInTheDocument()
   await user.click(screen.getByText('Treat a flea infestation in your home'))
   expect(screen.getByText('Vacuum daily.')).toBeVisible()
+})
+
+test('a first visit shows the landing while the session check runs, then switches to a found account', async () => {
+  let resolveMe: (owner: { id: string; email: string }) => void = () => {}
+  vi.mocked(api.getMe).mockReturnValue(new Promise((resolve) => { resolveMe = resolve }))
+  render(<App />)
+  expect(screen.getByRole('button', { name: /Start a quick check/ })).toBeVisible()
+  expect(screen.queryByText('Loading your account…')).not.toBeInTheDocument()
+  resolveMe({ id: 'owner', email: 'test@example.com' })
+  expect(await screen.findByRole('combobox', { name: 'Change active pet' })).toBeInTheDocument()
+  expect(localStorage.getItem('petadvice_signed_in_hint')).toBe('1')
+})
+
+test('a remembered sign-in shows loading, and an expired session clears the hint and shows the landing', async () => {
+  const { ApiError } = await import('./api')
+  localStorage.setItem('petadvice_signed_in_hint', '1')
+  let rejectMe: (error: Error) => void = () => {}
+  vi.mocked(api.getMe).mockReturnValue(new Promise((_, reject) => { rejectMe = reject }))
+  render(<App />)
+  expect(screen.getByText('Loading your account…')).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: /Start a quick check/ })).not.toBeInTheDocument()
+  rejectMe(new ApiError('Not authenticated', 401))
+  expect(await screen.findByRole('button', { name: /Start a quick check/ })).toBeVisible()
+  expect(localStorage.getItem('petadvice_signed_in_hint')).toBeNull()
+})
+
+test('logging out forgets the signed-in hint', async () => {
+  vi.mocked(api.logout).mockResolvedValue({ status: 'logged out' })
+  const user = userEvent.setup()
+  render(<App />)
+  await user.click(await screen.findByRole('button', { name: 'Log out' }))
+  expect(await screen.findByRole('button', { name: /Start a quick check/ })).toBeVisible()
+  expect(localStorage.getItem('petadvice_signed_in_hint')).toBeNull()
+})
+
+test('changing view scrolls to the top and moves focus to the new heading', async () => {
+  const user = userEvent.setup()
+  vi.mocked(api.listConditions).mockResolvedValue([])
+  render(<App />)
+  await user.click(await screen.findByRole('button', { name: 'Learn' }))
+  expect(window.scrollTo).toHaveBeenCalledWith(0, 0)
+  expect(screen.getByRole('heading', { level: 1, name: 'Plain-language starting points' })).toHaveFocus()
+  expect(screen.getByRole('button', { name: 'Learn' })).toHaveAttribute('aria-current', 'page')
+})
+
+test('a pet can be edited from Account and the life stage updates', async () => {
+  vi.mocked(api.updatePet).mockResolvedValue({ ...pets[0], name: 'Rexy', date_of_birth: '2015-01-01', life_stage: 'senior' })
+  const user = userEvent.setup()
+  render(<App />)
+  await user.click(await screen.findByRole('button', { name: 'Account' }))
+  await user.click(screen.getByRole('button', { name: 'Edit Rex' }))
+  expect(screen.getByRole('heading', { name: 'Update Rex’s details.' })).toHaveFocus()
+  expect(screen.getByRole('combobox', { name: 'Species' })).toBeDisabled()
+  const name = screen.getByRole('textbox', { name: 'Pet name' })
+  expect(name).toHaveValue('Rex')
+  await user.clear(name)
+  await user.type(name, 'Rexy')
+  await user.click(screen.getByRole('button', { name: 'Save changes' }))
+  expect(api.updatePet).toHaveBeenCalledWith('dog', { name: 'Rexy', date_of_birth: null, sex: null, neutered: null, breed_size: null })
+  expect(await screen.findByText('Rexy’s details were saved.')).toBeInTheDocument()
+  expect(screen.getByText('senior', { selector: '.pet-switcher-copy small' })).toBeInTheDocument()
+})
+
+test('deleting a pet asks for the password in the page and removes the pet', async () => {
+  const confirm = vi.spyOn(window, 'confirm')
+  vi.mocked(api.reauthenticate).mockResolvedValue({ status: 'confirmed' })
+  vi.mocked(api.deletePet).mockResolvedValue({ status: 'deleted' })
+  const user = userEvent.setup()
+  render(<App />)
+  await user.click(await screen.findByRole('button', { name: 'Account' }))
+  await user.click(screen.getByRole('button', { name: 'Delete Rex…' }))
+  expect(screen.getByRole('alert')).toHaveTextContent('all of Rex’s saved checks')
+  const password = screen.getByLabelText('Confirm your password to delete Rex')
+  expect(password).toHaveFocus()
+  expect(screen.getByRole('button', { name: 'Permanently delete Rex' })).toBeDisabled()
+  await user.type(password, 'correct-passphrase')
+  await user.click(screen.getByRole('button', { name: 'Permanently delete Rex' }))
+  expect(await screen.findByText('Rex’s profile was deleted.')).toBeInTheDocument()
+  expect(api.reauthenticate).toHaveBeenCalledWith('correct-passphrase')
+  expect(api.deletePet).toHaveBeenCalledWith('dog')
+  expect(screen.queryByRole('button', { name: 'Edit Rex' })).not.toBeInTheDocument()
+  expect(screen.getByRole('combobox', { name: 'Change active pet' })).toHaveValue('cat')
+  expect(confirm).not.toHaveBeenCalled()
+})
+
+test('library category chips filter entries and show counts', async () => {
+  const entry = { urgency_default: 'monitor_home' as const, home_care_guidance: null, prevention_tips: null, red_flags: [], sources: [], vet_reviewed_by: null, last_reviewed_date: null }
+  vi.mocked(api.listConditions).mockResolvedValue([
+    { ...entry, id: 'c1', name: 'Vomiting', category: 'gastrointestinal' },
+    { ...entry, id: 'c2', name: 'Diarrhoea', category: 'gastrointestinal' },
+    { ...entry, id: 'c3', name: 'Itchy skin', category: 'dermatological' },
+  ])
+  const user = userEvent.setup()
+  render(<App />)
+  await user.click(await screen.findByRole('button', { name: 'Learn' }))
+  const chips = await screen.findByRole('group', { name: 'Filter by category' })
+  expect(chips).toHaveTextContent('All 3')
+  await user.click(screen.getByRole('button', { name: 'skin 1' }))
+  expect(screen.getByRole('button', { name: 'skin 1' })).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.getByText('Itchy skin')).toBeInTheDocument()
+  expect(screen.queryByText('Diarrhoea')).not.toBeInTheDocument()
+  expect(screen.getByText('1 entry')).toBeInTheDocument()
+  await user.click(screen.getByRole('button', { name: 'All 3' }))
+  expect(screen.getByText('3 entries')).toBeInTheDocument()
 })

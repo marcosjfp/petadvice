@@ -45,8 +45,9 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
 export type Species = 'dog' | 'cat'
 export type Urgency = 'monitor_home' | 'vet_soon' | 'vet_24h' | 'emergency_now'
-export type Pet = { id: string; name: string; species: Species; life_stage?: string | null }
+export type Pet = { id: string; name: string; species: Species; life_stage?: string | null; date_of_birth?: string | null; sex?: string | null; neutered?: boolean | null; breed_size?: string | null }
 export type PetCreate = { name: string; species: Species; date_of_birth: string | null; sex: string | null; neutered: boolean | null; breed_size: string | null; environment_factors: string[] }
+export type PetUpdate = Partial<Omit<PetCreate, 'environment_factors'>>
 export type Condition = {
   id: string; name: string; category: string; urgency_default: Urgency;
   home_care_guidance: string | null; prevention_tips: string | null;
@@ -87,6 +88,8 @@ export const api = {
   deleteMyAccount: () => request('/auth/me', { method: 'DELETE' }),
   createPet: (payload: PetCreate) => request<Pet>('/pets', { method: 'POST', body: JSON.stringify(payload) }),
   listPets: () => request<Pet[]>('/pets'),
+  updatePet: (petId: string, payload: PetUpdate) => request<Pet>(`/pets/${encodeURIComponent(petId)}`, { method: 'PATCH', body: JSON.stringify(payload) }),
+  deletePet: (petId: string) => request<{ status: string }>(`/pets/${encodeURIComponent(petId)}`, { method: 'DELETE' }),
   listConditions: (species: Species) => request<Condition[]>(`/conditions?${new URLSearchParams({ species })}`),
   listPreventive: (species: Species, lifeStage?: string | null) => request<PreventiveCareItem[]>(`/preventive-care?${new URLSearchParams({ species, ...(lifeStage ? { life_stage: lifeStage } : {}) })}`),
   startTriage: (petId: string | null, symptom: string, species: Species = 'dog') => request<TriageStart>('/triage/start', { method: 'POST', body: JSON.stringify({ pet_id: petId, symptom_tag: symptom, species }) }),
