@@ -438,3 +438,12 @@ header > .language-switch + .header-actions, header > .language-switch + .cancel
 @media (max-width: 650px), (max-width: 950px) and (max-height: 500px) {
   .intro-more .secondary { flex: 1 1 auto; }
 }
+/* Symptom picker: grouped, emergencies first, single choice. */
+.symptom-group { margin-top: 22px; }
+.symptom-group h2 { margin: 0 0 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.symptom-group.urgent h2 { color: var(--coral); }
+.symptom-group.urgent .symptoms button { border-color: #e7b3a6; background: #fff6f3; }
+.symptom-group .symptoms { margin-top: 0; }
+.choice-mark { flex: none; width: 18px; height: 18px; border: 2px solid var(--line); border-radius: 50%; background: #fff; }
+.symptoms button[aria-pressed=true] .choice-mark { border: 5px solid var(--green); }
+.symptom-group.urgent .symptoms button:hover, .symptom-group.urgent .symptoms button.selected { border-color: var(--green); background: var(--mint); }

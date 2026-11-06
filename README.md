@@ -20,14 +20,17 @@ The beta runs on Vercel, Supabase PostgreSQL and Upstash Redis/QStash. Deploymen
 - Email verification and single-use password recovery for fully configured deployments; these features are disabled in the live tester beta.
 - Public Learn and Care pages for dogs and cats, including symptom search and life-stage information.
 - English, Portuguese (Portugal) and Spanish (Spain). The interface language is chosen from the header selector or the browser language. Clinical content translations live in `app/content/translations/`; triage answers are always stored as the canonical English option, so urgency rules are identical in every language. A check's report is saved in the language used when its guidance was first shown.
-- Multiple pet profiles and private, paginated check history.
+- Multiple pet profiles (editable and deletable) and private, paginated check history.
+- 18 symptom checks grouped by area, with emergencies first (poisoning, bloat, heatstroke, straining to urinate). Guests can give optional age, sex and spay/neuter status so age- and sex-specific rules apply; unknown details never lower urgency and the result says what would change the advice.
+- Results list the warning signs that should prompt a vet visit, a re-check window for home care, and related care guides. Questions show progress and can be stepped back.
+- Care guides grouped by topic with numbered steps, including vaccinations, dental care, weight, senior check-ups and puppy/kitten essentials, plus downloadable calendar (.ics) reminders.
 - Results with recorded answers, explanations of existing urgency rules, sources and preserved report context.
 - Printable/PDF and downloadable HTML summaries. Saved checks retain the guidance recorded at the time instead of recalculating it from current content.
 - Password confirmation for account export, deletion and session controls.
 - PostgreSQL/Alembic migrations, shared Redis rate limits, encrypted mail outbox and retention/readiness monitoring.
 - Responsive phone layouts, locally hosted fonts and a PWA shell. Symptom checks require an online API; private API responses are not cached for offline use.
 
-Scheduled care reminders and editing previously submitted answers are not implemented.
+Server-sent reminders are not implemented; care reminders are calendar files the user adds to their own calendar.
 
 ## Phone layout and app updates
 

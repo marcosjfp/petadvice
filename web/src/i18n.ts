@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import type { SymptomGroup } from './symptoms'
 
 export type Language = 'en' | 'pt' | 'es'
 export const languages: { code: Language; label: string }[] = [
@@ -88,6 +89,7 @@ const en = {
     submitLogin: 'Log in', submitForgot: 'Send reset link', submitCreate: 'Create account', createAccount: 'Create an account', backToLogin: 'Back to log in', forgot: 'Forgot your password?',
   },
   triage: {
+    symptomGroups: { urgent: 'Urgent — act now', digestion: 'Eating and digestion', breathing_eyes_ears: 'Breathing, eyes and ears', skin_behaviour: 'Skin and behaviour', body: 'Movement, thirst and other' } as Record<SymptomGroup, string>,  // keys must match SymptomGroup in symptoms.ts
     createAccountCta: 'Create an account for future pet profiles', startAnother: 'Start another check', complete: 'Your questions are complete.',
     loadingGuidance: 'Loading guidance…', guidanceNotLoaded: 'Guidance could not be loaded yet.', retryGuidance: 'Try loading guidance again',
     checkFor: (name: string) => `Check for ${name}`, yourSpecies: (species: string) => `your ${species}`, adaptive: 'Adaptive questions', savingAnswer: 'Saving your answer…', restart: 'Restart this check',
@@ -260,6 +262,7 @@ const pt: Messages = {
     submitLogin: 'Iniciar sessão', submitForgot: 'Enviar ligação de reposição', submitCreate: 'Criar conta', createAccount: 'Criar uma conta', backToLogin: 'Voltar ao início de sessão', forgot: 'Esqueceu-se da palavra-passe?',
   },
   triage: {
+    symptomGroups: { urgent: 'Urgente — aja já', digestion: 'Alimentação e digestão', breathing_eyes_ears: 'Respiração, olhos e ouvidos', skin_behaviour: 'Pele e comportamento', body: 'Movimento, sede e outros' },
     createAccountCta: 'Criar uma conta para futuros perfis de animais', startAnother: 'Fazer outra verificação', complete: 'As perguntas estão concluídas.',
     loadingGuidance: 'A carregar orientações…', guidanceNotLoaded: 'Ainda não foi possível carregar as orientações.', retryGuidance: 'Tentar carregar as orientações novamente',
     checkFor: (name) => `Verificação para ${name}`, yourSpecies: (species) => `o seu ${species}`, adaptive: 'Perguntas adaptativas', savingAnswer: 'A guardar a sua resposta…', restart: 'Recomeçar esta verificação',
@@ -458,6 +461,7 @@ const es: Messages = {
     submitLogin: 'Iniciar sesión', submitForgot: 'Enviar enlace', submitCreate: 'Crear cuenta', createAccount: 'Crear una cuenta', backToLogin: 'Volver a iniciar sesión', forgot: '¿Has olvidado tu contraseña?',
   },
   triage: {
+    symptomGroups: { urgent: 'Urgente — actúa ya', digestion: 'Alimentación y digestión', breathing_eyes_ears: 'Respiración, ojos y oídos', skin_behaviour: 'Piel y comportamiento', body: 'Movimiento, sed y otros' },
     createAccountCta: 'Crear una cuenta para futuros perfiles de mascotas', startAnother: 'Hacer otra revisión', complete: 'Has terminado las preguntas.',
     loadingGuidance: 'Cargando orientación…', guidanceNotLoaded: 'Todavía no se ha podido cargar la orientación.', retryGuidance: 'Volver a cargar la orientación',
     checkFor: (name) => `Revisión para ${name}`, yourSpecies: (species) => `tu ${species}`, adaptive: 'Preguntas adaptativas', savingAnswer: 'Guardando tu respuesta…', restart: 'Reiniciar esta revisión',

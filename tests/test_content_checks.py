@@ -30,10 +30,14 @@ def load_content():
 
 
 def offered_symptoms() -> dict[str, str | None]:
-    """Parse `{ value: 'tag', only: 'dog' }` entries from the frontend symptom list."""
-    entries = re.findall(r"\{\s*value:\s*'([^']+)'(?:,\s*only:\s*'(dog|cat)')?\s*\}", SYMPTOMS_TS.read_text())
-    assert entries, "could not parse web/src/symptoms.ts"
-    return {tag: only or None for tag, only in entries}
+    """Parse `{ value: 'tag', group: '…', only: 'dog' }` entries (fields in any order) from the frontend symptom list."""
+    objects = re.findall(r"\{[^{}]*\bvalue:\s*'[^']+'[^{}]*\}", SYMPTOMS_TS.read_text())
+    assert objects, "could not parse web/src/symptoms.ts"
+    entries = {}
+    for text in objects:
+        only = re.search(r"\bonly:\s*'(dog|cat)'", text)
+        entries[re.search(r"\bvalue:\s*'([^']+)'", text).group(1)] = only.group(1) if only else None
+    return entries
 
 
 def guest_pet(db, species):
