@@ -213,3 +213,32 @@ def test_schedule_plan_has_no_external_effects_and_apply_separates_sites(monkeyp
     production_ids = [call.kwargs['headers']['Upstash-Schedule-Id'] for call in sender.call_args_list[:2]]
     assert not set(preview_ids) & set(production_ids)
     assert 'private-test-bypass' not in capsys.readouterr().out
+
+
+def test_unhashed_frontend_files_change_validators_when_content_changes(client, monkeypatch, tmp_path):
+    """Vercel gives every built file one timestamp; same-size releases must still look different."""
+    import os
+    import server
+    monkeypatch.setattr(server, 'PUBLIC', tmp_path)
+    (tmp_path / 'assets').mkdir()
+    (tmp_path / 'index.html').write_text('<html>A</html>')
+    (tmp_path / 'assets' / 'index-abc123.js').write_text('console.log(1)')
+    fixed_time = 1540000000
+
+    def release(sw_body):
+        (tmp_path / 'sw.js').write_text(sw_body)
+        for path in tmp_path.rglob('*'):
+            os.utime(path, (fixed_time, fixed_time))
+
+    with TestClient(server.app) as browser:
+        release('precache("index-AAAAAAAA.js")')
+        first = browser.get('/sw.js')
+        release('precache("index-BBBBBBBB.js")')  # same size, same timestamp, new content
+        second = browser.get('/sw.js')
+        assert first.headers['etag'] != second.headers['etag']
+        assert 'last-modified' not in second.headers
+        assert second.headers['cache-control'] == 'no-store'
+        assert second.headers['content-type'].startswith('text/javascript')
+        assert browser.get('/').headers['cache-control'] == 'no-store'
+        assert browser.get('/learn', headers={'Accept': 'text/html'}).headers['cache-control'] == 'no-store'
+        assert 'last-modified' in browser.get('/assets/index-abc123.js').headers  # immutable hashed assets keep FileResponse

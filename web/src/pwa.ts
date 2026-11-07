@@ -17,7 +17,7 @@ export function registerServiceWorker() {
     if (!interacted) { reloading = true; window.location.reload(); return }
     window.dispatchEvent(new Event(UPDATE_READY_EVENT))
   })
-  navigator.serviceWorker.register('/sw.js', { scope: '/' }).then((registration) => {
+  navigator.serviceWorker.register('/sw.js', { scope: '/', updateViaCache: 'none' }).then((registration) => {
     const check = () => { registration.update().catch(() => { /* Offline; try again later. */ }) }
     window.setInterval(check, 30 * 60 * 1000)
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check() })
